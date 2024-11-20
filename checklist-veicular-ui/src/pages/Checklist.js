@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+
+import React, { useState, useRef } from 'react';
 import { Container, Box, Typography, TextField, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Paper, Divider, Snackbar } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+
 
 function Checklist() {
   const [mileage, setMileage] = useState('');
@@ -11,21 +13,46 @@ function Checklist() {
   const [cleanliness, setCleanliness] = useState('');
   const [engineOil, setEngineOil] = useState('');
   const [brakes, setBrakes] = useState('');
+  const [tireConditionDesc, setTireConditionDesc] = useState('');
+  const [lightsDesc, setLightsDesc] = useState('');
+  const [cleanlinessDesc, setCleanlinessDesc] = useState('');
+  const [engineOilDesc, setEngineOilDesc] = useState('');
+  const [brakesDesc, setBrakesDesc] = useState('');
   const [errors, setErrors] = useState({});
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [showCheckmark, setShowCheckmark] = useState(false);
+  const mileageRef = useRef(null);
+  const tireConditionRef = useRef(null);
+  const lightsRef = useRef(null);
+  const cleanlinessRef = useRef(null);
+  const engineOilRef = useRef(null);
+  const brakesRef = useRef(null);
 
   const navigate = useNavigate(); // Hook para redirecionamento
 
   // Função de validação dos campos obrigatórios
   const validateFields = () => {
     const newErrors = {};
-    if (!mileage) newErrors.mileage = "Quilometragem é obrigatória";
-    if (!tireCondition) newErrors.tireCondition = "Condição dos pneus é obrigatória";
-    if (!lights) newErrors.lights = "Faróis e lanternas são obrigatórios";
-    if (!cleanliness) newErrors.cleanliness = "Higienização é obrigatória";
-    if (!engineOil) newErrors.engineOil = "Óleo do motor é obrigatório";
-    if (!brakes) newErrors.brakes = "Status dos freios é obrigatório";
+    if (!mileage) {
+      newErrors.mileage = "Quilometragem é obrigatória";
+      mileageRef.current.scrollIntoView({ behavior: 'smooth' });
+    } else if (!tireCondition) { // Use 'else if' para parar no primeiro erro encontrado
+      newErrors.tireCondition = "Condição dos pneus é obrigatória";
+      tireConditionRef.current.scrollIntoView({ behavior: 'smooth' });
+    } else if (!lights) {
+      newErrors.lights = "Faróis e lanternas são obrigatórios";
+      lightsRef.current.scrollIntoView({ behavior: 'smooth' });
+    } else if (!cleanliness) {
+      newErrors.cleanliness = "Higienização é obrigatória";
+      cleanlinessRef.current.scrollIntoView({ behavior: 'smooth' });
+    } else if (!engineOil) {
+      newErrors.engineOil = "Óleo do motor é obrigatório";
+      engineOilRef.current.scrollIntoView({ behavior: 'smooth' });
+    } else if (!brakes) {
+      newErrors.brakes = "Status dos freios é obrigatório";
+      brakesRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -49,6 +76,11 @@ function Checklist() {
             cleanliness,
             engineOil,
             brakes,
+            tireConditionDesc,
+            lightsDesc,
+            cleanlinessDesc,
+            engineOilDesc,
+            brakesDesc,
           }
         });
       }, 3000);
@@ -63,6 +95,11 @@ function Checklist() {
     setCleanliness('');
     setEngineOil('');
     setBrakes('');
+    setTireConditionDesc('');
+    setLightsDesc('');
+    setCleanlinessDesc('');
+    setEngineOilDesc('');
+    setBrakesDesc('');
     setErrors({});
   };
 
@@ -97,9 +134,9 @@ function Checklist() {
       />
 
       <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 3 }}>
-        
+
         {/* Quilometragem */}
-        <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
+        <Paper elevation={3} sx={{ p: 3, mb: 2 }} ref={mileageRef}>
           <Divider textAlign="left">
             <Typography variant="h6" color="primary">
               Quilometragem
@@ -119,7 +156,7 @@ function Checklist() {
         </Paper>
 
         {/* Condição dos Pneus */}
-        <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
+        <Paper elevation={3} sx={{ p: 3, mb: 2 }} ref={tireConditionRef}>
           <Divider textAlign="left">
             <Typography variant="h6" color="primary">
               Condição dos Pneus
@@ -137,11 +174,22 @@ function Checklist() {
               <FormControlLabel value="Ruim" control={<Radio />} label="Ruim" />
             </RadioGroup>
             {errors.tireCondition && <Typography color="error">{errors.tireCondition}</Typography>}
+            {tireCondition === 'Ruim' && (
+              <TextField
+                label="Descrição"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={tireConditionDesc}
+                onChange={(e) => setTireConditionDesc(e.target.value)}
+              />
+            )}
           </FormControl>
         </Paper>
 
+
         {/* Faróis e Lanternas */}
-        <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
+        <Paper elevation={3} sx={{ p: 3, mb: 2 }} ref={lightsRef}>
           <Divider textAlign="left">
             <Typography variant="h6" color="primary">
               Faróis e Lanternas
@@ -158,11 +206,21 @@ function Checklist() {
               <FormControlLabel value="Com Defeito" control={<Radio />} label="Com Defeito" />
             </RadioGroup>
             {errors.lights && <Typography color="error">{errors.lights}</Typography>}
+            {lights === 'Com Defeito' && (
+              <TextField
+                label="Descrição"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={lightsDesc}
+                onChange={(e) => setLightsDesc(e.target.value)}
+              />
+            )}
           </FormControl>
         </Paper>
 
         {/* Higienização */}
-        <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
+        <Paper elevation={3} sx={{ p: 3, mb: 2 }} ref={cleanlinessRef}>
           <Divider textAlign="left">
             <Typography variant="h6" color="primary">
               Higienização
@@ -179,11 +237,21 @@ function Checklist() {
               <FormControlLabel value="Sujo" control={<Radio />} label="Sujo" />
             </RadioGroup>
             {errors.cleanliness && <Typography color="error">{errors.cleanliness}</Typography>}
+            {lights === 'Sujo' && (
+              <TextField
+                label="Descrição"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={lightsDesc}
+                onChange={(e) => setLightsDesc(e.target.value)}
+              />
+            )}
           </FormControl>
         </Paper>
 
         {/* Óleo do Motor */}
-        <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
+        <Paper elevation={3} sx={{ p: 3, mb: 2 }} ref={engineOilRef}>
           <Divider textAlign="left">
             <Typography variant="h6" color="primary">
               Óleo do Motor
@@ -204,7 +272,7 @@ function Checklist() {
         </Paper>
 
         {/* Freios */}
-        <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
+        <Paper elevation={3} sx={{ p: 3, mb: 2 }} ref={brakesRef}>
           <Divider textAlign="left">
             <Typography variant="h6" color="primary">
               Freios
