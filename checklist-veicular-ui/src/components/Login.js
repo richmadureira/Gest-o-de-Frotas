@@ -1,7 +1,15 @@
-// src/components/Login.js
 import React, { useState } from 'react';
-import { TextField, Button, CircularProgress, Box, Typography } from '@mui/material';
+import {
+  TextField,
+  Button,
+  CircularProgress,
+  Box,
+  Typography,
+  Paper,
+  Avatar,
+} from '@mui/material';
 import { Navigate } from 'react-router-dom';
+import logo from "../image/logo.png";
 
 function Login({ onLogin }) {
   const [username, setUsername] = useState('');
@@ -31,48 +39,87 @@ function Login({ onLogin }) {
 
   return (
     <Box
-      maxWidth="400px"
-      margin="auto"
-      padding="2rem"
       display="flex"
-      flexDirection="column"
+      justifyContent="center"
       alignItems="center"
-      boxShadow="0px 0px 10px rgba(0, 0, 0, 0.1)"
-      borderRadius="8px"
+      minHeight="100vh"
+      sx={{ backgroundColor: '#f4f6f8' }}
     >
-      <Typography variant="h4" component="h2" gutterBottom>
-        Login
-      </Typography>
-      {error && <Typography color="error">{error}</Typography>}
-      <form onSubmit={handleLogin} style={{ width: '100%', marginTop: '1rem' }}>
-        <TextField
-          label="Usuário"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-        <TextField
-          label="Senha"
-          type="password"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-        <Button
-          type="submit"
-          variant="contained"
-          color="primary"
-          fullWidth
-          style={{ marginTop: '1rem' }}
-          disabled={loading}
-        >
-          {loading ? <CircularProgress size={24} color="inherit" /> : 'Entrar'}
-        </Button>
-      </form>
+      <Paper
+        elevation={3}
+        sx={{
+          padding: '2rem',
+          maxWidth: '400px',
+          width: '100%',
+          textAlign: 'center',
+          borderRadius: '12px',
+        }}
+      >
+        {/* Logo centralizada */}
+        <Box display="flex" justifyContent="center" alignItems="center" mb={2}>
+          <Avatar
+            src={logo}
+            alt="Logo"
+            sx={{
+              width: 80,
+              height: 80,
+            }}
+          />
+        </Box>
+
+        <Typography variant="h4" component="h2" gutterBottom>
+          Bem-vindo
+        </Typography>
+        <Typography variant="body1" color="textSecondary" gutterBottom>
+          Faça login para acessar sua conta
+        </Typography>
+
+        {/* Mensagem de Erro */}
+        {error && (
+          <Typography color="error" sx={{ marginTop: '1rem' }}>
+            {error}
+          </Typography>
+        )}
+
+        {/* Formulário de Login */}
+        <form onSubmit={handleLogin} style={{ marginTop: '1.5rem' }}>
+          <TextField
+            label="Usuário"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <TextField
+            label="Senha"
+            type="password"
+            variant="outlined"
+            fullWidth
+            margin="normal"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            sx={{
+              marginTop: '1rem',
+              padding: '0.75rem',
+              fontWeight: 'bold',
+              backgroundColor: '#1976d2',
+              '&:hover': {
+                backgroundColor: '#115293',
+              },
+            }}
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Entrar'}
+          </Button>
+        </form>
+      </Paper>
     </Box>
   );
 }
