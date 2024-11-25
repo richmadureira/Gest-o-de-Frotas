@@ -1,10 +1,10 @@
-
 import React, { useState, useRef } from 'react';
-import { Container, Box, Typography, TextField, Button, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, Paper, Divider, Snackbar } from '@mui/material';
+import { Container, Box, Typography, TextField, Button, Snackbar, Paper, Divider, IconButton, AppBar, Toolbar } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import HomeIcon from '@mui/icons-material/Home';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-
+import FormSection from './components/FormSection'; // Importe o componente reutilizável
 
 function Checklist() {
   const [mileage, setMileage] = useState('');
@@ -18,6 +18,7 @@ function Checklist() {
   const [cleanlinessDesc, setCleanlinessDesc] = useState('');
   const [engineOilDesc, setEngineOilDesc] = useState('');
   const [brakesDesc, setBrakesDesc] = useState('');
+  const [brakesImage, setBrakesImage] = useState(null);
   const [errors, setErrors] = useState({});
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [showCheckmark, setShowCheckmark] = useState(false);
@@ -35,24 +36,41 @@ function Checklist() {
     const newErrors = {};
     if (!mileage) {
       newErrors.mileage = "Quilometragem é obrigatória";
-      mileageRef.current.scrollIntoView({ behavior: 'smooth' });
-    } else if (!tireCondition) { // Use 'else if' para parar no primeiro erro encontrado
+      if (mileageRef.current) {
+        mileageRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else if (mileage < 0) {
+      newErrors.mileage = "Quilometragem não pode ser negativa";
+      if (mileageRef.current) {
+        mileageRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else if (!tireCondition) {
       newErrors.tireCondition = "Condição dos pneus é obrigatória";
-      tireConditionRef.current.scrollIntoView({ behavior: 'smooth' });
+      if (tireConditionRef.current) {
+        tireConditionRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
     } else if (!lights) {
       newErrors.lights = "Faróis e lanternas são obrigatórios";
-      lightsRef.current.scrollIntoView({ behavior: 'smooth' });
+      if (lightsRef.current) {
+        lightsRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
     } else if (!cleanliness) {
       newErrors.cleanliness = "Higienização é obrigatória";
-      cleanlinessRef.current.scrollIntoView({ behavior: 'smooth' });
+      if (cleanlinessRef.current) {
+        cleanlinessRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
     } else if (!engineOil) {
       newErrors.engineOil = "Óleo do motor é obrigatório";
-      engineOilRef.current.scrollIntoView({ behavior: 'smooth' });
+      if (engineOilRef.current) {
+        engineOilRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
     } else if (!brakes) {
       newErrors.brakes = "Status dos freios é obrigatório";
-      brakesRef.current.scrollIntoView({ behavior: 'smooth' });
+      if (brakesRef.current) {
+        brakesRef.current.scrollIntoView({ behavior: 'smooth' });
+      }
     }
-  
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -81,6 +99,7 @@ function Checklist() {
             cleanlinessDesc,
             engineOilDesc,
             brakesDesc,
+            brakesImage,
           }
         });
       }, 3000);
@@ -100,18 +119,30 @@ function Checklist() {
     setCleanlinessDesc('');
     setEngineOilDesc('');
     setBrakesDesc('');
+    setBrakesImage(null);
     setErrors({});
   };
 
-  return (
-    <Container maxWidth="sm" style={{ marginTop: '2rem' }}>
-      <Typography variant="h4" component="h1" gutterBottom align="center">
-        Checklist Diário do Veículo
-      </Typography>
-      <Typography variant="body1" color="textSecondary" align="center" gutterBottom>
-        Preencha o checklist para garantir que o veículo está em condições seguras de uso.
-      </Typography>
+  // Função para redirecionar para o menu principal
+  const handleBackToMenu = () => {
+    navigate('/');
+  };
 
+  return (
+    <Container maxWidth="md" sx={{ mt: 4 }}>
+
+      {/* Barra Superior */}
+      <AppBar position="static" color="primary">
+        <Toolbar>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>
+            Checklist Diário do Veículo
+          </Typography>
+          <IconButton color="inherit" onClick={handleBackToMenu}>
+            <HomeIcon />
+          </IconButton>
+        </Toolbar>
+      </AppBar>
+      
       {/* Ícone de Checkmark com Animação */}
       {showCheckmark && (
         <motion.div
@@ -149,7 +180,12 @@ function Checklist() {
             margin="normal"
             type="number"
             value={mileage}
-            onChange={(e) => setMileage(e.target.value)}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value >= 0) {
+                setMileage(value);
+              }
+            }}
             error={!!errors.mileage}
             helperText={errors.mileage}
           />
@@ -157,139 +193,101 @@ function Checklist() {
 
         {/* Condição dos Pneus */}
         <Paper elevation={3} sx={{ p: 3, mb: 2 }} ref={tireConditionRef}>
-          <Divider textAlign="left">
-            <Typography variant="h6" color="primary">
-              Condição dos Pneus
-            </Typography>
-          </Divider>
-          <FormControl component="fieldset" fullWidth margin="normal" error={!!errors.tireCondition}>
-            <FormLabel component="legend">Condição dos Pneus</FormLabel>
-            <RadioGroup
-              value={tireCondition}
-              onChange={(e) => setTireCondition(e.target.value)}
-              row
-            >
-              <FormControlLabel value="Bom" control={<Radio />} label="Bom" />
-              <FormControlLabel value="Regular" control={<Radio />} label="Regular" />
-              <FormControlLabel value="Ruim" control={<Radio />} label="Ruim" />
-            </RadioGroup>
-            {errors.tireCondition && <Typography color="error">{errors.tireCondition}</Typography>}
-            {tireCondition === 'Ruim' && (
-              <TextField
-                label="Descrição"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                value={tireConditionDesc}
-                onChange={(e) => setTireConditionDesc(e.target.value)}
-              />
-            )}
-          </FormControl>
+          <FormSection
+            title="Condição dos Pneus"
+            value={tireCondition}
+            onChange={(e) => setTireCondition(e.target.value)}
+            error={errors.tireCondition}
+            options={[
+              { value: 'Bom', label: 'Bom' },
+              { value: 'Regular', label: 'Regular' },
+              { value: 'Ruim', label: 'Ruim' },
+            ]}
+            description={{ condition: 'Ruim' }}
+            descriptionValue={tireConditionDesc}
+            onDescriptionChange={(e) => setTireConditionDesc(e.target.value)}
+          />
         </Paper>
-
 
         {/* Faróis e Lanternas */}
         <Paper elevation={3} sx={{ p: 3, mb: 2 }} ref={lightsRef}>
-          <Divider textAlign="left">
-            <Typography variant="h6" color="primary">
-              Faróis e Lanternas
-            </Typography>
-          </Divider>
-          <FormControl component="fieldset" fullWidth margin="normal" error={!!errors.lights}>
-            <FormLabel component="legend">Faróis e Lanternas</FormLabel>
-            <RadioGroup
-              value={lights}
-              onChange={(e) => setLights(e.target.value)}
-              row
-            >
-              <FormControlLabel value="Funcionando" control={<Radio />} label="Funcionando" />
-              <FormControlLabel value="Com Defeito" control={<Radio />} label="Com Defeito" />
-            </RadioGroup>
-            {errors.lights && <Typography color="error">{errors.lights}</Typography>}
-            {lights === 'Com Defeito' && (
-              <TextField
-                label="Descrição"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                value={lightsDesc}
-                onChange={(e) => setLightsDesc(e.target.value)}
-              />
-            )}
-          </FormControl>
+          <FormSection
+            title="Faróis e Lanternas"
+            value={lights}
+            onChange={(e) => setLights(e.target.value)}
+            error={errors.lights}
+            options={[
+              { value: 'Funcionando', label: 'Funcionando' },
+              { value: 'Com Defeito', label: 'Com Defeito' },
+            ]}
+            description={{ condition: 'Com Defeito' }}
+            descriptionValue={lightsDesc}
+            onDescriptionChange={(e) => setLightsDesc(e.target.value)}
+          />
         </Paper>
 
         {/* Higienização */}
         <Paper elevation={3} sx={{ p: 3, mb: 2 }} ref={cleanlinessRef}>
-          <Divider textAlign="left">
-            <Typography variant="h6" color="primary">
-              Higienização
-            </Typography>
-          </Divider>
-          <FormControl component="fieldset" fullWidth margin="normal" error={!!errors.cleanliness}>
-            <FormLabel component="legend">Higienização</FormLabel>
-            <RadioGroup
-              value={cleanliness}
-              onChange={(e) => setCleanliness(e.target.value)}
-              row
-            >
-              <FormControlLabel value="Limpo" control={<Radio />} label="Limpo" />
-              <FormControlLabel value="Sujo" control={<Radio />} label="Sujo" />
-            </RadioGroup>
-            {errors.cleanliness && <Typography color="error">{errors.cleanliness}</Typography>}
-            {lights === 'Sujo' && (
-              <TextField
-                label="Descrição"
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                value={lightsDesc}
-                onChange={(e) => setLightsDesc(e.target.value)}
-              />
-            )}
-          </FormControl>
+          <FormSection
+            title="Higienização"
+            value={cleanliness}
+            onChange={(e) => setCleanliness(e.target.value)}
+            error={errors.cleanliness}
+            options={[
+              { value: 'Limpo', label: 'Limpo' },
+              { value: 'Sujo', label: 'Sujo' },
+            ]}
+            description={{ condition: 'Sujo' }}
+            descriptionValue={cleanlinessDesc}
+            onDescriptionChange={(e) => setCleanlinessDesc(e.target.value)}
+          />
         </Paper>
 
         {/* Óleo do Motor */}
         <Paper elevation={3} sx={{ p: 3, mb: 2 }} ref={engineOilRef}>
-          <Divider textAlign="left">
-            <Typography variant="h6" color="primary">
-              Óleo do Motor
-            </Typography>
-          </Divider>
-          <FormControl component="fieldset" fullWidth margin="normal" error={!!errors.engineOil}>
-            <FormLabel component="legend">Óleo do Motor</FormLabel>
-            <RadioGroup
-              value={engineOil}
-              onChange={(e) => setEngineOil(e.target.value)}
-              row
-            >
-              <FormControlLabel value="Nível Adequado" control={<Radio />} label="Nível Adequado" />
-              <FormControlLabel value="Necessita Completar" control={<Radio />} label="Necessita Completar" />
-            </RadioGroup>
-            {errors.engineOil && <Typography color="error">{errors.engineOil}</Typography>}
-          </FormControl>
+          <FormSection
+            title="Óleo do Motor"
+            value={engineOil}
+            onChange={(e) => setEngineOil(e.target.value)}
+            error={errors.engineOil}
+            options={[
+              { value: 'Nível Adequado', label: 'Nível Adequado' },
+              { value: 'Necessita Completar', label: 'Necessita Completar' },
+            ]}
+          />
         </Paper>
 
         {/* Freios */}
         <Paper elevation={3} sx={{ p: 3, mb: 2 }} ref={brakesRef}>
-          <Divider textAlign="left">
-            <Typography variant="h6" color="primary">
-              Freios
-            </Typography>
-          </Divider>
-          <FormControl component="fieldset" fullWidth margin="normal" error={!!errors.brakes}>
-            <FormLabel component="legend">Freios</FormLabel>
-            <RadioGroup
-              value={brakes}
-              onChange={(e) => setBrakes(e.target.value)}
-              row
-            >
-              <FormControlLabel value="Funcionando" control={<Radio />} label="Funcionando" />
-              <FormControlLabel value="Com Defeito" control={<Radio />} label="Com Defeito" />
-            </RadioGroup>
-            {errors.brakes && <Typography color="error">{errors.brakes}</Typography>}
-          </FormControl>
+          <FormSection
+            title="Freios"
+            value={brakes}
+            onChange={(e) => setBrakes(e.target.value)}
+            error={errors.brakes}
+            options={[
+              { value: 'Funcionando', label: 'Funcionando' },
+              { value: 'Com Defeito', label: 'Com Defeito' },
+            ]}
+          />
+        </Paper>
+
+        {/* Avarias */}
+        <Paper elevation={3} sx={{ p: 3, mb: 2 }} ref={brakesRef}>
+          <FormSection
+            title="Avarias"
+            value={brakes}
+            onChange={(e) => setBrakes(e.target.value)}
+            error={errors.brakes}
+            options={[
+              { value: 'Sim', label: 'Sim' },
+              { value: 'Não', label: 'Não' },
+            ]}
+            description={{ condition: 'Sim' }}
+            descriptionValue={brakesDesc}
+            onDescriptionChange={(e) => setBrakesDesc(e.target.value)}
+            image={brakesImage}
+            onImageChange={(e) => setBrakesImage(e.target.files[0])}
+          />
         </Paper>
 
         {/* Botões de Ação */}

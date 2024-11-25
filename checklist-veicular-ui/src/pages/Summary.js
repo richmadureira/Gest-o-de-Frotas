@@ -1,6 +1,7 @@
 import React from 'react';
-import { Container, Box, Typography, Button } from '@mui/material';
+import { Container, Box, Typography, Button, IconButton } from '@mui/material';
 import { useNavigate, useLocation } from 'react-router-dom';
+import HomeIcon from '@mui/icons-material/Home';
 
 function Summary() {
   const navigate = useNavigate();
@@ -10,8 +11,18 @@ function Summary() {
     navigate('/checklist'); // Redireciona para o formulário para enviar outra resposta
   };
 
+  // Função para redirecionar para o menu principal
+  const handleBackToMenu = () => {
+    navigate('/');
+  };
+
   return (
     <Container maxWidth="sm" style={{ marginTop: '2rem', textAlign: 'center' }}>
+      <Box display="flex" justifyContent="flex-end">
+        <IconButton color="primary" onClick={handleBackToMenu}>
+          <HomeIcon />
+        </IconButton>
+      </Box>
       <Box sx={{ p: 3, border: '1px solid #e0e0e0', borderRadius: '8px', boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)' }}>
         <Typography variant="h5" gutterBottom>
           Checklist Diário do Veículo
