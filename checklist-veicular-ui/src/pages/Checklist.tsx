@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Container, Box, Typography, TextField, Button, Snackbar, Paper, Divider, IconButton, AppBar, Toolbar } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
-import HomeIcon from '@mui/icons-material/Home';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import FormSection from './components/FormSection'; // Importe o componente reutilizável
@@ -146,9 +145,6 @@ function Checklist() {
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
             Checklist Diário do Veículo
           </Typography>
-          <IconButton color="inherit" onClick={handleBackToMenu}>
-            <HomeIcon />
-          </IconButton>
         </Toolbar>
       </AppBar>
       

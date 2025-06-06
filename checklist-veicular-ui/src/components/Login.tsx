@@ -10,14 +10,16 @@ import {
 } from '@mui/material';
 import { Navigate } from 'react-router-dom';
 import logo from "../image/logo.png";
+import { UserRole } from './AuthContext';
 
 interface LoginProps {
-  onLogin: (token: string) => void;
+  onLogin: (token: string, role: UserRole) => void;
 }
 
 function Login({ onLogin }: LoginProps) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState<UserRole>('admin');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [redirectToDashboard, setRedirectToDashboard] = useState(false);
@@ -26,15 +28,15 @@ function Login({ onLogin }: LoginProps) {
     e.preventDefault();
     setLoading(true);
     setTimeout(() => {
-      if (username === 'admin' && password === '1234') {
+      if (username && password) {
         setError('');
-        onLogin('fake-token');
+        onLogin('fake-token', role);
         setRedirectToDashboard(true);
       } else {
-        setError('Usuário ou senha incorretos');
+        setError('Preencha usuário e senha');
       }
       setLoading(false);
-    }, 1000);
+    }, 500);
   };
 
   if (redirectToDashboard) {
@@ -104,6 +106,11 @@ function Login({ onLogin }: LoginProps) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
+          <select value={role || ''} onChange={e => setRole(e.target.value as UserRole)} style={{ margin: '10px 0', width: '100%' }}>
+            <option value="admin">Administrador</option>
+            <option value="gestor">Gestor de Frota</option>
+            <option value="condutor">Condutor</option>
+          </select>
           <Button
             type="submit"
             variant="contained"
