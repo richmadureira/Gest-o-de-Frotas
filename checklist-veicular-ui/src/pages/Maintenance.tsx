@@ -23,8 +23,6 @@ import {
   InputLabel,
   IconButton,
   Tooltip,
-  AppBar,
-  Toolbar,
 } from '@mui/material';
 import { Add, Edit, Delete } from '@mui/icons-material';
 import HomeIcon from '@mui/icons-material/Home';
@@ -37,6 +35,9 @@ interface MaintenanceRequest {
   vehicle: string;
   description: string;
   status: string;
+  date?: string;
+  maintenanceType?: string;
+  suggestedDate?: string;
 }
 
 type MaintenanceFormData = Omit<MaintenanceRequest, 'id'>;
@@ -64,6 +65,7 @@ function Maintenance() {
   const [errors, setErrors] = useState<MaintenanceErrors>({});
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [openDetails, setOpenDetails] = useState(false);
 
   const statuses = ['Pendente', 'Em andamento', 'Concluído']; // Status possíveis
 
@@ -124,133 +126,174 @@ function Maintenance() {
     setFormData((prev) => ({ ...prev, [name as keyof MaintenanceFormData]: value }));
   };
 
+  const handleOpenDetails = (request: MaintenanceRequest) => {
+    setEditingRequest(request);
+    setOpenDetails(true);
+  };
+
+  const handleCloseDetails = () => {
+    setOpenDetails(false);
+    setEditingRequest(null);
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Implemente o upload de arquivo
+  };
+
+  const handleCancelRequest = (id: number) => {
+    // Implemente a lógica para cancelar uma solicitação
+  };
+
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
-      {/* Barra Superior */}
-      <AppBar position="static" color="primary">
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Solicitações de Manutenção
-          </Typography>
-          <Tooltip title="Voltar para Home">
-            <IconButton color="inherit" onClick={() => navigate('/')}>
-              <HomeIcon />
-            </IconButton>
-          </Tooltip>
-        </Toolbar>
-      </AppBar>
-
-      {/* Título */}
-      <Box sx={{ mt: 4 }}>
-        {/* Botão de Adicionar */}
-        <Box display="flex" justifyContent="flex-end" mb={2}>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<Add />}
-            onClick={() => handleOpenDialog()}
-          >
-            Nova Solicitação
-          </Button>
-        </Box>
-
-        {/* Tabela de Solicitações de Manutenção */}
-        <TableContainer component={Paper}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Veículo</TableCell>
-                <TableCell>Descrição</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell align="right">Ações</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {maintenanceRequests.map((request) => (
-                <TableRow key={request.id}>
-                  <TableCell>{request.vehicle}</TableCell>
-                  <TableCell>{request.description}</TableCell>
-                  <TableCell>{request.status}</TableCell>
-                  <TableCell align="right">
-                    <IconButton
-                      color="primary"
-                      onClick={() => handleOpenDialog(request)}
-                    >
-                      <Edit />
-                    </IconButton>
-                    <IconButton
-                      color="secondary"
-                      onClick={() => handleDeleteRequest(request.id)}
-                    >
-                      <Delete />
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+      {/* Barra de Ações */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={3} marginTop={4}>
+        <Typography variant="h5" fontWeight={700}>Solicitações de Manutenção</Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<Add />}
+          onClick={() => handleOpenDialog()}
+          sx={{ alignSelf: 'flex-end' }}
+        >
+          Nova Solicitação
+        </Button>
       </Box>
 
-      {/* Dialog de Adicionar/Editar */}
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>
-          {editingRequest ? 'Editar Solicitação' : 'Nova Solicitação'}
-        </DialogTitle>
+      {/* Tabela de Solicitações de Manutenção */}
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>ID</TableCell>
+              <TableCell>Veículo</TableCell>
+              <TableCell>Data da Solicitação</TableCell>
+              <TableCell>Tipo</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell align="right">Ações</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {maintenanceRequests.map((request) => (
+              <TableRow key={request.id}>
+                <TableCell>{request.id}</TableCell>
+                <TableCell>{request.vehicle}</TableCell>
+                <TableCell>{request.date || '-'}</TableCell>
+                <TableCell>{request.maintenanceType || '-'}</TableCell>
+                <TableCell>{request.status}</TableCell>
+                <TableCell align="right">
+                  <Tooltip title="Visualizar Detalhes">
+                    <IconButton color="primary" onClick={() => handleOpenDetails(request)}>
+                      <i className="fas fa-eye" />
+                    </IconButton>
+                  </Tooltip>
+                  {request.status === 'Aguardando Aprovação' && (
+                    <Tooltip title="Editar">
+                      <IconButton color="primary" onClick={() => handleOpenDialog(request)}>
+                        <Edit />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                  {request.status === 'Aguardando Aprovação' && (
+                    <Tooltip title="Cancelar">
+                      <IconButton color="error" onClick={() => handleCancelRequest(request.id)}>
+                        <Delete />
+                      </IconButton>
+                    </Tooltip>
+                  )}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+
+      {/* Dialog de Adicionar/Editar Solicitação */}
+      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>{editingRequest ? 'Editar Solicitação' : 'Nova Solicitação'}</DialogTitle>
         <DialogContent>
-          <TextField
-            label="Veículo"
-            fullWidth
-            margin="normal"
-            name="vehicle"
-            value={formData.vehicle}
-            onChange={handleInputChange}
-            error={!!errors.vehicle}
-            helperText={errors.vehicle}
-          />
-          <TextField
-            label="Descrição"
-            fullWidth
-            margin="normal"
-            name="description"
-            value={formData.description}
-            onChange={handleInputChange}
-            error={!!errors.description}
-            helperText={errors.description}
-          />
-          <FormControl fullWidth margin="normal">
-            <InputLabel id="status-label">Status</InputLabel>
-            <Select
-              labelId="status-label"
-              name="status"
-              value={formData.status}
-              onChange={handleSelectChange}
-            >
-              {statuses.map((status) => (
-                <MenuItem key={status} value={status}>
-                  {status}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Box component="form" sx={{ mt: 1 }}>
+            <FormControl fullWidth margin="normal" required>
+              <InputLabel>Veículo</InputLabel>
+              <Select
+                value={formData.vehicle}
+                onChange={e => setFormData({ ...formData, vehicle: e.target.value })}
+                label="Veículo"
+              >
+                {/* Exemplo de veículos, troque por sua lista real */}
+                <MenuItem value="ABC-1234">ABC-1234</MenuItem>
+                <MenuItem value="DEF-5678">DEF-5678</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl fullWidth margin="normal" required>
+              <InputLabel>Tipo de Manutenção</InputLabel>
+              <Select
+                value={formData.maintenanceType || ''}
+                onChange={e => setFormData({ ...formData, maintenanceType: e.target.value })}
+                label="Tipo de Manutenção"
+              >
+                <MenuItem value="Preventiva">Preventiva</MenuItem>
+                <MenuItem value="Corretiva">Corretiva</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              label="Descrição do problema *"
+              value={formData.description}
+              onChange={e => setFormData({ ...formData, description: e.target.value })}
+              error={!!errors.description}
+              helperText={errors.description}
+              fullWidth
+              margin="normal"
+              required
+              multiline
+              minRows={3}
+            />
+            <TextField
+              label="Data sugerida para manutenção"
+              type="date"
+              value={formData.suggestedDate || ''}
+              onChange={e => setFormData({ ...formData, suggestedDate: e.target.value })}
+              fullWidth
+              margin="normal"
+              InputLabelProps={{ shrink: true }}
+            />
+            <Box mt={2} mb={1}>
+              <input
+                type="file"
+                accept="image/*,application/pdf"
+                onChange={handleFileUpload}
+                multiple
+              />
+            </Box>
+          </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="secondary">
-            Cancelar
-          </Button>
-          <Button onClick={handleSaveRequest} color="primary">
+          <Button onClick={handleCloseDialog} color="secondary">Cancelar</Button>
+          <Button onClick={handleSaveRequest} color="primary" variant="contained" disabled={!formData.vehicle || !formData.maintenanceType || !formData.description || Object.keys(errors).length > 0}>
             Salvar
           </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Modal de Detalhes da Solicitação */}
+      <Dialog open={openDetails} onClose={handleCloseDetails} maxWidth="sm" fullWidth>
+        <DialogTitle>Detalhes da Solicitação</DialogTitle>
+        <DialogContent>
+          {/* Exibir todos os campos e anexos aqui */}
+          {/* ... */}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseDetails} color="primary">Fechar</Button>
         </DialogActions>
       </Dialog>
 
       {/* Snackbar */}
       <Snackbar
         open={snackbarOpen}
-        autoHideDuration={3000}
+        autoHideDuration={4000}
         onClose={() => setSnackbarOpen(false)}
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
         message={snackbarMessage}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       />
     </Container>
   );

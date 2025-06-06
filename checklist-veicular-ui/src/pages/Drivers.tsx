@@ -25,7 +25,8 @@ import {
   Switch,
   FormControlLabel,
   AppBar,
-  Toolbar
+  Toolbar,
+  Alert
 } from '@mui/material';
 
 import { Add, Edit, Delete, Upload, Download } from '@mui/icons-material';
@@ -35,14 +36,18 @@ import Papa from 'papaparse'; // Biblioteca para processar CSV
 import { Autocomplete } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import InputMask from 'react-input-mask';
 
 // Tipos e interfaces para TypeScript
 interface Driver {
-  matricula: string;
+  id: number;
   name: string;
-  cnh: string;
-  assignedVehicle: string;
+  cpf: string;
+  email: string;
+  phone: string;
   status: boolean;
+  address?: string;
+  grantAccess?: boolean;
 }
 
 interface Vehicle {
@@ -51,7 +56,7 @@ interface Vehicle {
   model: string;
 }
 
-type DriverFormData = Omit<Driver, 'status'> & { status: boolean };
+type DriverFormData = Omit<Driver, 'id'>;
 type DriverErrors = Partial<Record<keyof DriverFormData, string>>;
 
 function DriverManagement() {
@@ -61,15 +66,18 @@ function DriverManagement() {
   const [openDialog, setOpenDialog] = useState(false);
   const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
   const [formData, setFormData] = useState<DriverFormData>({
-    matricula: '',
     name: '',
-    cnh: '',
-    assignedVehicle: '',
+    cpf: '',
+    email: '',
+    phone: '',
     status: true,
+    address: '',
+    grantAccess: true,
   });
   const [errors, setErrors] = useState<DriverErrors>({});
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarType, setSnackbarType] = useState<'success' | 'error'>('success');
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -77,18 +85,9 @@ function DriverManagement() {
 
   useEffect(() => {
     setDrivers([
-      { matricula: '001', name: 'João Silva', cnh: '1234567890', assignedVehicle: 'ABC-1234', status: true },
-      { matricula: '002', name: 'Maria Oliveira', cnh: '0987654321', assignedVehicle: 'DEF-5678', status: false },
-      { matricula: '003', name: 'Carlos Souza', cnh: '1122334455', assignedVehicle: 'GHI-9012', status: true },
-      { matricula: '004', name: 'Ana Costa', cnh: '6677889900', assignedVehicle: 'JKL-3456', status: true },
-      { matricula: '005', name: 'Fernando Lima', cnh: '9988776655', assignedVehicle: 'MNO-7890', status: false },
-      { matricula: '006', name: 'Beatriz Rocha', cnh: '2233445566', assignedVehicle: 'PQR-4567', status: true },
-      { matricula: '007', name: 'Rafael Alves', cnh: '4455667788', assignedVehicle: 'STU-8910', status: true },
-      { matricula: '008', name: 'Patrícia Mendes', cnh: '6677881122', assignedVehicle: 'VWX-2345', status: true },
-      { matricula: '009', name: 'Gustavo Nunes', cnh: '7788990011', assignedVehicle: 'YZA-6789', status: false },
-      { matricula: '010', name: 'Renata Ribeiro', cnh: '5566778899', assignedVehicle: 'BCD-0123', status: true },
-      { matricula: '011', name: 'Cláudio Ferreira', cnh: '3344556677', assignedVehicle: 'EFG-4567', status: true },
-      { matricula: '012', name: 'Marta Souza', cnh: '9988112233', assignedVehicle: 'HIJ-8901', status: false },
+      { id: 1, name: 'João Silva', cpf: '12345678901', email: 'joao@email.com', phone: '11999999999', status: true },
+      { id: 2, name: 'Maria Oliveira', cpf: '98765432100', email: 'maria@email.com', phone: '11988888888', status: false },
+      { id: 3, name: 'Carlos Souza', cpf: '11122233344', email: 'carlos@email.com', phone: '11977777777', status: true },
     ]);
   
     setVehicles([
@@ -107,16 +106,22 @@ function DriverManagement() {
     ]);
   }, []);
 
+  // Validação dinâmica dos campos obrigatórios
+  useEffect(() => {
+    const newErrors: DriverErrors = {};
+    if (!formData.name) newErrors.name = 'Nome obrigatório';
+    if (!formData.cpf || formData.cpf.replace(/\D/g, '').length !== 11) newErrors.cpf = 'CPF inválido';
+    if (!formData.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email)) newErrors.email = 'E-mail inválido';
+    if (!formData.phone) newErrors.phone = 'Telefone obrigatório';
+    setErrors(newErrors);
+  }, [formData]);
+
   const handleOpenDialog = (driver: Driver | null = null) => {
     setEditingDriver(driver);
     setFormData(
-      driver || {
-        matricula: '',
-        name: '',
-        cnh: '',
-        assignedVehicle: '',
-        status: true,
-      }
+      driver
+        ? { ...driver }
+        : { name: '', cpf: '', email: '', phone: '', status: true, address: '', grantAccess: true }
     );
     setErrors({});
     setOpenDialog(true);
@@ -128,46 +133,34 @@ function DriverManagement() {
   };
 
   const validateForm = () => {
-    const newErrors: DriverErrors = {};
-    if (!formData.matricula) {
-      newErrors.matricula = 'A matrícula é obrigatória.';
-    } else if (
-      drivers.some(
-        (driver) =>
-          driver.matricula === formData.matricula &&
-          (!editingDriver || driver.matricula !== editingDriver.matricula)
-      )
-    ) {
-      newErrors.matricula = 'A matrícula já existe.';
-    }
-    if (!formData.name) newErrors.name = 'O nome é obrigatório.';
-    if (!formData.cnh) newErrors.cnh = 'A CNH é obrigatória.';
-    if (!formData.assignedVehicle) newErrors.assignedVehicle = 'O veículo é obrigatório.';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return Object.keys(errors).length === 0;
   };
 
   const handleSaveDriver = () => {
     if (!validateForm()) return;
-
-    setLoading(true);
-    setTimeout(() => {
-      if (editingDriver) {
-        setDrivers(drivers.map(d => (d.matricula === editingDriver.matricula ? { ...formData } : d)));
-        setSnackbarMessage('Condutor atualizado com sucesso!');
-      } else {
-        setDrivers([...drivers, formData]);
-        setSnackbarMessage('Condutor adicionado com sucesso!');
+    if (editingDriver) {
+      setDrivers(drivers.map(d => (d.id === editingDriver.id ? { ...editingDriver, ...formData } : d)));
+      setSnackbarMessage('Dados atualizados com sucesso!');
+      setSnackbarType('success');
+    } else {
+      if (drivers.some(d => d.cpf === formData.cpf)) {
+        setSnackbarMessage('Erro ao salvar condutor: CPF já cadastrado');
+        setSnackbarType('error');
+        setOpenSnackbar(true);
+        return;
       }
-      setLoading(false);
-      setOpenSnackbar(true);
-      handleCloseDialog();
-    }, 1000);
+      setDrivers([...drivers, { ...formData, id: drivers.length ? Math.max(...drivers.map(d => d.id)) + 1 : 1 }]);
+      setSnackbarMessage('Condutor criado com sucesso!');
+      setSnackbarType('success');
+    }
+    setOpenSnackbar(true);
+    handleCloseDialog();
   };
 
-  const handleDeactivateDriver = (matricula: string) => {
-    setDrivers(drivers.map(driver => (driver.matricula === matricula ? { ...driver, status: false } : driver)));
-    setSnackbarMessage('Condutor desativado com sucesso!');
+  const handleDeleteDriver = (id: number) => {
+    setDrivers(drivers.filter(d => d.id !== id));
+    setSnackbarMessage('Condutor removido com sucesso!');
+    setSnackbarType('success');
     setOpenSnackbar(true);
   };
 
@@ -184,120 +177,111 @@ function DriverManagement() {
       skipEmptyLines: true,
       complete: (results: any) => {
         const importedDrivers: Driver[] = results.data.map((row: any) => ({
-          matricula: row.matricula,
+          id: row.id,
           name: row.name,
-          cnh: row.cnh,
-          assignedVehicle: row.assignedVehicle,
+          cpf: row.cpf,
+          email: row.email,
+          phone: row.phone,
           status: row.status === 'true',
+          address: row.address,
+          grantAccess: row.grantAccess === 'true',
         }));
 
         const duplicates = importedDrivers.filter((imported) =>
-          drivers.some((existing) => existing.matricula === imported.matricula)
+          drivers.some((existing) => existing.cpf === imported.cpf)
         );
 
         if (duplicates.length > 0) {
-          setSnackbarMessage('Erro: Matrículas duplicadas no arquivo importado.');
+          setSnackbarMessage('Erro: CPFs duplicados no arquivo importado.');
+          setSnackbarType('error');
           setOpenSnackbar(true);
           return;
         }
 
         setDrivers([...drivers, ...importedDrivers]);
         setSnackbarMessage('Dados importados com sucesso!');
+        setSnackbarType('success');
         setOpenSnackbar(true);
       },
     });
   };
 
-  const filteredDrivers = drivers.filter(driver =>
-    driver.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    driver.cnh.includes(searchQuery) ||
-    driver.assignedVehicle.toLowerCase().includes(searchQuery)
-  );
+  // Função para normalizar strings (remover acentos e deixar minúsculo)
+  function normalize(str: string) {
+    return str ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() : '';
+  }
+
+  const filteredDrivers = drivers.filter(d => {
+    const query = normalize(searchQuery);
+    return (
+      normalize(d.name).includes(query) ||
+      normalize(d.cpf).includes(query) ||
+      (d.email && normalize(d.email).includes(query)) ||
+      (d.phone && normalize(d.phone).includes(query))
+    );
+  });
 
   return (
     <Container maxWidth="lg" style={{ marginTop: '2rem' }}>
-      {/* Barra Superior */}
-      <Box>
-        <AppBar position="static" color="primary">
-          <Toolbar>
-            <Typography variant="h6" sx={{ flexGrow: 1 }}>
-              Gestão de Condutores
-            </Typography>
-            <Tooltip title="Voltar">
-              <IconButton
-                edge="end"
-                color="inherit"
-                onClick={() => navigate('/')}
-                aria-label="voltar"
-              >
-                <HomeIcon />
-              </IconButton>
-            </Tooltip>
-          </Toolbar>
-        </AppBar>
+      {/* Barra de Ações */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={3} marginTop={4}>
+        <Box display="flex" alignItems={'center'} gap={2}>
+          <TextField
+            variant="outlined"
+            size="small"
+            placeholder="Pesquisar condutores..."
+            value={searchQuery}
+            onChange={handleSearchChange}
+            style={{ width: '300px' }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<Add />}
+            onClick={() => handleOpenDialog()}
+          >
+            Novo Condutor
+          </Button>
+        </Box>
+        <Box display="flex" gap={2}>
+          <Button
+            variant="outlined"
+            component="label"
+            startIcon={<Upload />}
+          >
+            Importar CSV
+            <input type="file" hidden onChange={handleImportCSV} />
+          </Button>
+          <CSVLink data={drivers} filename="drivers.csv">
+            <Button variant="outlined" color="secondary" startIcon={<Download />}>
+              Exportar Dados
+            </Button>
+          </CSVLink>
+        </Box>
       </Box>
-
-   {/* Barra de Ações */}
-<Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={3} marginTop={4}>
-  <Box display="flex" alignItems={'center'} gap={2}>
-
-  <TextField
-    variant="outlined"
-    size="small"
-    placeholder="Pesquisar condutores..."
-    value={searchQuery}
-    onChange={handleSearchChange}
-    style={{ width: '300px' }}
-  />
-
-     <Button
-      variant="contained"
-      color="primary"
-      startIcon={<Add />}
-      onClick={() => handleOpenDialog()}
-    >
-      Adicionar Condutor
-    </Button>
-  </Box>
-  <Box display="flex" gap={2}>
-    <Button
-      variant="outlined"
-      component="label"
-      startIcon={<Upload />}
-    >
-      Importar CSV
-      <input type="file" hidden onChange={handleImportCSV} />
-    </Button>
-    <CSVLink data={drivers} filename="drivers.csv">
-      <Button variant="outlined" color="secondary" startIcon={<Download />}>
-        Exportar Dados
-      </Button>
-    </CSVLink>
-  </Box>
-</Box>
-
-
 
       {/* Tabela de Condutores */}
       <TableContainer component={Paper}>
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Matrícula</TableCell>
-              <TableCell>Nome</TableCell>
-              <TableCell>CNH</TableCell>
-              <TableCell>Veículo Designado</TableCell>
+              <TableCell>ID</TableCell>
+              <TableCell>Nome completo</TableCell>
+              <TableCell>CPF</TableCell>
+              <TableCell>E-mail</TableCell>
+              <TableCell>Telefone</TableCell>
               <TableCell>Status</TableCell>
               <TableCell align="right">Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredDrivers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((driver) => (
-              <TableRow key={driver.matricula}>
-                <TableCell>{driver.matricula}</TableCell>
+              <TableRow key={driver.id}>
+                <TableCell>{driver.id}</TableCell>
                 <TableCell>{driver.name}</TableCell>
-                <TableCell>{driver.cnh}</TableCell>
-                <TableCell>{driver.assignedVehicle}</TableCell>
+                <TableCell>{driver.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}</TableCell>
+                <TableCell>{driver.email}</TableCell>
+                <TableCell>{driver.phone}</TableCell>
                 <TableCell>
                   <Chip
                     label={driver.status ? 'Ativo' : 'Inativo'}
@@ -311,8 +295,8 @@ function DriverManagement() {
                       <Edit />
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title="Desativar">
-                    <IconButton color="secondary" onClick={() => handleDeactivateDriver(driver.matricula)}>
+                  <Tooltip title="Excluir">
+                    <IconButton color="error" onClick={() => handleDeleteDriver(driver.id)}>
                       <Delete />
                     </IconButton>
                   </Tooltip>
@@ -325,82 +309,99 @@ function DriverManagement() {
 
       {/* Paginação */}
       <TablePagination
-        rowsPerPageOptions={[10, 20, 50]}
+        rowsPerPageOptions={[10, 20]}
         component="div"
         count={filteredDrivers.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={(event, newPage) => setPage(newPage)}
-        onRowsPerPageChange={(event) => setRowsPerPage(parseInt(event.target.value, 10))}
+        onRowsPerPageChange={event => {
+          setRowsPerPage(parseInt(event.target.value, 10));
+          setPage(0);
+        }}
       />
 
       {/* Dialog de Cadastro/Edição */}
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>{editingDriver ? 'Editar Condutor' : 'Adicionar Condutor'}</DialogTitle>
+      <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>{editingDriver ? 'Editar Condutor' : 'Novo Condutor'}</DialogTitle>
         <DialogContent>
-          <TextField
-            label="Matrícula"
-            name="matricula"
-            value={formData.matricula}
-            onChange={(e) => setFormData({ ...formData, matricula: e.target.value })}
-            fullWidth
-            margin="dense"
-            error={!!errors.matricula}
-            helperText={errors.matricula}
-          />
-          <TextField
-            label="Nome"
-            name="name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-            fullWidth
-            margin="dense"
-            error={!!errors.name}
-            helperText={errors.name}
-          />
-          <TextField
-            label="CNH"
-            name="cnh"
-            value={formData.cnh}
-            onChange={(e) => setFormData({ ...formData, cnh: e.target.value })}
-            fullWidth
-            margin="dense"
-            error={!!errors.cnh}
-            helperText={errors.cnh}
-          />
-          <Autocomplete
-            options={vehicles.map((vehicle) => `${vehicle.plate} - ${vehicle.model}`)}
-            value={formData.assignedVehicle}
-            onChange={(event, newValue) => setFormData({ ...formData, assignedVehicle: newValue || '' })}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                label="Veículo Designado"
-                margin="dense"
-                fullWidth
-                error={!!errors.assignedVehicle}
-                helperText={errors.assignedVehicle}
+          <Box component="form" sx={{ mt: 1 }}>
+            <TextField
+              label="Nome completo *"
+              value={formData.name}
+              onChange={e => setFormData({ ...formData, name: e.target.value })}
+              error={!!errors.name}
+              helperText={errors.name}
+              fullWidth
+              margin="normal"
+              required
+            />
+            <InputMask
+              mask="999.999.999-99"
+              value={formData.cpf}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, cpf: e.target.value })}
+            >
+              {(inputProps: any) => (
+                <TextField
+                  {...inputProps}
+                  label="CPF *"
+                  error={!!errors.cpf}
+                  helperText={errors.cpf}
+                  fullWidth
+                  margin="normal"
+                  required
+                />
+              )}
+            </InputMask>
+            <TextField
+              label="E-mail *"
+              value={formData.email}
+              onChange={e => setFormData({ ...formData, email: e.target.value })}
+              error={!!errors.email}
+              helperText={errors.email}
+              fullWidth
+              margin="normal"
+              required
+            />
+            <TextField
+              label="Telefone *"
+              value={formData.phone}
+              onChange={e => setFormData({ ...formData, phone: e.target.value })}
+              error={!!errors.phone}
+              helperText={errors.phone}
+              fullWidth
+              margin="normal"
+              required
+            />
+            <TextField
+              label="Endereço"
+              value={formData.address}
+              onChange={e => setFormData({ ...formData, address: e.target.value })}
+              fullWidth
+              margin="normal"
+            />
+            {editingDriver && (
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={formData.grantAccess}
+                    onChange={e => setFormData({ 
+                      ...formData, 
+                      grantAccess: e.target.checked,
+                      status: e.target.checked
+                    })}
+                    color="primary"
+                  />
+                }
+                label="Conceder acesso ao sistema"
               />
             )}
-          />
-          <Box mt={2}>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.checked })}
-                />
-              }
-              label={formData.status ? 'Ativo' : 'Inativo'}
-            />
           </Box>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="secondary">
-            Cancelar
-          </Button>
-          <Button onClick={handleSaveDriver} color="primary" disabled={loading}>
-            {loading ? <CircularProgress size={24} /> : 'Salvar'}
+          <Button onClick={handleCloseDialog} color="secondary">Cancelar</Button>
+          <Button onClick={handleSaveDriver} color="primary" variant="contained" disabled={!formData.name || !formData.cpf || !formData.email || !formData.phone || Object.keys(errors).length > 0}>
+            Salvar
           </Button>
         </DialogActions>
       </Dialog>
@@ -410,8 +411,14 @@ function DriverManagement() {
         open={openSnackbar}
         autoHideDuration={4000}
         onClose={() => setOpenSnackbar(false)}
-        message={snackbarMessage}
-      />
+        anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+      >
+        <Box>
+          <Alert severity={snackbarType} onClose={() => setOpenSnackbar(false)}>
+            {snackbarMessage}
+          </Alert>
+        </Box>
+      </Snackbar>
     </Container>
   );
 }

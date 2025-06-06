@@ -18,8 +18,19 @@ import {
   Toolbar,
   Box,
   TablePagination,
+  Snackbar,
+  Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  RadioGroup,
+  FormControlLabel,
+  Radio,
+  Stack,
+  Grid
 } from '@mui/material';
-import { Visibility, Home } from '@mui/icons-material';
+import { Visibility, Home, PictureAsPdf, Download } from '@mui/icons-material';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { CSVLink } from 'react-csv';
@@ -53,6 +64,13 @@ interface Report {
 
 type DateRange = { start: Date | null; end: Date | null };
 
+const vehiclesList = [
+  'ABC-1234', 'DEF-5678', 'GHI-9012', 'JKL-3456', 'MNO-7890', 'PQR-1122', 'STU-3344', 'VWX-5566', 'YZA-7788', 'BCD-9900', 'EFG-2233'
+];
+const driversList = [
+  'João Silva', 'Maria Oliveira', 'Carlos Souza', 'Ana Clara', 'Pedro Costa', 'Lucas Ferreira', 'Mariana Rocha', 'Bruna Lima', 'Eduardo Gomes', 'Sofia Andrade', 'Renato Silva'
+];
+
 function Reports() {
   const [data, setData] = useState<Report[]>([]);
   const [filteredData, setFilteredData] = useState<Report[]>([]);
@@ -60,6 +78,10 @@ function Reports() {
   const [page, setPage] = useState(0);
   const [dateRange, setDateRange] = useState<DateRange>({ start: null, end: null });
   const [searchQuery, setSearchQuery] = useState('');
+  const [vehicle, setVehicle] = useState('');
+  const [driver, setDriver] = useState('');
+  const [reportType, setReportType] = useState('checklist');
+  const [snackbar, setSnackbar] = useState({ open: false, msg: '', type: 'success' });
 
   const navigate = useNavigate();
 
@@ -266,13 +288,12 @@ function Reports() {
       const isWithinDateRange =
         (!dateRange.start || new Date(item.date) >= dateRange.start) &&
         (!dateRange.end || new Date(item.date) <= dateRange.end);
-      const matchesSearchQuery =
-        item.details?.driver.toLowerCase().includes(searchQuery.toLowerCase());
-      return isWithinDateRange && matchesSearchQuery;
+      const matchesVehicle = !vehicle || item.details?.vehicle === vehicle;
+      const matchesDriver = !driver || item.details?.driver === driver;
+      return isWithinDateRange && matchesVehicle && matchesDriver;
     });
-
     setFilteredData(filtered);
-  }, [data, dateRange, searchQuery]);
+  }, [data, dateRange, vehicle, driver]);
 
   useEffect(() => {
     handleFilter();
@@ -303,110 +324,137 @@ function Reports() {
     };
   });
 
+  // Exportação PDF (mock)
+  const handleExportPDF = () => {
+    setSnackbar({ open: true, msg: 'Relatório gerado com sucesso', type: 'success' });
+  };
+
+  // Mensagem sem dados
+  const noData = filteredData.length === 0;
+
   return (
-    <Container maxWidth="lg" style={{ marginTop: '2rem' }}>
-      <AppBar position="static" color="primary">
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Relatórios - Gestão de Frota
-          </Typography>
-          <Tooltip title="Home">
-            <IconButton color="inherit" onClick={() => navigate('/')}>
-              <Home />
-            </IconButton>
-          </Tooltip>
-        </Toolbar>
-      </AppBar>
-
-      <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={3} marginTop={4}>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
-          <DatePicker
-            label="Data Inicial"
-            value={dateRange.start}
-            onChange={(newValue) => setDateRange({ ...dateRange, start: newValue })}
-            slotProps={{ textField: { fullWidth: true } }}
-          />
-          <DatePicker
-            label="Data Final"
-            value={dateRange.end}
-            onChange={(newValue) => setDateRange({ ...dateRange, end: newValue })}
-            slotProps={{ textField: { fullWidth: true } }}
-          />
-        </LocalizationProvider>
-        <TextField
-          label="Pesquisar por Condutor"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          style={{ width: '300px' }}
-        />
-        <Button variant="contained" color="primary" onClick={handleFilter}>
-          Filtrar
-        </Button>
-        <CSVLink data={exportData} filename="relatorios_checklist_completo.csv">
-          <Button variant="outlined" color="secondary">
-            Exportar CSV
-          </Button>
-        </CSVLink>
-      </Box>
-
-      <TableContainer component={Paper} style={{ marginTop: '2rem' }}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Data</TableCell>
-              <TableCell>Condutor</TableCell>
-              <TableCell>Veículo</TableCell>
-              <TableCell>Avarias</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell align="right">Ações</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredData
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((report) => (
-                <TableRow key={report.id}>
-                  <TableCell>{report.date}</TableCell>
-                  <TableCell>{report.details?.driver || 'N/A'}</TableCell>
-                  <TableCell>{report.details?.vehicle || 'N/A'}</TableCell>
-                  <TableCell>{report.avarias}</TableCell>
-                  <TableCell>
-                    <Chip
-                      label={report.status}
-                      color={report.status === 'Enviado' ? 'success' : 'default'}
-                    />
-                  </TableCell>
-                  <TableCell align="right">
-                    <Tooltip title="Visualizar">
-                      <span>
-                        <IconButton
-                          color="primary"
-                          onClick={() => handleViewDetails(report)}
-                          disabled={!report.details?.checklist}
-                        >
-                          <Visibility />
-                        </IconButton>
-                      </span>
-                    </Tooltip>
-                  </TableCell>
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
+      {/* Painel de Filtros */}
+      <Paper sx={{ p: 3, mt: 4, mb: 3 }}>
+        <Grid container spacing={2} alignItems="center" justifyContent="center">
+          <Grid item xs={12} sm={2}>
+            <FormControl fullWidth>
+              <InputLabel>Tipo de Relatório</InputLabel>
+              <Select label="Tipo de Relatório" value={reportType} onChange={e => setReportType(e.target.value)}>
+                <MenuItem value="checklist">Checklist Diário</MenuItem>
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={2.5}>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <DatePicker
+                label="Data Inicial"
+                value={dateRange.start}
+                onChange={(newValue) => setDateRange({ ...dateRange, start: newValue })}
+                slotProps={{ textField: { fullWidth: true } }}
+              />
+            </LocalizationProvider>
+          </Grid>
+          <Grid item xs={12} sm={2.5}>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <DatePicker
+                label="Data Final"
+                value={dateRange.end}
+                onChange={(newValue) => setDateRange({ ...dateRange, end: newValue })}
+                slotProps={{ textField: { fullWidth: true } }}
+              />
+            </LocalizationProvider>
+          </Grid>
+          <Grid item xs={12} sm={2}>
+            <FormControl fullWidth>
+              <InputLabel>Veículo</InputLabel>
+              <Select label="Veículo" value={vehicle} onChange={e => setVehicle(e.target.value)}>
+                <MenuItem value="">Todos</MenuItem>
+                {vehiclesList.map(v => <MenuItem key={v} value={v}>{v}</MenuItem>)}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={12} sm={2}>
+            <FormControl fullWidth>
+              <InputLabel>Condutor</InputLabel>
+              <Select label="Condutor" value={driver} onChange={e => setDriver(e.target.value)}>
+                <MenuItem value="">Todos</MenuItem>
+                {driversList.map(d => <MenuItem key={d} value={d}>{d}</MenuItem>)}
+              </Select>
+            </FormControl>
+          </Grid>
+        </Grid>
+        <Box textAlign="center" mt={3}>
+          <Button variant="contained" color="primary" onClick={handleFilter}>Pesquisar</Button>
+        </Box>
+      </Paper>
+      {/* Exibição dos resultados: Checklist Diário */}
+      {noData ? (
+        <Alert severity="info" sx={{ mt: 4 }}>Nenhum registro encontrado para os filtros selecionados.</Alert>
+      ) : (
+        <>
+          <Box display="flex" justifyContent="flex-end" gap={2} mb={2}>
+            <CSVLink data={exportData} filename="relatorios_checklist.csv" style={{ textDecoration: 'none' }}>
+              <Button variant="outlined" color="secondary" startIcon={<Download />}>Exportar CSV</Button>
+            </CSVLink>
+            <Button variant="outlined" color="secondary" startIcon={<PictureAsPdf />} onClick={handleExportPDF}>Exportar PDF</Button>
+          </Box>
+          <TableContainer component={Paper}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <TableCell>Data</TableCell>
+                  <TableCell>Veículo</TableCell>
+                  <TableCell>Condutor</TableCell>
+                  <TableCell>Status</TableCell>
+                  <TableCell>Avarias</TableCell>
+                  <TableCell align="right">Ações</TableCell>
                 </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-
-      <TablePagination
-        rowsPerPageOptions={[10, 20, 50]}
-        component="div"
-        count={filteredData.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={(event, newPage) => setPage(newPage)}
-        onRowsPerPageChange={(event) => {
-          setRowsPerPage(parseInt(event.target.value, 10));
-          setPage(0);
-        }}
-      />
+              </TableHead>
+              <TableBody>
+                {filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((report) => (
+                  <TableRow key={report.id}>
+                    <TableCell>{report.date}</TableCell>
+                    <TableCell>{report.details?.vehicle || 'N/A'}</TableCell>
+                    <TableCell>{report.details?.driver || 'N/A'}</TableCell>
+                    <TableCell>
+                      <Chip label={report.status} color={report.status === 'Enviado' ? 'success' : 'default'} />
+                    </TableCell>
+                    <TableCell>{report.avarias === 'Sim' ? 'Sim' : 'Não'}</TableCell>
+                    <TableCell align="right">
+                      <Tooltip title="Visualizar">
+                        <span>
+                          <IconButton color="primary" onClick={() => handleViewDetails(report)} disabled={!report.details?.checklist}>
+                            <Visibility />
+                          </IconButton>
+                        </span>
+                      </Tooltip>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          <TablePagination
+            rowsPerPageOptions={[10, 20, 50]}
+            component="div"
+            count={filteredData.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={(event, newPage) => setPage(newPage)}
+            onRowsPerPageChange={(event) => {
+              setRowsPerPage(parseInt(event.target.value, 10));
+              setPage(0);
+            }}
+          />
+        </>
+      )}
+      {/* Snackbar para feedback */}
+      <Snackbar open={snackbar.open} autoHideDuration={4000} onClose={() => setSnackbar({ ...snackbar, open: false })}>
+        <Alert onClose={() => setSnackbar({ ...snackbar, open: false })} severity={snackbar.type as any} sx={{ width: '100%' }}>
+          {snackbar.msg}
+        </Alert>
+      </Snackbar>
     </Container>
   );
 }

@@ -51,14 +51,14 @@ function ReportDetails() {
 
   // Transformar os dados do checklist em formato CSV
   const csvData = [
-    ['Item', 'Resposta', 'Descrição', 'Imagem'],
-    ['Quilometragem', checklistData.mileage, '', ''],
-    ['Condição dos Pneus', checklistData.tires, checklistData.tiresDesc, checklistData.tiresImg || 'N/A'],
-    ['Faróis e Lanternas', checklistData.lights, checklistData.lightsDesc, checklistData.lightsImg || 'N/A'],
-    ['Higienização', checklistData.cleanliness, checklistData.cleanlinessDesc, checklistData.cleanlinessImg || 'N/A'],
-    ['Óleo do Motor', checklistData.oil, checklistData.oilDesc, checklistData.oilImg || 'N/A'],
-    ['Freios', checklistData.brakes, checklistData.brakesDesc, checklistData.brakesImg || 'N/A'],
-    ['Avarias', checklistData.avarias, checklistData.avariasDesc, checklistData.avariasImg || 'N/A'],
+    ['Item', 'Resposta', 'Imagem'],
+    ['Quilometragem', checklistData.mileage, ''],
+    ['Condição dos Pneus', checklistData.tires, checklistData.tiresImg || 'N/A'],
+    ['Faróis e Lanternas', checklistData.lights, checklistData.lightsImg || 'N/A'],
+    ['Higienização', checklistData.cleanliness, checklistData.cleanlinessImg || 'N/A'],
+    ['Óleo do Motor', checklistData.oil, checklistData.oilImg || 'N/A'],
+    ['Freios', checklistData.brakes, checklistData.brakesImg || 'N/A'],
+    ['Avarias', checklistData.avarias, checklistData.avariasImg || 'N/A'],
   ];
 
   return (
@@ -88,26 +88,24 @@ function ReportDetails() {
             <TableRow>
               <TableCell><strong>Item</strong></TableCell>
               <TableCell><strong>Resposta</strong></TableCell>
-              <TableCell><strong>Descrição</strong></TableCell>
               <TableCell><strong>Imagem</strong></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {[
-              { label: 'Quilometragem', value: checklistData.mileage, desc: '', img: '' },
-              { label: 'Condição dos Pneus', value: checklistData.tires, desc: checklistData.tiresDesc, img: checklistData.tiresImg || 'N/A' },
-              { label: 'Faróis e Lanternas', value: checklistData.lights, desc: checklistData.lightsDesc, img: checklistData.lightsImg || 'N/A' },
-              { label: 'Higienização', value: checklistData.cleanliness, desc: checklistData.cleanlinessDesc, img: checklistData.cleanlinessImg || 'N/A' },
-              { label: 'Óleo do Motor', value: checklistData.oil, desc: checklistData.oilDesc, img: checklistData.oilImg || 'N/A' },
-              { label: 'Freios', value: checklistData.brakes, desc: checklistData.brakesDesc, img: checklistData.brakesImg || 'N/A' },
-              { label: 'Avarias', value: checklistData.avarias, desc: checklistData.avariasDesc, img: checklistData.avariasImg || 'N/A' },
+              { label: 'Quilometragem', value: checklistData.mileage, img: '' },
+              { label: 'Condição dos Pneus', value: checklistData.tires, img: checklistData.tiresImg || 'N/A' },
+              { label: 'Faróis e Lanternas', value: checklistData.lights, img: checklistData.lightsImg || 'N/A' },
+              { label: 'Higienização', value: checklistData.cleanliness, img: checklistData.cleanlinessImg || 'N/A' },
+              { label: 'Óleo do Motor', value: checklistData.oil, img: checklistData.oilImg || 'N/A' },
+              { label: 'Freios', value: checklistData.brakes, img: checklistData.brakesImg || 'N/A' },
+              { label: 'Avarias', value: checklistData.avarias, img: checklistData.avariasImg || 'N/A' },
             ].map((item, index) => (
               <TableRow key={index}>
                 <TableCell>{item.label}</TableCell>
                 <TableCell>{item.value}</TableCell>
-                <TableCell>{item.desc || 'N/A'}</TableCell>
                 <TableCell>
-                  {item.img !== 'N/A' ? (
+                  {item.img !== 'N/A' && item.img !== '' ? (
                     <img
                       src={item.img}
                       alt={`${item.label} imagem`}

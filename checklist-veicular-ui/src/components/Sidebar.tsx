@@ -18,19 +18,24 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import PeopleIcon from '@mui/icons-material/People';
 import BuildIcon from '@mui/icons-material/Build';
 import SettingsIcon from '@mui/icons-material/Settings';
+import HomeIcon from '@mui/icons-material/Home';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import PersonIcon from '@mui/icons-material/Person';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import translogLogo from '../image/translog.png';
 
 const drawerWidth = 240;
 
-const navItems = [
-  { label: 'Checklist Diário', icon: <ChecklistIcon />, path: '/checklist', key: 'checklist' },
-  { label: 'Relatórios', icon: <AssessmentIcon />, path: '/reports', key: 'reports' },
-  { label: 'Veículos', icon: <DirectionsCarIcon />, path: '/vehicles', key: 'vehicles' },
-  { label: 'Condutores', icon: <PeopleIcon />, path: '/drivers', key: 'drivers' },
-  { label: 'Manutenção', icon: <BuildIcon />, path: '/maintenance', key: 'maintenance' },
-  { label: 'Configurações', icon: <SettingsIcon />, path: '/settings', key: 'settings' },
+const gestorAdminMenu = [
+  { text: 'Início', icon: <HomeIcon />, path: '/' },
+  { text: 'Gestão de Checklists', icon: <AssignmentIcon />, path: '/checklist' },
+  { text: 'Relatórios', icon: <BarChartIcon />, path: '/reports' },
+  { text: 'Cadastro de Condutores', icon: <PersonIcon />, path: '/drivers' },
+  { text: 'Cadastro de Veículos', icon: <DirectionsCarIcon />, path: '/vehicles' },
+  { text: 'Solicitações de Manutenção', icon: <BuildIcon />, path: '/maintenance' },
+  { text: 'Configurações', icon: <SettingsIcon />, path: '/settings' },
 ];
 
 const permissions = {
@@ -51,7 +56,7 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onDrawerToggle }) => {
   const navigate = useNavigate();
   const { userRole } = useAuth();
 
-  const allowedNavItems = userRole ? navItems.filter(item => permissions[userRole].includes(item.key)) : [];
+  const allowedNavItems = userRole ? gestorAdminMenu.filter(item => permissions[userRole].includes(item.path.split('/')[1])) : [];
 
   const drawerContent = (
     <div>
@@ -68,10 +73,10 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onDrawerToggle }) => {
                 navigate(item.path);
                 if (!isDesktop) onDrawerToggle();
               }}
-              aria-label={`Ir para ${item.label}`}
+              aria-label={`Ir para ${item.text}`}
             >
               <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.label} />
+              <ListItemText primary={item.text} />
             </ListItemButton>
           </ListItem>
         ))}

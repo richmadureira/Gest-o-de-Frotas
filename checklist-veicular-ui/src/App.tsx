@@ -18,6 +18,7 @@ import Maintenance from './pages/Maintenance';
 import Sidebar from './components/Sidebar';
 import { useAuth, UserRole } from './components/AuthContext';
 import LogoutIcon from '@mui/icons-material/ExitToApp';
+import ChecklistManagement from './pages/ChecklistManagement';
 
 const drawerWidth = 240;
 
@@ -106,7 +107,11 @@ function App() {
             >
               <Routes>
                 <Route path="/" element={<Dashboard onLogout={handleLogout} />} />
-                <Route path="/checklist" element={<ProtectedRoute path="/checklist" element={<Checklist />} />} />
+                <Route path="/checklist" element={
+                  userRole === 'condutor'
+                    ? <ProtectedRoute path="/checklist" element={<Checklist />} />
+                    : <ProtectedRoute path="/checklist" element={<ChecklistManagement />} />
+                } />
                 <Route path="/reports" element={<ProtectedRoute path="/reports" element={<Reports />} />} />
                 <Route path="/vehicles" element={<ProtectedRoute path="/vehicles" element={<Vehicles />} />} />
                 <Route path="/summary" element={<ProtectedRoute path="/summary" element={<Summary />} />} />

@@ -26,9 +26,13 @@ import {
   History as HistoryIcon,
   Person as PersonIcon,
   ExitToApp as LogoutIcon,
-  Support as SupportIcon
+  Support as SupportIcon,
+  PieChart as PieChartIcon,
+  AssignmentTurnedIn as AssignmentTurnedInIcon,
+  Warning as WarningIcon,
+  Build as BuildIcon
 } from '@mui/icons-material';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { useAuth } from '../components/AuthContext';
 import translogLogo from '../image/translog.png';
 
@@ -166,6 +170,134 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, userName }) => {
             <Typography>Telefone: (11) 1234-5678</Typography>
           </Box>
         </Modal>
+      </Box>
+    );
+  }
+
+  // Visão padrão para admin/gestor (mantém como está)
+  if (userRole === 'gestor' || userRole === 'admin') {
+    // Mock data para cards e gráfico
+    const totalChecklistsHoje = { pendentes: 5, concluidos: 18 };
+    const avariasNaoResolvidas = [
+      { id: 1, veiculo: 'Fiat Strada', desc: 'Risco na porta', status: 'Pendente' },
+      { id: 2, veiculo: 'Volkswagen Gol', desc: 'Trinca no vidro', status: 'Pendente' },
+    ];
+    const conformidadeData = [
+      { name: 'Realizados', value: 85 },
+      { name: 'Faltantes', value: 15 },
+    ];
+    const COLORS = ['#4caf50', '#f44336'];
+    const ultimasManutencoes = [
+      { id: 1, veiculo: 'Fiat Strada', data: '2024-06-07', status: 'Aguardando Aprovação' },
+      { id: 2, veiculo: 'Volkswagen Gol', data: '2024-06-06', status: 'Aprovado' },
+      { id: 3, veiculo: 'Chevrolet Onix', data: '2024-06-05', status: 'Concluído' },
+    ];
+
+    return (
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          p: { xs: 1, sm: 2, md: 4 },
+          width: '100%',
+          minHeight: '100vh',
+          bgcolor: '#f5f5f5',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+        }}
+      >
+        <Box
+          sx={{
+            width: '100%',
+            maxWidth: 1280,
+            mt: { xs: 2, md: 6 },
+            mb: 4,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Grid container spacing={{ xs: 2, sm: 4, md: 6 }} justifyContent="center" alignItems="stretch">
+            {/* Card 1: Total de Checklists Hoje */}
+            <Grid item xs={12} md={5} display="flex" justifyContent="center">
+              <Card
+                sx={{
+                  width: '100%',
+                  minWidth: 340,
+                  maxWidth: 480,
+                  height: { xs: 'auto', md: 260 },
+                  boxShadow: 4,
+                  borderRadius: 4,
+                  transition: 'box-shadow 0.2s',
+                  '&:hover': { boxShadow: 8 },
+                  mx: 'auto',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  p: { xs: 2, md: 4 },
+                }}
+              >
+                <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
+                  <Box display="flex" alignItems="center" mb={2}>
+                    <AssignmentTurnedInIcon color="primary" sx={{ mr: 2 }} />
+                    <Typography variant="h6">
+                      Checklists Hoje
+                    </Typography>
+                  </Box>
+                  <Typography variant="body1" color="textSecondary">
+                    Pendentes: <b style={{ color: '#1976d2' }}>{totalChecklistsHoje.pendentes}</b>
+                  </Typography>
+                  <Typography variant="body1" color="textSecondary">
+                    Concluídos: <b style={{ color: '#388e3c' }}>{totalChecklistsHoje.concluidos}</b>
+                  </Typography>
+                  <Box flexGrow={1} />
+                  <Button
+                    variant="outlined"
+                    size="medium"
+                    sx={{ mt: 3, width: '100%' }}
+                    href="/checklist"
+                  >
+                    Ver lista completa
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+            {/* Card 2: Avarias Não Resolvidas */}
+            <Grid item xs={12} md={5} display="flex" justifyContent="center">
+              <Card
+                sx={{
+                  width: '100%',
+                  minWidth: 340,
+                  maxWidth: 480,
+                  height: { xs: 'auto', md: 260 },
+                  boxShadow: 4,
+                  borderRadius: 4,
+                  transition: 'box-shadow 0.2s',
+                  '&:hover': { boxShadow: 8 },
+                  mx: 'auto',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  p: { xs: 2, md: 4 },
+                }}
+              >
+                <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 2 }}>
+                  <Box display="flex" alignItems="center" mb={2}>
+                    <WarningIcon color="error" sx={{ mr: 2 }} />
+                    <Typography variant="h6">
+                      Avarias Não Resolvidas
+                    </Typography>
+                  </Box>
+                  <Typography variant="body1" color="textSecondary">
+                    Pendentes: <b style={{ color: '#d32f2f' }}>{avariasNaoResolvidas.length}</b>
+                  </Typography>
+                  <Box flexGrow={1} />
+                </CardContent>
+              </Card>
+            </Grid>
+          </Grid>
+        </Box>
       </Box>
     );
   }
