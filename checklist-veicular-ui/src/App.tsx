@@ -17,6 +17,7 @@ import Settings from './pages/Settings'; // Importa a nova página de configura�
 import Maintenance from './pages/Maintenance'; 
 import Sidebar from './components/Sidebar';
 import { useAuth, UserRole } from './components/AuthContext';
+import LogoutIcon from '@mui/icons-material/ExitToApp';
 
 const drawerWidth = 240;
 
@@ -46,8 +47,8 @@ function App() {
   const muiTheme = useTheme();
   const isDesktop = useMediaQuery(muiTheme.breakpoints.up('md'));
 
-  const handleLogin = (token: string, role: UserRole) => {
-    login(token, role);
+  const handleLogin = (email: string, password: string, role: UserRole) => {
+    login(email, role);
   };
 
   const handleLogout = () => {
@@ -68,12 +69,12 @@ function App() {
               position="fixed"
               sx={{
                 zIndex: (theme) => theme.zIndex.drawer + 1,
-                width: userRole === 'condutor' ? '100%' : { md: `calc(100% - ${drawerWidth}px)` },
-                ml: userRole === 'condutor' ? 0 : { md: `${drawerWidth}px` },
+                width: { md: `calc(100% - ${drawerWidth}px)` },
+                ml: { md: `${drawerWidth}px` },
               }}
             >
               <Toolbar>
-                {userRole !== 'condutor' && !isDesktop && (
+                {!isDesktop && (
                   <IconButton
                     color="inherit"
                     aria-label="abrir menu"
@@ -87,43 +88,39 @@ function App() {
                 <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
                   Gestão de Frota
                 </Typography>
-                <Button color="inherit" onClick={handleLogout}>
-                  Sair
-                </Button>
+                <IconButton color="inherit" onClick={handleLogout} aria-label="Sair">
+                  <LogoutIcon />
+                </IconButton>
               </Toolbar>
             </AppBar>
-            {userRole !== 'condutor' && (
-              <Sidebar mobileOpen={mobileOpen} onDrawerToggle={handleDrawerToggle} />
-            )}
+            <Sidebar mobileOpen={mobileOpen} onDrawerToggle={handleDrawerToggle} />
             <Box
               component="main"
               sx={{
                 flexGrow: 1,
                 p: 3,
-                width: userRole === 'condutor' ? '100%' : { md: `calc(100% - ${drawerWidth}px)` },
-                ml: userRole === 'condutor' ? 0 : { md: `${drawerWidth}px` },
+                width: { md: `calc(100% - ${drawerWidth}px)` },
+                ml: { md: `${drawerWidth}px` },
                 mt: 8,
               }}
             >
-              {userRole === 'condutor' ? (
-                <Routes>
-                  <Route path="/checklist" element={<Checklist />} />
-                  <Route path="*" element={<Navigate to="/checklist" replace />} />
-                </Routes>
-              ) : (
-                <Routes>
-                  <Route path="/" element={<Dashboard onLogout={handleLogout} />} />
-                  <Route path="/checklist" element={<ProtectedRoute path="/checklist" element={<Checklist />} />} />
-                  <Route path="/reports" element={<ProtectedRoute path="/reports" element={<Reports />} />} />
-                  <Route path="/vehicles" element={<ProtectedRoute path="/vehicles" element={<Vehicles />} />} />
-                  <Route path="/summary" element={<ProtectedRoute path="/summary" element={<Summary />} />} />
-                  <Route path="/drivers" element={<ProtectedRoute path="/drivers" element={<Drivers />} />} />
-                  <Route path="/report-details" element={<ProtectedRoute path="/report-details" element={<ReportDetails />} />} />
-                  <Route path="/settings" element={<ProtectedRoute path="/settings" element={<Settings />} />} />
-                  <Route path="/maintenance" element={<ProtectedRoute path="/maintenance" element={<Maintenance />} />} />
-                  <Route path="*" element={<Dashboard onLogout={handleLogout} />} />
-                </Routes>
-              )}
+              <Routes>
+                <Route path="/" element={<Dashboard onLogout={handleLogout} />} />
+                <Route path="/checklist" element={<ProtectedRoute path="/checklist" element={<Checklist />} />} />
+                <Route path="/reports" element={<ProtectedRoute path="/reports" element={<Reports />} />} />
+                <Route path="/vehicles" element={<ProtectedRoute path="/vehicles" element={<Vehicles />} />} />
+                <Route path="/summary" element={<ProtectedRoute path="/summary" element={<Summary />} />} />
+                <Route path="/drivers" element={<ProtectedRoute path="/drivers" element={<Drivers />} />} />
+                <Route path="/report-details" element={<ProtectedRoute path="/report-details" element={<ReportDetails />} />} />
+                <Route path="/settings" element={<ProtectedRoute path="/settings" element={<Settings />} />} />
+                <Route path="/maintenance" element={<ProtectedRoute path="/maintenance" element={<Maintenance />} />} />
+                <Route path="*" element={<Dashboard onLogout={handleLogout} />} />
+              </Routes>
+              <Box sx={{ position: 'fixed', bottom: 16, right: 24, zIndex: 1300 }}>
+                <Typography variant="caption" color="textSecondary">
+                  v1.0.0
+                </Typography>
+              </Box>
             </Box>
           </Box>
         ) : (
