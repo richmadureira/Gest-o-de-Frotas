@@ -1,6 +1,7 @@
 using GestaoFrotas.Domain.Entities;
 using GestaoFrotas.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
+using BCrypt.Net;
 
 namespace GestaoFrotas.Infrastructure.Data;
 

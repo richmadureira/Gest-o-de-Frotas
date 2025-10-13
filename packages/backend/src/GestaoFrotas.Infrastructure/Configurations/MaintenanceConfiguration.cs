@@ -44,10 +44,6 @@ public class MaintenanceConfiguration : IEntityTypeConfiguration<Maintenance>
             .HasConversion<string>()
             .HasMaxLength(20);
 
-        // Valores padrão
-        builder.Property(m => m.Status)
-            .HasDefaultValue("Scheduled");
-
         // Relacionamentos
         builder.HasOne(m => m.Vehicle)
             .WithMany(v => v.Maintenances)

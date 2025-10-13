@@ -63,9 +63,6 @@ public class ChecklistConfiguration : IEntityTypeConfiguration<Checklist>
         builder.Property(c => c.Date)
             .HasDefaultValueSql("GETUTCDATE()");
 
-        builder.Property(c => c.Status)
-            .HasDefaultValue("Pending");
-
         // Relacionamentos
         builder.HasOne(c => c.Vehicle)
             .WithMany(v => v.Checklists)

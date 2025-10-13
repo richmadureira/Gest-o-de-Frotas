@@ -3,64 +3,12 @@
   "WorkspaceRootPath": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{4F82951C-FE70-4878-B2F1-04BDAB3D7410}|src\\GestaoFrotas.API\\GestaoFrotas.API.csproj|d:\\projeto tcc fatec 2024\\app\\gest-o-de-frotas\\packages\\backend\\src\\gestaofrotas.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4F82951C-FE70-4878-B2F1-04BDAB3D7410}|src\\GestaoFrotas.API\\GestaoFrotas.API.csproj|solutionrelative:src\\gestaofrotas.api\\controllers\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4F82951C-FE70-4878-B2F1-04BDAB3D7410}|src\\GestaoFrotas.API\\GestaoFrotas.API.csproj|d:\\projeto tcc fatec 2024\\app\\gest-o-de-frotas\\packages\\backend\\src\\gestaofrotas.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{4F82951C-FE70-4878-B2F1-04BDAB3D7410}|src\\GestaoFrotas.API\\GestaoFrotas.API.csproj|solutionrelative:src\\gestaofrotas.api\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{6B57DE23-79C6-4305-B23A-57CF9FBF2BF6}|src\\GestaoFrotas.Infrastructure\\GestaoFrotas.Infrastructure.csproj|d:\\projeto tcc fatec 2024\\app\\gest-o-de-frotas\\packages\\backend\\src\\gestaofrotas.infrastructure\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6B57DE23-79C6-4305-B23A-57CF9FBF2BF6}|src\\GestaoFrotas.Infrastructure\\GestaoFrotas.Infrastructure.csproj|solutionrelative:src\\gestaofrotas.infrastructure\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6B57DE23-79C6-4305-B23A-57CF9FBF2BF6}|src\\GestaoFrotas.Infrastructure\\GestaoFrotas.Infrastructure.csproj|d:\\projeto tcc fatec 2024\\app\\gest-o-de-frotas\\packages\\backend\\src\\gestaofrotas.infrastructure\\data\\dataseeder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6B57DE23-79C6-4305-B23A-57CF9FBF2BF6}|src\\GestaoFrotas.Infrastructure\\GestaoFrotas.Infrastructure.csproj|solutionrelative:src\\gestaofrotas.infrastructure\\data\\dataseeder.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6B57DE23-79C6-4305-B23A-57CF9FBF2BF6}|src\\GestaoFrotas.Infrastructure\\GestaoFrotas.Infrastructure.csproj|d:\\projeto tcc fatec 2024\\app\\gest-o-de-frotas\\packages\\backend\\src\\gestaofrotas.infrastructure\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6B57DE23-79C6-4305-B23A-57CF9FBF2BF6}|src\\GestaoFrotas.Infrastructure\\GestaoFrotas.Infrastructure.csproj|solutionrelative:src\\gestaofrotas.infrastructure\\data\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6B57DE23-79C6-4305-B23A-57CF9FBF2BF6}|src\\GestaoFrotas.Infrastructure\\GestaoFrotas.Infrastructure.csproj|d:\\projeto tcc fatec 2024\\app\\gest-o-de-frotas\\packages\\backend\\src\\gestaofrotas.infrastructure\\configurations\\vehicleconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6B57DE23-79C6-4305-B23A-57CF9FBF2BF6}|src\\GestaoFrotas.Infrastructure\\GestaoFrotas.Infrastructure.csproj|solutionrelative:src\\gestaofrotas.infrastructure\\configurations\\vehicleconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6B57DE23-79C6-4305-B23A-57CF9FBF2BF6}|src\\GestaoFrotas.Infrastructure\\GestaoFrotas.Infrastructure.csproj|d:\\projeto tcc fatec 2024\\app\\gest-o-de-frotas\\packages\\backend\\src\\gestaofrotas.infrastructure\\configurations\\userconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6B57DE23-79C6-4305-B23A-57CF9FBF2BF6}|src\\GestaoFrotas.Infrastructure\\GestaoFrotas.Infrastructure.csproj|solutionrelative:src\\gestaofrotas.infrastructure\\configurations\\userconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6B57DE23-79C6-4305-B23A-57CF9FBF2BF6}|src\\GestaoFrotas.Infrastructure\\GestaoFrotas.Infrastructure.csproj|d:\\projeto tcc fatec 2024\\app\\gest-o-de-frotas\\packages\\backend\\src\\gestaofrotas.infrastructure\\configurations\\maintenanceconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6B57DE23-79C6-4305-B23A-57CF9FBF2BF6}|src\\GestaoFrotas.Infrastructure\\GestaoFrotas.Infrastructure.csproj|solutionrelative:src\\gestaofrotas.infrastructure\\configurations\\maintenanceconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{6B57DE23-79C6-4305-B23A-57CF9FBF2BF6}|src\\GestaoFrotas.Infrastructure\\GestaoFrotas.Infrastructure.csproj|d:\\projeto tcc fatec 2024\\app\\gest-o-de-frotas\\packages\\backend\\src\\gestaofrotas.infrastructure\\configurations\\checklistconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{6B57DE23-79C6-4305-B23A-57CF9FBF2BF6}|src\\GestaoFrotas.Infrastructure\\GestaoFrotas.Infrastructure.csproj|solutionrelative:src\\gestaofrotas.infrastructure\\configurations\\checklistconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D2994AD5-BF4C-416F-9DFF-EB5CCBA04F19}|src\\GestaoFrotas.Domain\\GestaoFrotas.Domain.csproj|d:\\projeto tcc fatec 2024\\app\\gest-o-de-frotas\\packages\\backend\\src\\gestaofrotas.domain\\enums\\checkliststatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D2994AD5-BF4C-416F-9DFF-EB5CCBA04F19}|src\\GestaoFrotas.Domain\\GestaoFrotas.Domain.csproj|solutionrelative:src\\gestaofrotas.domain\\enums\\checkliststatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D2994AD5-BF4C-416F-9DFF-EB5CCBA04F19}|src\\GestaoFrotas.Domain\\GestaoFrotas.Domain.csproj|d:\\projeto tcc fatec 2024\\app\\gest-o-de-frotas\\packages\\backend\\src\\gestaofrotas.domain\\entities\\vehicle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D2994AD5-BF4C-416F-9DFF-EB5CCBA04F19}|src\\GestaoFrotas.Domain\\GestaoFrotas.Domain.csproj|solutionrelative:src\\gestaofrotas.domain\\entities\\vehicle.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D2994AD5-BF4C-416F-9DFF-EB5CCBA04F19}|src\\GestaoFrotas.Domain\\GestaoFrotas.Domain.csproj|d:\\projeto tcc fatec 2024\\app\\gest-o-de-frotas\\packages\\backend\\src\\gestaofrotas.domain\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D2994AD5-BF4C-416F-9DFF-EB5CCBA04F19}|src\\GestaoFrotas.Domain\\GestaoFrotas.Domain.csproj|solutionrelative:src\\gestaofrotas.domain\\entities\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D2994AD5-BF4C-416F-9DFF-EB5CCBA04F19}|src\\GestaoFrotas.Domain\\GestaoFrotas.Domain.csproj|d:\\projeto tcc fatec 2024\\app\\gest-o-de-frotas\\packages\\backend\\src\\gestaofrotas.domain\\entities\\maintenance.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D2994AD5-BF4C-416F-9DFF-EB5CCBA04F19}|src\\GestaoFrotas.Domain\\GestaoFrotas.Domain.csproj|solutionrelative:src\\gestaofrotas.domain\\entities\\maintenance.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D2994AD5-BF4C-416F-9DFF-EB5CCBA04F19}|src\\GestaoFrotas.Domain\\GestaoFrotas.Domain.csproj|d:\\projeto tcc fatec 2024\\app\\gest-o-de-frotas\\packages\\backend\\src\\gestaofrotas.domain\\entities\\checklist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D2994AD5-BF4C-416F-9DFF-EB5CCBA04F19}|src\\GestaoFrotas.Domain\\GestaoFrotas.Domain.csproj|solutionrelative:src\\gestaofrotas.domain\\entities\\checklist.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{D2994AD5-BF4C-416F-9DFF-EB5CCBA04F19}|src\\GestaoFrotas.Domain\\GestaoFrotas.Domain.csproj|d:\\projeto tcc fatec 2024\\app\\gest-o-de-frotas\\packages\\backend\\src\\gestaofrotas.domain\\entities\\baseentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{D2994AD5-BF4C-416F-9DFF-EB5CCBA04F19}|src\\GestaoFrotas.Domain\\GestaoFrotas.Domain.csproj|solutionrelative:src\\gestaofrotas.domain\\entities\\baseentity.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{86835CFE-1E44-43B3-89E6-7D8B60FEDB61}|src\\GestaoFrotas.Application\\GestaoFrotas.Application.csproj|d:\\projeto tcc fatec 2024\\app\\gest-o-de-frotas\\packages\\backend\\src\\gestaofrotas.application\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{86835CFE-1E44-43B3-89E6-7D8B60FEDB61}|src\\GestaoFrotas.Application\\GestaoFrotas.Application.csproj|solutionrelative:src\\gestaofrotas.application\\class1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{4F82951C-FE70-4878-B2F1-04BDAB3D7410}|src\\GestaoFrotas.API\\GestaoFrotas.API.csproj|d:\\projeto tcc fatec 2024\\app\\gest-o-de-frotas\\packages\\backend\\src\\gestaofrotas.api\\controllers\\checklistscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4F82951C-FE70-4878-B2F1-04BDAB3D7410}|src\\GestaoFrotas.API\\GestaoFrotas.API.csproj|solutionrelative:src\\gestaofrotas.api\\controllers\\checklistscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -75,196 +23,27 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "AuthController.cs",
-              "DocumentMoniker": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.API\\Controllers\\AuthController.cs",
-              "RelativeDocumentMoniker": "src\\GestaoFrotas.API\\Controllers\\AuthController.cs",
-              "ToolTip": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.API\\Controllers\\AuthController.cs",
-              "RelativeToolTip": "src\\GestaoFrotas.API\\Controllers\\AuthController.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T00:42:54.685Z",
+              "Title": "appsettings.json",
+              "DocumentMoniker": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.API\\appsettings.json",
+              "RelativeDocumentMoniker": "src\\GestaoFrotas.API\\appsettings.json",
+              "ToolTip": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.API\\appsettings.json",
+              "RelativeToolTip": "src\\GestaoFrotas.API\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABIAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2025-10-13T03:20:32.122Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
-              "Title": "Class1.cs",
-              "DocumentMoniker": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Infrastructure\\Class1.cs",
-              "RelativeDocumentMoniker": "src\\GestaoFrotas.Infrastructure\\Class1.cs",
-              "ToolTip": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Infrastructure\\Class1.cs",
-              "RelativeToolTip": "src\\GestaoFrotas.Infrastructure\\Class1.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Title": "ChecklistsController.cs",
+              "DocumentMoniker": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.API\\Controllers\\ChecklistsController.cs",
+              "RelativeDocumentMoniker": "src\\GestaoFrotas.API\\Controllers\\ChecklistsController.cs",
+              "ToolTip": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.API\\Controllers\\ChecklistsController.cs",
+              "RelativeToolTip": "src\\GestaoFrotas.API\\Controllers\\ChecklistsController.cs",
+              "ViewState": "AgIAAFkAAAAAAAAAAAAIwGgAAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T00:41:37.133Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "DataSeeder.cs",
-              "DocumentMoniker": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Infrastructure\\Data\\DataSeeder.cs",
-              "RelativeDocumentMoniker": "src\\GestaoFrotas.Infrastructure\\Data\\DataSeeder.cs",
-              "ToolTip": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Infrastructure\\Data\\DataSeeder.cs",
-              "RelativeToolTip": "src\\GestaoFrotas.Infrastructure\\Data\\DataSeeder.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T00:39:50.101Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "AppDbContext.cs",
-              "DocumentMoniker": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Infrastructure\\Data\\AppDbContext.cs",
-              "RelativeDocumentMoniker": "src\\GestaoFrotas.Infrastructure\\Data\\AppDbContext.cs",
-              "ToolTip": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Infrastructure\\Data\\AppDbContext.cs",
-              "RelativeToolTip": "src\\GestaoFrotas.Infrastructure\\Data\\AppDbContext.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T00:39:43.211Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "VehicleConfiguration.cs",
-              "DocumentMoniker": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Infrastructure\\Configurations\\VehicleConfiguration.cs",
-              "RelativeDocumentMoniker": "src\\GestaoFrotas.Infrastructure\\Configurations\\VehicleConfiguration.cs",
-              "ToolTip": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Infrastructure\\Configurations\\VehicleConfiguration.cs",
-              "RelativeToolTip": "src\\GestaoFrotas.Infrastructure\\Configurations\\VehicleConfiguration.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T00:39:40.968Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
-              "Title": "UserConfiguration.cs",
-              "DocumentMoniker": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Infrastructure\\Configurations\\UserConfiguration.cs",
-              "RelativeDocumentMoniker": "src\\GestaoFrotas.Infrastructure\\Configurations\\UserConfiguration.cs",
-              "ToolTip": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Infrastructure\\Configurations\\UserConfiguration.cs",
-              "RelativeToolTip": "src\\GestaoFrotas.Infrastructure\\Configurations\\UserConfiguration.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T00:39:40.332Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "MaintenanceConfiguration.cs",
-              "DocumentMoniker": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Infrastructure\\Configurations\\MaintenanceConfiguration.cs",
-              "RelativeDocumentMoniker": "src\\GestaoFrotas.Infrastructure\\Configurations\\MaintenanceConfiguration.cs",
-              "ToolTip": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Infrastructure\\Configurations\\MaintenanceConfiguration.cs",
-              "RelativeToolTip": "src\\GestaoFrotas.Infrastructure\\Configurations\\MaintenanceConfiguration.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T00:39:39.689Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "ChecklistConfiguration.cs",
-              "DocumentMoniker": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Infrastructure\\Configurations\\ChecklistConfiguration.cs",
-              "RelativeDocumentMoniker": "src\\GestaoFrotas.Infrastructure\\Configurations\\ChecklistConfiguration.cs",
-              "ToolTip": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Infrastructure\\Configurations\\ChecklistConfiguration.cs",
-              "RelativeToolTip": "src\\GestaoFrotas.Infrastructure\\Configurations\\ChecklistConfiguration.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T00:39:37.729Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "ChecklistStatus.cs",
-              "DocumentMoniker": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Domain\\Enums\\ChecklistStatus.cs",
-              "RelativeDocumentMoniker": "src\\GestaoFrotas.Domain\\Enums\\ChecklistStatus.cs",
-              "ToolTip": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Domain\\Enums\\ChecklistStatus.cs",
-              "RelativeToolTip": "src\\GestaoFrotas.Domain\\Enums\\ChecklistStatus.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T00:39:31.234Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "Vehicle.cs",
-              "DocumentMoniker": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Domain\\Entities\\Vehicle.cs",
-              "RelativeDocumentMoniker": "src\\GestaoFrotas.Domain\\Entities\\Vehicle.cs",
-              "ToolTip": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Domain\\Entities\\Vehicle.cs",
-              "RelativeToolTip": "src\\GestaoFrotas.Domain\\Entities\\Vehicle.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T00:39:27.594Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "User.cs",
-              "DocumentMoniker": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Domain\\Entities\\User.cs",
-              "RelativeDocumentMoniker": "src\\GestaoFrotas.Domain\\Entities\\User.cs",
-              "ToolTip": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Domain\\Entities\\User.cs",
-              "RelativeToolTip": "src\\GestaoFrotas.Domain\\Entities\\User.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T00:39:26.731Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "Maintenance.cs",
-              "DocumentMoniker": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Domain\\Entities\\Maintenance.cs",
-              "RelativeDocumentMoniker": "src\\GestaoFrotas.Domain\\Entities\\Maintenance.cs",
-              "ToolTip": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Domain\\Entities\\Maintenance.cs",
-              "RelativeToolTip": "src\\GestaoFrotas.Domain\\Entities\\Maintenance.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T00:39:24.206Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "Checklist.cs",
-              "DocumentMoniker": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Domain\\Entities\\Checklist.cs",
-              "RelativeDocumentMoniker": "src\\GestaoFrotas.Domain\\Entities\\Checklist.cs",
-              "ToolTip": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Domain\\Entities\\Checklist.cs",
-              "RelativeToolTip": "src\\GestaoFrotas.Domain\\Entities\\Checklist.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T00:39:21.561Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "BaseEntity.cs",
-              "DocumentMoniker": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Domain\\Entities\\BaseEntity.cs",
-              "RelativeDocumentMoniker": "src\\GestaoFrotas.Domain\\Entities\\BaseEntity.cs",
-              "ToolTip": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Domain\\Entities\\BaseEntity.cs",
-              "RelativeToolTip": "src\\GestaoFrotas.Domain\\Entities\\BaseEntity.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T00:39:18.351Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "Class1.cs",
-              "DocumentMoniker": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Application\\Class1.cs",
-              "RelativeDocumentMoniker": "src\\GestaoFrotas.Application\\Class1.cs",
-              "ToolTip": "D:\\Projeto TCC Fatec 2024\\app\\Gest-o-de-Frotas\\packages\\backend\\src\\GestaoFrotas.Application\\Class1.cs",
-              "RelativeToolTip": "src\\GestaoFrotas.Application\\Class1.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-13T00:38:29.134Z",
+              "WhenOpened": "2025-10-13T03:19:23.551Z",
               "EditorCaption": ""
             }
           ]

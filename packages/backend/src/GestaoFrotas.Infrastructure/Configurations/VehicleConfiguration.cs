@@ -55,10 +55,6 @@ public class VehicleConfiguration : IEntityTypeConfiguration<Vehicle>
             .HasConversion<string>()
             .HasMaxLength(20);
 
-        // Valores padrão
-        builder.Property(v => v.Status)
-            .HasDefaultValue("Available");
-
         // Relacionamentos
         builder.HasMany(v => v.Checklists)
             .WithOne(c => c.Vehicle)
