@@ -19,6 +19,7 @@ public class UsersController : ControllerBase
         _context = context;
     }
 
+    [Authorize(Roles = "Admin,Gestor")]
     [HttpGet]
     public async Task<ActionResult<IEnumerable<object>>> GetUsers(
         [FromQuery] string? search,
@@ -90,7 +91,7 @@ public class UsersController : ControllerBase
         return Ok(user);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Gestor")]
     [HttpPut("{id}")]
     public async Task<ActionResult> UpdateUser(Guid id, [FromBody] UpdateUserRequest request)
     {

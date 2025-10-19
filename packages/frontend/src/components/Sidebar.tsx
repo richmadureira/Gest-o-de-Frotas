@@ -32,7 +32,7 @@ const gestorAdminMenu = [
   { text: 'Início', icon: <HomeIcon />, path: '/' },
   { text: 'Gestão de Checklists', icon: <AssignmentIcon />, path: '/checklist' },
   { text: 'Relatórios', icon: <BarChartIcon />, path: '/reports' },
-  { text: 'Cadastro de Condutores', icon: <PersonIcon />, path: '/drivers' },
+  { text: 'Gestão de Usuários', icon: <PersonIcon />, path: '/drivers' },
   { text: 'Cadastro de Veículos', icon: <DirectionsCarIcon />, path: '/vehicles' },
   { text: 'Solicitações de Manutenção', icon: <BuildIcon />, path: '/maintenance' },
   { text: 'Configurações', icon: <SettingsIcon />, path: '/settings' },

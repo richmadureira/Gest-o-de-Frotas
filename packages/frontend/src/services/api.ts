@@ -81,7 +81,16 @@ export const updateUser = async (id: string, data: {
   phone?: string;
   active: boolean;
 }) => {
-  const response = await api.put(`/users/${id}`, data);
+  // Mapear camelCase para PascalCase para o backend
+  const backendData = {
+    Email: data.email,
+    Name: data.name,
+    Role: data.role,
+    Cpf: data.cpf,
+    Phone: data.phone,
+    Active: data.active
+  };
+  const response = await api.put(`/users/${id}`, backendData);
   return response.data;
 };
 
