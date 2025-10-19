@@ -26,7 +26,11 @@ import {
   FormControlLabel,
   AppBar,
   Toolbar,
-  Alert
+  Alert,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel
 } from '@mui/material';
 
 import { Add, Edit, Delete, Upload, Download } from '@mui/icons-material';
@@ -37,42 +41,39 @@ import { Autocomplete } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import InputMask from 'react-input-mask';
+import { getUsers, register, updateUser, deleteUser } from '../services/api';
 
 // Tipos e interfaces para TypeScript
 interface Driver {
-  id: number;
+  id: string;
   name: string;
-  cpf: string;
   email: string;
-  phone: string;
-  status: boolean;
-  address?: string;
-  grantAccess?: boolean;
+  role: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 }
 
-interface Vehicle {
-  id: number;
-  plate: string;
-  model: string;
-}
-
-type DriverFormData = Omit<Driver, 'id'>;
+type DriverFormData = {
+  name: string;
+  email: string;
+  role: string;
+  active: boolean;
+  cpf?: string;
+  phone?: string;
+};
 type DriverErrors = Partial<Record<keyof DriverFormData, string>>;
 
 function DriverManagement() {
   const navigate = useNavigate();
   const [drivers, setDrivers] = useState<Driver[]>([]);
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
   const [formData, setFormData] = useState<DriverFormData>({
     name: '',
-    cpf: '',
     email: '',
-    phone: '',
-    status: true,
-    address: '',
-    grantAccess: true,
+    role: 'Condutor',
+    active: true,
   });
   const [errors, setErrors] = useState<DriverErrors>({});
   const [openSnackbar, setOpenSnackbar] = useState(false);
@@ -83,36 +84,33 @@ function DriverManagement() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
 
+  const [error, setError] = useState<string | null>(null);
+
+  // Carregar motoristas da API
   useEffect(() => {
-    setDrivers([
-      { id: 1, name: 'João Silva', cpf: '12345678901', email: 'joao@email.com', phone: '11999999999', status: true },
-      { id: 2, name: 'Maria Oliveira', cpf: '98765432100', email: 'maria@email.com', phone: '11988888888', status: false },
-      { id: 3, name: 'Carlos Souza', cpf: '11122233344', email: 'carlos@email.com', phone: '11977777777', status: true },
-    ]);
-  
-    setVehicles([
-      { id: 1, plate: 'ABC-1234', model: 'Fiat Uno' },
-      { id: 2, plate: 'DEF-5678', model: 'Toyota Corolla' },
-      { id: 3, plate: 'GHI-9012', model: 'Honda Civic' },
-      { id: 4, plate: 'JKL-3456', model: 'Volkswagen Gol' },
-      { id: 5, plate: 'MNO-7890', model: 'Ford Ka' },
-      { id: 6, plate: 'PQR-4567', model: 'Chevrolet Onix' },
-      { id: 7, plate: 'STU-8910', model: 'Hyundai HB20' },
-      { id: 8, plate: 'VWX-2345', model: 'Renault Kwid' },
-      { id: 9, plate: 'YZA-6789', model: 'Jeep Compass' },
-      { id: 10, plate: 'BCD-0123', model: 'Kia Sportage' },
-      { id: 11, plate: 'EFG-4567', model: 'Peugeot 208' },
-      { id: 12, plate: 'HIJ-8901', model: 'Nissan Versa' },
-    ]);
+    loadDrivers();
   }, []);
+
+  const loadDrivers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const data = await getUsers({ role: 'Condutor' });
+      setDrivers(data);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Erro ao carregar motoristas');
+      console.error('Erro ao carregar motoristas:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Validação dinâmica dos campos obrigatórios
   useEffect(() => {
     const newErrors: DriverErrors = {};
     if (!formData.name) newErrors.name = 'Nome obrigatório';
-    if (!formData.cpf || formData.cpf.replace(/\D/g, '').length !== 11) newErrors.cpf = 'CPF inválido';
     if (!formData.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email)) newErrors.email = 'E-mail inválido';
-    if (!formData.phone) newErrors.phone = 'Telefone obrigatório';
+    if (!formData.role) newErrors.role = 'Função obrigatória';
     setErrors(newErrors);
   }, [formData]);
 
@@ -120,8 +118,13 @@ function DriverManagement() {
     setEditingDriver(driver);
     setFormData(
       driver
-        ? { ...driver }
-        : { name: '', cpf: '', email: '', phone: '', status: true, address: '', grantAccess: true }
+        ? { 
+            name: driver.name, 
+            email: driver.email, 
+            role: driver.role, 
+            active: driver.isActive 
+          }
+        : { name: '', email: '', role: 'Condutor', active: true }
     );
     setErrors({});
     setOpenDialog(true);
@@ -136,32 +139,59 @@ function DriverManagement() {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSaveDriver = () => {
+  const handleSaveDriver = async () => {
     if (!validateForm()) return;
-    if (editingDriver) {
-      setDrivers(drivers.map(d => (d.id === editingDriver.id ? { ...editingDriver, ...formData } : d)));
-      setSnackbarMessage('Dados atualizados com sucesso!');
-      setSnackbarType('success');
-    } else {
-      if (drivers.some(d => d.cpf === formData.cpf)) {
-        setSnackbarMessage('Erro ao salvar condutor: CPF já cadastrado');
-        setSnackbarType('error');
-        setOpenSnackbar(true);
-        return;
+
+    try {
+      setLoading(true);
+      setError(null);
+      
+      if (editingDriver) {
+        await updateUser(editingDriver.id, formData);
+        setSnackbarMessage('Motorista atualizado com sucesso!');
+      } else {
+        // Para criar um novo usuário, precisamos de uma senha
+        const userData = {
+          ...formData,
+          password: '123456', // Senha padrão - em produção, isso deveria ser definido pelo usuário
+        };
+        await register(userData);
+        setSnackbarMessage('Motorista criado com sucesso!');
       }
-      setDrivers([...drivers, { ...formData, id: drivers.length ? Math.max(...drivers.map(d => d.id)) + 1 : 1 }]);
-      setSnackbarMessage('Condutor criado com sucesso!');
+      
       setSnackbarType('success');
+      setOpenSnackbar(true);
+      await loadDrivers();
+      handleCloseDialog();
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Erro ao salvar motorista');
+      setSnackbarMessage('Erro ao salvar motorista');
+      setSnackbarType('error');
+      setOpenSnackbar(true);
+      console.error('Erro ao salvar motorista:', err);
+    } finally {
+      setLoading(false);
     }
-    setOpenSnackbar(true);
-    handleCloseDialog();
   };
 
-  const handleDeleteDriver = (id: number) => {
-    setDrivers(drivers.filter(d => d.id !== id));
-    setSnackbarMessage('Condutor removido com sucesso!');
-    setSnackbarType('success');
-    setOpenSnackbar(true);
+  const handleDeleteDriver = async (id: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await deleteUser(id);
+      setSnackbarMessage('Motorista removido com sucesso!');
+      setSnackbarType('success');
+      setOpenSnackbar(true);
+      await loadDrivers();
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Erro ao remover motorista');
+      setSnackbarMessage('Erro ao remover motorista');
+      setSnackbarType('error');
+      setOpenSnackbar(true);
+      console.error('Erro ao remover motorista:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -169,41 +199,10 @@ function DriverManagement() {
   };
 
   const handleImportCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    Papa.parse(file, {
-      header: true,
-      skipEmptyLines: true,
-      complete: (results: any) => {
-        const importedDrivers: Driver[] = results.data.map((row: any) => ({
-          id: row.id,
-          name: row.name,
-          cpf: row.cpf,
-          email: row.email,
-          phone: row.phone,
-          status: row.status === 'true',
-          address: row.address,
-          grantAccess: row.grantAccess === 'true',
-        }));
-
-        const duplicates = importedDrivers.filter((imported) =>
-          drivers.some((existing) => existing.cpf === imported.cpf)
-        );
-
-        if (duplicates.length > 0) {
-          setSnackbarMessage('Erro: CPFs duplicados no arquivo importado.');
-          setSnackbarType('error');
-          setOpenSnackbar(true);
-          return;
-        }
-
-        setDrivers([...drivers, ...importedDrivers]);
-        setSnackbarMessage('Dados importados com sucesso!');
-        setSnackbarType('success');
-        setOpenSnackbar(true);
-      },
-    });
+    // Função de importação CSV desabilitada temporariamente
+    setSnackbarMessage('Funcionalidade de importação CSV em desenvolvimento.');
+    setSnackbarType('error');
+    setOpenSnackbar(true);
   };
 
   // Função para normalizar strings (remover acentos e deixar minúsculo)
@@ -215,14 +214,20 @@ function DriverManagement() {
     const query = normalize(searchQuery);
     return (
       normalize(d.name).includes(query) ||
-      normalize(d.cpf).includes(query) ||
       (d.email && normalize(d.email).includes(query)) ||
-      (d.phone && normalize(d.phone).includes(query))
+      normalize(d.role).includes(query)
     );
   });
 
   return (
     <Container maxWidth="lg" style={{ marginTop: '2rem' }}>
+      {/* Indicador de Erro */}
+      {error && (
+        <Alert severity="error" sx={{ marginBottom: 2 }}>
+          {error}
+        </Alert>
+      )}
+      
       {/* Barra de Ações */}
       <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={3} marginTop={4}>
         <Box display="flex" alignItems={'center'} gap={2}>
@@ -267,25 +272,23 @@ function DriverManagement() {
             <TableRow>
               <TableCell>ID</TableCell>
               <TableCell>Nome completo</TableCell>
-              <TableCell>CPF</TableCell>
               <TableCell>E-mail</TableCell>
-              <TableCell>Telefone</TableCell>
+              <TableCell>Função</TableCell>
               <TableCell>Status</TableCell>
               <TableCell align="right">Ações</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredDrivers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((driver) => (
+            {filteredDrivers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((driver, idx) => (
               <TableRow key={driver.id}>
-                <TableCell>{driver.id}</TableCell>
+                <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
                 <TableCell>{driver.name}</TableCell>
-                <TableCell>{driver.cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4')}</TableCell>
                 <TableCell>{driver.email}</TableCell>
-                <TableCell>{driver.phone}</TableCell>
+                <TableCell>{driver.role}</TableCell>
                 <TableCell>
                   <Chip
-                    label={driver.status ? 'Ativo' : 'Inativo'}
-                    color={driver.status ? 'success' : 'default'}
+                    label={driver.isActive ? 'Ativo' : 'Inativo'}
+                    color={driver.isActive ? 'success' : 'default'}
                     size="small"
                   />
                 </TableCell>
@@ -323,7 +326,7 @@ function DriverManagement() {
 
       {/* Dialog de Cadastro/Edição */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingDriver ? 'Editar Condutor' : 'Novo Condutor'}</DialogTitle>
+        <DialogTitle>{editingDriver ? 'Editar Motorista' : 'Novo Motorista'}</DialogTitle>
         <DialogContent>
           <Box component="form" sx={{ mt: 1 }}>
             <TextField
@@ -336,23 +339,6 @@ function DriverManagement() {
               margin="normal"
               required
             />
-            <InputMask
-              mask="999.999.999-99"
-              value={formData.cpf}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, cpf: e.target.value })}
-            >
-              {(inputProps: any) => (
-                <TextField
-                  {...inputProps}
-                  label="CPF *"
-                  error={!!errors.cpf}
-                  helperText={errors.cpf}
-                  fullWidth
-                  margin="normal"
-                  required
-                />
-              )}
-            </InputMask>
             <TextField
               label="E-mail *"
               value={formData.email}
@@ -363,45 +349,36 @@ function DriverManagement() {
               margin="normal"
               required
             />
-            <TextField
-              label="Telefone *"
-              value={formData.phone}
-              onChange={e => setFormData({ ...formData, phone: e.target.value })}
-              error={!!errors.phone}
-              helperText={errors.phone}
-              fullWidth
-              margin="normal"
-              required
+            <FormControl fullWidth margin="normal" required>
+              <InputLabel id="role-label">Função *</InputLabel>
+              <Select
+                labelId="role-label"
+                value={formData.role}
+                label="Função *"
+                onChange={e => setFormData({ ...formData, role: e.target.value })}
+                error={!!errors.role}
+              >
+                <MenuItem value="Condutor">Condutor</MenuItem>
+                <MenuItem value="Gestor">Gestor de Frota</MenuItem>
+                <MenuItem value="Admin">Administrador</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={formData.active}
+                  onChange={e => setFormData({ ...formData, active: e.target.checked })}
+                  color="primary"
+                />
+              }
+              label="Usuário ativo"
             />
-            <TextField
-              label="Endereço"
-              value={formData.address}
-              onChange={e => setFormData({ ...formData, address: e.target.value })}
-              fullWidth
-              margin="normal"
-            />
-            {editingDriver && (
-              <FormControlLabel
-                control={
-                  <Switch
-                    checked={formData.grantAccess}
-                    onChange={e => setFormData({ 
-                      ...formData, 
-                      grantAccess: e.target.checked,
-                      status: e.target.checked
-                    })}
-                    color="primary"
-                  />
-                }
-                label="Conceder acesso ao sistema"
-              />
-            )}
           </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="secondary">Cancelar</Button>
-          <Button onClick={handleSaveDriver} color="primary" variant="contained" disabled={!formData.name || !formData.cpf || !formData.email || !formData.phone || Object.keys(errors).length > 0}>
-            Salvar
+          <Button onClick={handleSaveDriver} color="primary" variant="contained" disabled={!formData.name || !formData.email || !formData.role || Object.keys(errors).length > 0 || loading}>
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Salvar'}
           </Button>
         </DialogActions>
       </Dialog>

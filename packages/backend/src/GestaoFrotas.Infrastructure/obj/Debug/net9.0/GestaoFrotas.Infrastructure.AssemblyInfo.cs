@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("GestaoFrotas.Infrastructure")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8a892372a05bda0c91f4f4a6d07c62a8f4a25c30")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8e7d956d5398b6bbde87680a53b4b4a924465b3f")]
 [assembly: System.Reflection.AssemblyProductAttribute("GestaoFrotas.Infrastructure")]
 [assembly: System.Reflection.AssemblyTitleAttribute("GestaoFrotas.Infrastructure")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

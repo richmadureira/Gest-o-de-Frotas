@@ -56,7 +56,9 @@ const Sidebar: React.FC<SidebarProps> = ({ mobileOpen, onDrawerToggle }) => {
   const navigate = useNavigate();
   const { userRole } = useAuth();
 
-  const allowedNavItems = userRole ? gestorAdminMenu.filter(item => permissions[userRole].includes(item.path.split('/')[1])) : [];
+  const allowedNavItems = userRole && permissions[userRole] 
+    ? gestorAdminMenu.filter(item => permissions[userRole].includes(item.path.split('/')[1])) 
+    : [];
 
   const drawerContent = (
     <div>

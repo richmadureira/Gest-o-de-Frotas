@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
-import { AppBar, Toolbar, Typography, IconButton, Box, CssBaseline, useMediaQuery, Button } from '@mui/material';
+import { AppBar, Toolbar, Typography, IconButton, Box, CssBaseline, useMediaQuery } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 import MenuIcon from '@mui/icons-material/Menu';
 import theme from './theme';
@@ -16,7 +16,7 @@ import ReportDetails from './pages/ReportDetails'; // Importa a nova página de 
 import Settings from './pages/Settings'; // Importa a nova página de configurações
 import Maintenance from './pages/Maintenance'; 
 import Sidebar from './components/Sidebar';
-import { useAuth, UserRole } from './components/AuthContext';
+import { useAuth } from './components/AuthContext';
 import LogoutIcon from '@mui/icons-material/ExitToApp';
 import ChecklistManagement from './pages/ChecklistManagement';
 
@@ -43,14 +43,10 @@ function ProtectedRoute({ element, path }: { element: React.ReactElement, path: 
 }
 
 function App() {
-  const { isAuthenticated, login, logout, userRole } = useAuth();
+  const { isAuthenticated, logout, userRole } = useAuth();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const muiTheme = useTheme();
   const isDesktop = useMediaQuery(muiTheme.breakpoints.up('md'));
-
-  const handleLogin = (email: string, password: string, role: UserRole) => {
-    login(email, role);
-  };
 
   const handleLogout = () => {
     logout();
@@ -130,7 +126,7 @@ function App() {
           </Box>
         ) : (
           <Routes>
-            <Route path="/login" element={<Login onLogin={handleLogin} />} />
+            <Route path="/login" element={<Login />} />
             <Route path="*" element={<Navigate to="/login" />} />
           </Routes>
         )}

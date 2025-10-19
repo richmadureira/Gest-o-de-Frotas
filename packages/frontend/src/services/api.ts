@@ -33,6 +33,7 @@ api.interceptors.response.use(
       // Token inválido ou expirado - redirecionar para login
       localStorage.removeItem('token');
       localStorage.removeItem('userRole');
+      localStorage.removeItem('user');
       window.location.href = '/login';
     }
     return Promise.reject(error);

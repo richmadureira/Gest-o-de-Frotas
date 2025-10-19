@@ -9,49 +9,44 @@ import {
   InputAdornment,
   IconButton,
   Link,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel
+  Alert
 } from '@mui/material';
-import { Navigate, Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink } from 'react-router-dom';
 import logo from "../image/logo.png";
-import { UserRole } from './AuthContext';
+import { useAuth } from './AuthContext';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-
-interface LoginProps {
-  onLogin: (email: string, password: string, role: UserRole) => void;
-}
 
 const validateEmail = (email: string) => {
   // Regex simples para validação de e-mail
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
 
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
+const Login: React.FC = () => {
+  const { login, loading, error } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [role, setRole] = useState<UserRole | ''>('');
+  const [localError, setLocalError] = useState('');
 
   const isEmailValid = validateEmail(email);
   const isPasswordValid = password.length > 0;
-  const isFormValid = isEmailValid && isPasswordValid && !!role;
+  const isFormValid = isEmailValid && isPasswordValid;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-    setTimeout(() => {
-      setLoading(false);
-      if (email && password && role !== '') {
-        onLogin(email, password, role as UserRole);
-      } else {
-        setError('Preencha todos os campos corretamente');
-      }
-    }, 1000);
+    setLocalError('');
+    
+    if (!isFormValid) {
+      setLocalError('Preencha todos os campos corretamente');
+      return;
+    }
+
+    try {
+      await login(email, password);
+    } catch (err) {
+      // O erro já é tratado no AuthContext
+      console.error('Erro no login:', err);
+    }
   };
 
   return (
@@ -121,30 +116,17 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
               ),
             }}
           />
-          <FormControl fullWidth margin="normal" required>
-            <InputLabel id="role-label">Perfil</InputLabel>
-            <Select
-              labelId="role-label"
-              value={role}
-              label="Perfil"
-              onChange={e => setRole((e.target.value ?? '') as UserRole)}
-            >
-              <MenuItem value="admin">Administrador</MenuItem>
-              <MenuItem value="gestor">Gestor de Frota</MenuItem>
-              <MenuItem value="condutor">Condutor</MenuItem>
-            </Select>
-          </FormControl>
           {/* Link Esqueci minha senha */}
           <Box display="flex" justifyContent="flex-end" mb={1}>
             <Link component={RouterLink} to="/forgot-password" underline="hover" color="primary" fontSize={14}>
               Esqueci minha senha
             </Link>
           </Box>
-          {/* Mensagem de erro */}
-          {error && (
-            <Typography color="error" sx={{ marginTop: '0.5rem', fontSize: 14 }}>
-              {error}
-            </Typography>
+          {/* Mensagens de erro */}
+          {(error || localError) && (
+            <Alert severity="error" sx={{ marginTop: '0.5rem', fontSize: 14 }}>
+              {error || localError}
+            </Alert>
           )}
           <Button
             type="submit"
