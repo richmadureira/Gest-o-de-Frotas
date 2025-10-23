@@ -5,15 +5,12 @@
 # ===========================================
 
 # ===========================================
-# NODE.JS / NPM / YARN (PRIORIDADE MÁXIMA)
+# NODE.JS / NPM / YARN
 # ===========================================
 
-# Dependencies - IGNORAR COMPLETAMENTE
+# Dependencies
 node_modules/
 **/node_modules/
-packages/*/node_modules/
-packages/frontend/node_modules/
-packages/backend/node_modules/
 
 # Package manager files
 npm-debug.log*
@@ -21,7 +18,7 @@ yarn-debug.log*
 yarn-error.log*
 lerna-debug.log*
 
-# Package manager lock files (manter apenas um)
+# Package manager lock files
 package-lock.json
 yarn.lock
 pnpm-lock.yaml
@@ -289,7 +286,6 @@ FakesAssemblies/
 
 # Node.js Tools for Visual Studio
 .ntvs_analysis.dat
-node_modules/
 
 # Visual Studio 6 build log
 *.plg
@@ -637,20 +633,5 @@ playwright/.cache/
 *.mkv
 
 # ===========================================
-# ARQUIVOS JÁ COMMITADOS (REMOVER DO TRACKING)
-# ===========================================
-
-# Se você já commitou node_modules por engano, use estes comandos:
-# git rm -r --cached node_modules/
-# git rm -r --cached packages/*/node_modules/
-# git commit -m "Remove node_modules from tracking"
-
-# Arquivos específicos que podem ter sido commitados
-packages/frontend/node_modules/
-packages/backend/node_modules/
-node_modules/
-
-# ===========================================
 # END OF .gitignore
 # ===========================================
-/packages
