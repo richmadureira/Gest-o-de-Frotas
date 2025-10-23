@@ -129,7 +129,19 @@ export const createVehicle = async (data: {
   lastMaintenance?: string;
   nextMaintenance?: string;
 }) => {
-  const response = await api.post('/vehicles', data);
+  // Mapear camelCase para PascalCase e converter strings para enums
+  const backendData = {
+    Plate: data.plate,
+    Model: data.model,
+    Brand: data.brand,
+    Year: data.year,
+    Type: data.type, // Backend vai converter string para enum
+    Status: data.status, // Backend vai converter string para enum
+    Mileage: data.mileage,
+    LastMaintenance: data.lastMaintenance ? new Date(data.lastMaintenance) : null,
+    NextMaintenance: data.nextMaintenance ? new Date(data.nextMaintenance) : null
+  };
+  const response = await api.post('/vehicles', backendData);
   return response.data;
 };
 
@@ -144,7 +156,19 @@ export const updateVehicle = async (id: string, data: {
   lastMaintenance?: string;
   nextMaintenance?: string;
 }) => {
-  const response = await api.put(`/vehicles/${id}`, data);
+  // Mapear camelCase para PascalCase e converter strings para enums
+  const backendData = {
+    Plate: data.plate,
+    Model: data.model,
+    Brand: data.brand,
+    Year: data.year,
+    Type: data.type, // Backend vai converter string para enum
+    Status: data.status, // Backend vai converter string para enum
+    Mileage: data.mileage,
+    LastMaintenance: data.lastMaintenance ? new Date(data.lastMaintenance) : null,
+    NextMaintenance: data.nextMaintenance ? new Date(data.nextMaintenance) : null
+  };
+  const response = await api.put(`/vehicles/${id}`, backendData);
   return response.data;
 };
 

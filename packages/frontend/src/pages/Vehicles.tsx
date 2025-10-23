@@ -25,11 +25,13 @@ import {
   Toolbar,
   CircularProgress,
   Alert,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from '@mui/material';
-import { Add, Edit, Delete, Upload, Download } from '@mui/icons-material';
+import { Add, Edit, Delete } from '@mui/icons-material';
 import HomeIcon from '@mui/icons-material/Home';
-import Papa from 'papaparse';
-import { CSVLink } from 'react-csv';
 import { useNavigate } from 'react-router-dom';
 import InputMask from 'react-input-mask';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -121,6 +123,7 @@ function VehicleManagement() {
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setEditingVehicle(null);
+    setError(null);
   };
 
   // Validação dinâmica dos campos obrigatórios e da placa
@@ -210,27 +213,9 @@ function VehicleManagement() {
       normalize(vehicle.model).includes(normalize(searchQuery))
   );
 
-  const handleImportCSV = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    Papa.parse(file, {
-      header: true,
-      complete: (results: any) => {
-        setVehicles((prev) => [...prev, ...results.data]);
-        setSnackbarMessage('Dados importados com sucesso!');
-        setOpenSnackbar(true);
-      },
-    });
-  };
 
   return (
     <Container maxWidth="lg" style={{ marginTop: '2rem' }}>
-      {/* Indicador de Erro */}
-      {error && (
-        <Alert severity="error" sx={{ marginBottom: 2 }}>
-          {error}
-        </Alert>
-      )}
       
       {/* Barra de Ações */}
       <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={3} marginTop={4}>
@@ -252,21 +237,6 @@ function VehicleManagement() {
           >
             Novo Veículo
           </Button>
-        </Box>
-        <Box display="flex" gap={2}>
-          <Button
-            variant="outlined"
-            component="label"
-            startIcon={<Upload />}
-          >
-            Importar CSV
-            <input type="file" hidden onChange={handleImportCSV} />
-          </Button>
-          <CSVLink data={vehicles} filename="vehicles.csv">
-            <Button variant="outlined" color="secondary" startIcon={<Download />}>
-              Exportar Dados
-            </Button>
-          </CSVLink>
         </Box>
       </Box>
 
@@ -345,7 +315,22 @@ function VehicleManagement() {
 
       {/* Dialog de Cadastro/Edição */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingVehicle ? 'Editar Veículo' : 'Novo Veículo'}</DialogTitle>
+        {error && (
+          <Alert 
+            severity="error" 
+            sx={{ 
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              zIndex: 1,
+              borderRadius: 0
+            }}
+          >
+            {error}
+          </Alert>
+        )}
+        <DialogTitle sx={{ mt: error ? 6 : 0 }}>{editingVehicle ? 'Editar Veículo' : 'Novo Veículo'}</DialogTitle>
         <DialogContent>
           <Box component="form" sx={{ mt: 1 }}>
             <TextField
@@ -379,16 +364,21 @@ function VehicleManagement() {
               margin="normal"
               required
             />
-            <TextField
-              label="Tipo *"
-              value={formData.type}
-              onChange={e => setFormData({ ...formData, type: e.target.value })}
-              error={!!errors.type}
-              helperText={errors.type}
-              fullWidth
-              margin="normal"
-              required
-            />
+            <FormControl fullWidth margin="normal" required>
+              <InputLabel id="type-label">Tipo *</InputLabel>
+              <Select
+                labelId="type-label"
+                value={formData.type}
+                label="Tipo *"
+                onChange={e => setFormData({ ...formData, type: e.target.value })}
+                error={!!errors.type}
+              >
+                <MenuItem value="Car">Carro</MenuItem>
+                <MenuItem value="Truck">Caminhão</MenuItem>
+                <MenuItem value="Van">Van/Utilitário</MenuItem>
+                <MenuItem value="Motorcycle">Motocicleta</MenuItem>
+              </Select>
+            </FormControl>
             <TextField
               label="Ano *"
               type="number"
