@@ -35,47 +35,47 @@ import HomeIcon from '@mui/icons-material/Home';
 import { useNavigate } from 'react-router-dom';
 import InputMask from 'react-input-mask';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { getVehicles, createVehicle, updateVehicle, deleteVehicle } from '../services/api';
+import { getVeiculos, createVeiculo, updateVeiculo, deleteVeiculo } from '../services/api';
 
 // Tipos e interfaces para TypeScript
-interface Vehicle {
+interface Veiculo {
   id: string;
-  plate: string;
-  model: string;
-  year: number;
-  brand: string;
-  type: string;
+  placa: string;
+  modelo: string;
+  ano: number;
+  marca: string;
+  tipo: string;
   status: string;
-  fuelLevel: string;
-  mileage: number;
-  lastMaintenance?: string;
-  createdAt: string;
-  updatedAt: string;
+  nivelCombustivel: string;
+  quilometragem: number;
+  ultimaManutencao?: string;
+  criadoEm: string;
+  atualizadoEm: string;
 }
 
-type VehicleFormData = Omit<Vehicle, 'id' | 'createdAt' | 'updatedAt'>;
-type VehicleErrors = Partial<Record<keyof VehicleFormData, string>>;
+type VeiculoFormData = Omit<Veiculo, 'id' | 'criadoEm' | 'atualizadoEm'>;
+type VeiculoErrors = Partial<Record<keyof VeiculoFormData, string>>;
 
 // Regex para placas brasileiras (antiga e Mercosul, com ou sem hífen)
 const PLATE_REGEX = /^([A-Z]{3}-?\d{4}|[A-Z]{3}\d[A-Z]\d{2})$/i;
 
-function VehicleManagement() {
+function GerenciamentoVeiculos() {
   const navigate = useNavigate();
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
-  const [editingVehicle, setEditingVehicle] = useState<Vehicle | null>(null);
-  const [formData, setFormData] = useState<VehicleFormData>({
-    plate: '',
-    model: '',
-    year: new Date().getFullYear(),
-    brand: '',
-    type: '',
-    status: 'Available',
-    fuelLevel: 'Full',
-    mileage: 0,
-    lastMaintenance: '',
+  const [editingVeiculo, setEditingVeiculo] = useState<Veiculo | null>(null);
+  const [formData, setFormData] = useState<VeiculoFormData>({
+    placa: '',
+    modelo: '',
+    ano: new Date().getFullYear(),
+    marca: '',
+    tipo: '',
+    status: 'Disponivel',
+    nivelCombustivel: 'Cheio',
+    quilometragem: 0,
+    ultimaManutencao: '',
   });
-  const [errors, setErrors] = useState<VehicleErrors>({});
+  const [errors, setErrors] = useState<VeiculoErrors>({});
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
@@ -86,15 +86,15 @@ function VehicleManagement() {
 
   // Carregar veículos da API
   useEffect(() => {
-    loadVehicles();
+    carregarVeiculos();
   }, []);
 
-  const loadVehicles = async () => {
+  const carregarVeiculos = async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getVehicles();
-      setVehicles(data);
+      const data = await getVeiculos();
+      setVeiculos(data);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao carregar veículos');
       console.error('Erro ao carregar veículos:', err);
@@ -103,18 +103,18 @@ function VehicleManagement() {
     }
   };
 
-  const handleOpenDialog = (vehicle: Vehicle | null = null) => {
-    setEditingVehicle(vehicle);
-    setFormData(vehicle || {
-      plate: '',
-      model: '',
-      year: new Date().getFullYear(),
-      brand: '',
-      type: '',
-      status: 'Available',
-      fuelLevel: 'Full',
-      mileage: 0,
-      lastMaintenance: '',
+  const handleOpenDialog = (veiculo: Veiculo | null = null) => {
+    setEditingVeiculo(veiculo);
+    setFormData(veiculo || {
+      placa: '',
+      modelo: '',
+      ano: new Date().getFullYear(),
+      marca: '',
+      tipo: '',
+      status: 'Disponivel',
+      nivelCombustivel: 'Cheio',
+      quilometragem: 0,
+      ultimaManutencao: '',
     });
     setErrors({});
     setOpenDialog(true);
@@ -122,56 +122,56 @@ function VehicleManagement() {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    setEditingVehicle(null);
+    setEditingVeiculo(null);
     setError(null);
   };
 
   // Validação dinâmica dos campos obrigatórios e da placa
   useEffect(() => {
-    const newErrors: VehicleErrors = {};
-    if (!formData.plate) {
-      newErrors.plate = 'A placa é obrigatória.';
-    } else if (!PLATE_REGEX.test(formData.plate.replace(/\s/g, '').toUpperCase())) {
-      newErrors.plate = 'Placa inválida. Use o formato AAA-9999, AAA9999 ou AAA1A23.';
+    const newErrors: VeiculoErrors = {};
+    if (!formData.placa) {
+      newErrors.placa = 'A placa é obrigatória.';
+    } else if (!PLATE_REGEX.test(formData.placa.replace(/\s/g, '').toUpperCase())) {
+      newErrors.placa = 'Placa inválida. Use o formato AAA-9999, AAA9999 ou AAA1A23.';
     } else if (
-      vehicles.some(
-        (vehicle) =>
-          vehicle.plate.replace(/\s/g, '').toUpperCase() === formData.plate.replace(/\s/g, '').toUpperCase() &&
-          (!editingVehicle || vehicle.id !== editingVehicle.id)
+      veiculos.some(
+        (veiculo) =>
+          veiculo.placa.replace(/\s/g, '').toUpperCase() === formData.placa.replace(/\s/g, '').toUpperCase() &&
+          (!editingVeiculo || veiculo.id !== editingVeiculo.id)
       )
     ) {
-      newErrors.plate = 'A placa já existe.';
+      newErrors.placa = 'A placa já existe.';
     }
-    if (!formData.model) newErrors.model = 'O modelo é obrigatório.';
-    if (!formData.brand) newErrors.brand = 'A marca é obrigatória.';
-    if (!formData.type) newErrors.type = 'O tipo é obrigatório.';
-    if (!formData.year || formData.year < 1900 || formData.year > new Date().getFullYear() + 1) {
-      newErrors.year = 'O ano deve ser válido.';
+    if (!formData.modelo) newErrors.modelo = 'O modelo é obrigatório.';
+    if (!formData.marca) newErrors.marca = 'A marca é obrigatória.';
+    if (!formData.tipo) newErrors.tipo = 'O tipo é obrigatório.';
+    if (!formData.ano || formData.ano < 1900 || formData.ano > new Date().getFullYear() + 1) {
+      newErrors.ano = 'O ano deve ser válido.';
     }
     setErrors(newErrors);
-  }, [formData, vehicles, editingVehicle]);
+  }, [formData, veiculos, editingVeiculo]);
 
   const validateForm = () => {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSaveVehicle = async () => {
+  const handleSaveVeiculo = async () => {
     if (!validateForm()) return;
 
     try {
       setLoading(true);
       setError(null);
       
-      if (editingVehicle) {
-        await updateVehicle(editingVehicle.id, formData);
+      if (editingVeiculo) {
+        await updateVeiculo(editingVeiculo.id, formData);
         setSnackbarMessage('Veículo atualizado com sucesso!');
       } else {
-        await createVehicle(formData);
+        await createVeiculo(formData);
         setSnackbarMessage('Veículo adicionado com sucesso!');
       }
       
       // Recarregar lista de veículos
-      await loadVehicles();
+      await carregarVeiculos();
       setOpenSnackbar(true);
       handleCloseDialog();
     } catch (err: any) {
@@ -182,14 +182,14 @@ function VehicleManagement() {
     }
   };
 
-  const handleDeactivateVehicle = async (id: string) => {
+  const handleDeactivateVeiculo = async (id: string) => {
     try {
       setLoading(true);
       setError(null);
-      await deleteVehicle(id);
+      await deleteVeiculo(id);
       setSnackbarMessage('Veículo removido com sucesso!');
       setOpenSnackbar(true);
-      await loadVehicles();
+      await carregarVeiculos();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao remover veículo');
       console.error('Erro ao remover veículo:', err);
@@ -207,10 +207,10 @@ function VehicleManagement() {
     return str ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() : '';
   }
 
-  const filteredVehicles = vehicles.filter(
-    (vehicle) =>
-      normalize(vehicle.plate).includes(normalize(searchQuery)) ||
-      normalize(vehicle.model).includes(normalize(searchQuery))
+  const filteredVeiculos = veiculos.filter(
+    (veiculo) =>
+      normalize(veiculo.placa).includes(normalize(searchQuery)) ||
+      normalize(veiculo.modelo).includes(normalize(searchQuery))
   );
 
 
@@ -257,14 +257,14 @@ function VehicleManagement() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredVehicles.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((vehicle, idx) => (
-              <TableRow key={vehicle.id}>
+            {filteredVeiculos.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((veiculo, idx) => (
+              <TableRow key={veiculo.id}>
                 <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
-                <TableCell>{vehicle.plate}</TableCell>
-                <TableCell>{vehicle.brand}</TableCell>
-                <TableCell>{vehicle.model}</TableCell>
-                <TableCell>{vehicle.type}</TableCell>
-                <TableCell>{vehicle.year}</TableCell>
+                <TableCell>{veiculo.placa}</TableCell>
+                <TableCell>{veiculo.marca}</TableCell>
+                <TableCell>{veiculo.modelo}</TableCell>
+                <TableCell>{veiculo.tipo}</TableCell>
+                <TableCell>{veiculo.ano}</TableCell>
                 <TableCell>
                   <Box
                     sx={{
@@ -273,22 +273,22 @@ function VehicleManagement() {
                       borderRadius: '4px',
                       fontSize: '0.75rem',
                       fontWeight: 'bold',
-                      backgroundColor: vehicle.status === 'Available' ? '#e8f5e8' : '#ffe8e8',
-                      color: vehicle.status === 'Available' ? '#2e7d32' : '#d32f2f',
+                      backgroundColor: veiculo.status === 'Disponivel' ? '#e8f5e8' : '#ffe8e8',
+                      color: veiculo.status === 'Disponivel' ? '#2e7d32' : '#d32f2f',
                     }}
                   >
-                    {vehicle.status === 'Available' ? 'Disponível' : 'Indisponível'}
+                    {veiculo.status === 'Disponivel' ? 'Disponível' : 'Indisponível'}
                   </Box>
                 </TableCell>
-                <TableCell>{vehicle.mileage.toLocaleString()} km</TableCell>
+                <TableCell>{veiculo.quilometragem.toLocaleString()} km</TableCell>
                 <TableCell align="right">
                   <Tooltip title="Editar">
-                    <IconButton color="primary" onClick={() => handleOpenDialog(vehicle)}>
+                    <IconButton color="primary" onClick={() => handleOpenDialog(veiculo)}>
                       <Edit />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Excluir">
-                    <IconButton color="error" onClick={() => handleDeactivateVehicle(vehicle.id)}>
+                    <IconButton color="error" onClick={() => handleDeactivateVeiculo(veiculo.id)}>
                       <Delete />
                     </IconButton>
                   </Tooltip>
@@ -303,7 +303,7 @@ function VehicleManagement() {
       <TablePagination
         rowsPerPageOptions={[10, 20]}
         component="div"
-        count={filteredVehicles.length}
+        count={filteredVeiculos.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={(event, newPage) => setPage(newPage)}
@@ -330,15 +330,15 @@ function VehicleManagement() {
             {error}
           </Alert>
         )}
-        <DialogTitle sx={{ mt: error ? 6 : 0 }}>{editingVehicle ? 'Editar Veículo' : 'Novo Veículo'}</DialogTitle>
+        <DialogTitle sx={{ mt: error ? 6 : 0 }}>{editingVeiculo ? 'Editar Veículo' : 'Novo Veículo'}</DialogTitle>
         <DialogContent>
           <Box component="form" sx={{ mt: 1 }}>
             <TextField
               label="Placa *"
-              value={formData.plate}
-              onChange={e => setFormData({ ...formData, plate: e.target.value.toUpperCase() })}
-              error={!!errors.plate}
-              helperText={errors.plate}
+              value={formData.placa}
+              onChange={e => setFormData({ ...formData, placa: e.target.value.toUpperCase() })}
+              error={!!errors.placa}
+              helperText={errors.placa}
               fullWidth
               margin="normal"
               required
@@ -346,20 +346,20 @@ function VehicleManagement() {
             />
             <TextField
               label="Marca *"
-              value={formData.brand}
-              onChange={e => setFormData({ ...formData, brand: e.target.value })}
-              error={!!errors.brand}
-              helperText={errors.brand}
+              value={formData.marca}
+              onChange={e => setFormData({ ...formData, marca: e.target.value })}
+              error={!!errors.marca}
+              helperText={errors.marca}
               fullWidth
               margin="normal"
               required
             />
             <TextField
               label="Modelo *"
-              value={formData.model}
-              onChange={e => setFormData({ ...formData, model: e.target.value })}
-              error={!!errors.model}
-              helperText={errors.model}
+              value={formData.modelo}
+              onChange={e => setFormData({ ...formData, modelo: e.target.value })}
+              error={!!errors.modelo}
+              helperText={errors.modelo}
               fullWidth
               margin="normal"
               required
@@ -368,24 +368,24 @@ function VehicleManagement() {
               <InputLabel id="type-label">Tipo *</InputLabel>
               <Select
                 labelId="type-label"
-                value={formData.type}
+                value={formData.tipo}
                 label="Tipo *"
-                onChange={e => setFormData({ ...formData, type: e.target.value })}
-                error={!!errors.type}
+                onChange={e => setFormData({ ...formData, tipo: e.target.value })}
+                error={!!errors.tipo}
               >
-                <MenuItem value="Car">Carro</MenuItem>
-                <MenuItem value="Truck">Caminhão</MenuItem>
+                <MenuItem value="Carro">Carro</MenuItem>
+                <MenuItem value="Caminhao">Caminhão</MenuItem>
                 <MenuItem value="Van">Van/Utilitário</MenuItem>
-                <MenuItem value="Motorcycle">Motocicleta</MenuItem>
+                <MenuItem value="Motocicleta">Motocicleta</MenuItem>
               </Select>
             </FormControl>
             <TextField
               label="Ano *"
               type="number"
-              value={formData.year}
-              onChange={e => setFormData({ ...formData, year: parseInt(e.target.value) || new Date().getFullYear() })}
-              error={!!errors.year}
-              helperText={errors.year}
+              value={formData.ano}
+              onChange={e => setFormData({ ...formData, ano: parseInt(e.target.value) || new Date().getFullYear() })}
+              error={!!errors.ano}
+              helperText={errors.ano}
               fullWidth
               margin="normal"
               required
@@ -394,8 +394,8 @@ function VehicleManagement() {
             <TextField
               label="Quilometragem"
               type="number"
-              value={formData.mileage}
-              onChange={e => setFormData({ ...formData, mileage: parseInt(e.target.value) || 0 })}
+              value={formData.quilometragem}
+              onChange={e => setFormData({ ...formData, quilometragem: parseInt(e.target.value) || 0 })}
               fullWidth
               margin="normal"
               inputProps={{ min: 0 }}
@@ -403,8 +403,8 @@ function VehicleManagement() {
             <TextField
               label="Última manutenção"
               type="date"
-              value={formData.lastMaintenance || ''}
-              onChange={e => setFormData({ ...formData, lastMaintenance: e.target.value })}
+              value={formData.ultimaManutencao || ''}
+              onChange={e => setFormData({ ...formData, ultimaManutencao: e.target.value })}
               fullWidth
               margin="normal"
               InputLabelProps={{ shrink: true }}
@@ -413,7 +413,7 @@ function VehicleManagement() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="secondary">Cancelar</Button>
-          <Button onClick={handleSaveVehicle} color="primary" variant="contained" disabled={!formData.plate || !formData.brand || !formData.model || !formData.type || !formData.year || Object.keys(errors).length > 0 || loading}>
+          <Button onClick={handleSaveVeiculo} color="primary" variant="contained" disabled={!formData.placa || !formData.marca || !formData.modelo || !formData.tipo || !formData.ano || Object.keys(errors).length > 0 || loading}>
             {loading ? <CircularProgress size={24} color="inherit" /> : 'Salvar'}
           </Button>
         </DialogActions>
@@ -434,4 +434,4 @@ function VehicleManagement() {
   );
 }
 
-export default VehicleManagement;
+export default GerenciamentoVeiculos;

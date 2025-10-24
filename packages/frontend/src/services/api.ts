@@ -49,141 +49,141 @@ export const login = async (email: string, password: string) => {
 export const register = async (data: {
   email: string;
   password: string;
-  name: string;
-  role?: string;
+  nome: string;
+  papel?: string;
   cpf?: string;
-  phone?: string;
+  telefone?: string;
 }) => {
   const response = await api.post('/auth/register', data);
   return response.data;
 };
 
-// ===== USERS =====
-export const getUsers = async (params?: {
+// ===== USUARIOS =====
+export const getUsuarios = async (params?: {
   search?: string;
-  role?: string;
-  active?: boolean;
+  papel?: string;
+  ativo?: boolean;
 }) => {
-  const response = await api.get('/users', { params });
+  const response = await api.get('/usuarios', { params });
   return response.data;
 };
 
-export const getUser = async (id: string) => {
-  const response = await api.get(`/users/${id}`);
+export const getUsuario = async (id: string) => {
+  const response = await api.get(`/usuarios/${id}`);
   return response.data;
 };
 
-export const updateUser = async (id: string, data: {
+export const updateUsuario = async (id: string, data: {
   email: string;
-  name: string;
-  role: string;
+  nome: string;
+  papel: string;
   cpf?: string;
-  phone?: string;
-  active: boolean;
+  telefone?: string;
+  ativo: boolean;
 }) => {
   // Mapear camelCase para PascalCase para o backend
   const backendData = {
     Email: data.email,
-    Name: data.name,
-    Role: data.role,
+    Nome: data.nome,
+    Papel: data.papel,
     Cpf: data.cpf,
-    Phone: data.phone,
-    Active: data.active
+    Telefone: data.telefone,
+    Ativo: data.ativo
   };
-  const response = await api.put(`/users/${id}`, backendData);
+  const response = await api.put(`/usuarios/${id}`, backendData);
   return response.data;
 };
 
-export const toggleUserActive = async (id: string) => {
-  const response = await api.put(`/users/${id}/toggle-active`);
+export const toggleUsuarioAtivo = async (id: string) => {
+  const response = await api.put(`/usuarios/${id}/toggle-active`);
   return response.data;
 };
 
-export const deleteUser = async (id: string) => {
-  const response = await api.delete(`/users/${id}`);
+export const deleteUsuario = async (id: string) => {
+  const response = await api.delete(`/usuarios/${id}`);
   return response.data;
 };
 
-// ===== VEHICLES =====
-export const getVehicles = async (params?: {
+// ===== VEICULOS =====
+export const getVeiculos = async (params?: {
   search?: string;
   status?: string;
 }) => {
-  const response = await api.get('/vehicles', { params });
+  const response = await api.get('/veiculos', { params });
   return response.data;
 };
 
-export const getVehicle = async (id: string) => {
-  const response = await api.get(`/vehicles/${id}`);
+export const getVeiculo = async (id: string) => {
+  const response = await api.get(`/veiculos/${id}`);
   return response.data;
 };
 
-export const createVehicle = async (data: {
-  plate: string;
-  model: string;
-  brand: string;
-  year: number;
-  type: string;
+export const createVeiculo = async (data: {
+  placa: string;
+  modelo: string;
+  marca: string;
+  ano: number;
+  tipo: string;
   status?: string;
-  mileage?: number;
-  lastMaintenance?: string;
-  nextMaintenance?: string;
+  quilometragem?: number;
+  ultimaManutencao?: string;
+  proximaManutencao?: string;
 }) => {
   // Mapear camelCase para PascalCase e converter strings para enums
   const backendData = {
-    Plate: data.plate,
-    Model: data.model,
-    Brand: data.brand,
-    Year: data.year,
-    Type: data.type, // Backend vai converter string para enum
+    Placa: data.placa,
+    Modelo: data.modelo,
+    Marca: data.marca,
+    Ano: data.ano,
+    Tipo: data.tipo, // Backend vai converter string para enum
     Status: data.status, // Backend vai converter string para enum
-    Mileage: data.mileage,
-    LastMaintenance: data.lastMaintenance ? new Date(data.lastMaintenance) : null,
-    NextMaintenance: data.nextMaintenance ? new Date(data.nextMaintenance) : null
+    Quilometragem: data.quilometragem,
+    UltimaManutencao: data.ultimaManutencao ? new Date(data.ultimaManutencao) : null,
+    ProximaManutencao: data.proximaManutencao ? new Date(data.proximaManutencao) : null
   };
-  const response = await api.post('/vehicles', backendData);
+  const response = await api.post('/veiculos', backendData);
   return response.data;
 };
 
-export const updateVehicle = async (id: string, data: {
-  plate: string;
-  model: string;
-  brand: string;
-  year: number;
-  type: string;
+export const updateVeiculo = async (id: string, data: {
+  placa: string;
+  modelo: string;
+  marca: string;
+  ano: number;
+  tipo: string;
   status?: string;
-  mileage?: number;
-  lastMaintenance?: string;
-  nextMaintenance?: string;
+  quilometragem?: number;
+  ultimaManutencao?: string;
+  proximaManutencao?: string;
 }) => {
   // Mapear camelCase para PascalCase e converter strings para enums
   const backendData = {
-    Plate: data.plate,
-    Model: data.model,
-    Brand: data.brand,
-    Year: data.year,
-    Type: data.type, // Backend vai converter string para enum
+    Placa: data.placa,
+    Modelo: data.modelo,
+    Marca: data.marca,
+    Ano: data.ano,
+    Tipo: data.tipo, // Backend vai converter string para enum
     Status: data.status, // Backend vai converter string para enum
-    Mileage: data.mileage,
-    LastMaintenance: data.lastMaintenance ? new Date(data.lastMaintenance) : null,
-    NextMaintenance: data.nextMaintenance ? new Date(data.nextMaintenance) : null
+    Quilometragem: data.quilometragem,
+    UltimaManutencao: data.ultimaManutencao ? new Date(data.ultimaManutencao) : null,
+    ProximaManutencao: data.proximaManutencao ? new Date(data.proximaManutencao) : null
   };
-  const response = await api.put(`/vehicles/${id}`, backendData);
+  const response = await api.put(`/veiculos/${id}`, backendData);
   return response.data;
 };
 
-export const deleteVehicle = async (id: string) => {
-  const response = await api.delete(`/vehicles/${id}`);
+export const deleteVeiculo = async (id: string) => {
+  const response = await api.delete(`/veiculos/${id}`);
   return response.data;
 };
 
 // ===== CHECKLISTS =====
 export const getChecklists = async (params?: {
-  startDate?: string;
-  endDate?: string;
+  dataInicio?: string;
+  dataFim?: string;
   status?: string;
-  vehicleId?: string;
-  driverId?: string;
+  veiculoId?: string;
+  motoristaId?: string;
 }) => {
   const response = await api.get('/checklists', { params });
   return response.data;
@@ -195,45 +195,45 @@ export const getChecklist = async (id: string) => {
 };
 
 export const createChecklist = async (data: {
-  vehicleId: string;
-  shift: string;
-  vehicleKm: number;
-  tires: boolean;
-  lights: boolean;
-  mirrors: boolean;
-  windshield: boolean;
-  horn: boolean;
-  brakes: boolean;
-  fuel: string;
-  documents: boolean;
-  cleaning: boolean;
-  tiresImage?: string;
-  lightsImage?: string;
-  windshieldImage?: string;
-  brakesImage?: string;
-  observations?: string;
+  veiculoId: string;
+  turno: string;
+  kmVeiculo: number;
+  pneus: boolean;
+  luzes: boolean;
+  retrovisores: boolean;
+  paraBrisa: boolean;
+  buzina: boolean;
+  freios: boolean;
+  combustivel: string;
+  documentos: boolean;
+  limpeza: boolean;
+  imagemPneus?: string;
+  imagemLuzes?: string;
+  imagemParaBrisa?: string;
+  imagemFreios?: string;
+  observacoes?: string;
 }) => {
   const response = await api.post('/checklists', data);
   return response.data;
 };
 
 export const updateChecklist = async (id: string, data: {
-  shift: string;
-  vehicleKm: number;
-  tires: boolean;
-  lights: boolean;
-  mirrors: boolean;
-  windshield: boolean;
-  horn: boolean;
-  brakes: boolean;
-  fuel: string;
-  documents: boolean;
-  cleaning: boolean;
-  tiresImage?: string;
-  lightsImage?: string;
-  windshieldImage?: string;
-  brakesImage?: string;
-  observations?: string;
+  turno: string;
+  kmVeiculo: number;
+  pneus: boolean;
+  luzes: boolean;
+  retrovisores: boolean;
+  paraBrisa: boolean;
+  buzina: boolean;
+  freios: boolean;
+  combustivel: string;
+  documentos: boolean;
+  limpeza: boolean;
+  imagemPneus?: string;
+  imagemLuzes?: string;
+  imagemParaBrisa?: string;
+  imagemFreios?: string;
+  observacoes?: string;
 }) => {
   const response = await api.put(`/checklists/${id}`, data);
   return response.data;
@@ -249,51 +249,51 @@ export const deleteChecklist = async (id: string) => {
   return response.data;
 };
 
-// ===== MAINTENANCES =====
-export const getMaintenances = async (params?: {
+// ===== MANUTENCOES =====
+export const getManutencoes = async (params?: {
   status?: string;
-  type?: string;
-  vehicleId?: string;
-  startDate?: string;
-  endDate?: string;
+  tipo?: string;
+  veiculoId?: string;
+  dataInicio?: string;
+  dataFim?: string;
 }) => {
-  const response = await api.get('/maintenances', { params });
+  const response = await api.get('/manutencoes', { params });
   return response.data;
 };
 
-export const getMaintenance = async (id: string) => {
-  const response = await api.get(`/maintenances/${id}`);
+export const getManutencao = async (id: string) => {
+  const response = await api.get(`/manutencoes/${id}`);
   return response.data;
 };
 
-export const createMaintenance = async (data: {
-  vehicleId: string;
-  type: string;
-  description: string;
-  cost?: number;
-  scheduledAt: string;
+export const createManutencao = async (data: {
+  veiculoId: string;
+  tipo: string;
+  descricao: string;
+  custo?: number;
+  agendadoPara: string;
 }) => {
-  const response = await api.post('/maintenances', data);
+  const response = await api.post('/manutencoes', data);
   return response.data;
 };
 
-export const updateMaintenance = async (id: string, data: {
-  type: string;
-  description: string;
-  cost?: number;
-  scheduledAt: string;
+export const updateManutencao = async (id: string, data: {
+  tipo: string;
+  descricao: string;
+  custo?: number;
+  agendadoPara: string;
 }) => {
-  const response = await api.put(`/maintenances/${id}`, data);
+  const response = await api.put(`/manutencoes/${id}`, data);
   return response.data;
 };
 
-export const updateMaintenanceStatus = async (id: string, status: string, cost?: number) => {
-  const response = await api.put(`/maintenances/${id}/status`, { status, cost });
+export const updateManutencaoStatus = async (id: string, status: string, custo?: number) => {
+  const response = await api.put(`/manutencoes/${id}/status`, { status, custo });
   return response.data;
 };
 
-export const deleteMaintenance = async (id: string) => {
-  const response = await api.delete(`/maintenances/${id}`);
+export const deleteManutencao = async (id: string) => {
+  const response = await api.delete(`/manutencoes/${id}`);
   return response.data;
 };
 

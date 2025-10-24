@@ -39,43 +39,43 @@ import { Autocomplete } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import InputMask from 'react-input-mask';
-import { getUsers, register, updateUser, deleteUser } from '../services/api';
+import { getUsuarios, register, updateUsuario, deleteUsuario } from '../services/api';
 import { useAuth } from '../components/AuthContext';
 
 // Tipos e interfaces para TypeScript
-interface Driver {
+interface Usuario {
   id: string;
-  name: string;
+  nome: string;
   email: string;
-  role: string;
-  active: boolean;
-  createdAt: string;
-  updatedAt: string;
+  papel: string;
+  ativo: boolean;
+  criadoEm: string;
+  atualizadoEm: string;
 }
 
-type DriverFormData = {
-  name: string;
+type UsuarioFormData = {
+  nome: string;
   email: string;
-  role: string;
-  active: boolean;
+  papel: string;
+  ativo: boolean;
   cpf?: string;
-  phone?: string;
+  telefone?: string;
 };
-type DriverErrors = Partial<Record<keyof DriverFormData, string>>;
+type UsuarioErrors = Partial<Record<keyof UsuarioFormData, string>>;
 
-function DriverManagement() {
+function GerenciamentoUsuarios() {
   const navigate = useNavigate();
   const { userRole, user } = useAuth();
-  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
-  const [editingDriver, setEditingDriver] = useState<Driver | null>(null);
-  const [formData, setFormData] = useState<DriverFormData>({
-    name: '',
+  const [editingUsuario, setEditingUsuario] = useState<Usuario | null>(null);
+  const [formData, setFormData] = useState<UsuarioFormData>({
+    nome: '',
     email: '',
-    role: 'Condutor',
-    active: true,
+    papel: 'Condutor',
+    ativo: true,
   });
-  const [errors, setErrors] = useState<DriverErrors>({});
+  const [errors, setErrors] = useState<UsuarioErrors>({});
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarType, setSnackbarType] = useState<'success' | 'error'>('success');
@@ -86,17 +86,17 @@ function DriverManagement() {
 
   const [error, setError] = useState<string | null>(null);
 
-  // Carregar motoristas da API
+  // Carregar usuários da API
   useEffect(() => {
-    loadDrivers();
+    carregarUsuarios();
   }, []);
 
-  const loadDrivers = async () => {
+  const carregarUsuarios = async () => {
     try {
       setLoading(true);
       setError(null);
-      const data = await getUsers(); // Carregar todos os usuários
-      setDrivers(data);
+      const data = await getUsuarios(); // Carregar todos os usuários
+      setUsuarios(data);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao carregar usuários');
       console.error('Erro ao carregar usuários:', err);
@@ -107,16 +107,16 @@ function DriverManagement() {
 
   // Validação dinâmica dos campos obrigatórios
   useEffect(() => {
-    const newErrors: DriverErrors = {};
-    if (!formData.name) newErrors.name = 'Nome obrigatório';
+    const newErrors: UsuarioErrors = {};
+    if (!formData.nome) newErrors.nome = 'Nome obrigatório';
     if (!formData.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email)) newErrors.email = 'E-mail inválido';
-    if (!formData.role) newErrors.role = 'Perfil obrigatório';
+    if (!formData.papel) newErrors.papel = 'Perfil obrigatório';
     setErrors(newErrors);
   }, [formData]);
 
-  const handleOpenDialog = (driver: Driver | null = null) => {
+  const handleOpenDialog = (usuario: Usuario | null = null) => {
     // Validação: Gestores não podem editar usuários Admin
-    if (userRole === 'gestor' && driver && driver.role === 'Admin') {
+    if (userRole === 'gestor' && usuario && usuario.papel === 'Administrador') {
       setSnackbarMessage('Gestores não podem editar usuários Administradores');
       setSnackbarType('error');
       setOpenSnackbar(true);
@@ -124,7 +124,7 @@ function DriverManagement() {
     }
 
     // Validação: Gestores não podem editar outros gestores
-    if (userRole === 'gestor' && driver && driver.role === 'Gestor') {
+    if (userRole === 'gestor' && usuario && usuario.papel === 'Gestor') {
       setSnackbarMessage('Gestores não podem editar outros gestores');
       setSnackbarType('error');
       setOpenSnackbar(true);
@@ -132,23 +132,23 @@ function DriverManagement() {
     }
 
     // Validação: Administradores não podem editar a si mesmos
-    if (user?.id === driver?.id) {
+    if (user?.id === usuario?.id) {
       setSnackbarMessage('Administradores não podem editar a si mesmos');
       setSnackbarType('error');
       setOpenSnackbar(true);
       return;
     }
 
-    setEditingDriver(driver);
+    setEditingUsuario(usuario);
     setFormData(
-      driver
+      usuario
         ? { 
-            name: driver.name, 
-            email: driver.email, 
-            role: driver.role, 
-            active: driver.active 
+            nome: usuario.nome, 
+            email: usuario.email, 
+            papel: usuario.papel, 
+            ativo: usuario.ativo 
           }
-        : { name: '', email: '', role: 'Condutor', active: true }
+        : { nome: '', email: '', papel: 'Condutor', ativo: true }
     );
     setErrors({});
     setOpenDialog(true);
@@ -156,7 +156,7 @@ function DriverManagement() {
 
   const handleCloseDialog = () => {
     setOpenDialog(false);
-    setEditingDriver(null);
+    setEditingUsuario(null);
     setError(null); // Limpar erro ao fechar dialog
   };
 
@@ -164,35 +164,35 @@ function DriverManagement() {
     return Object.keys(errors).length === 0;
   };
 
-  const handleSaveDriver = async () => {
+  const handleSaveUsuario = async () => {
     if (!validateForm()) return;
 
     // Validação: Gestores não podem criar/editar usuários Admin
-    if (userRole === 'gestor' && formData.role === 'Admin') {
+    if (userRole === 'gestor' && formData.papel === 'Administrador') {
       setError('Gestores não podem criar ou editar usuários Administradores');
       return;
     }
 
     // Validação: Gestores não podem criar novos gestores
-    if (userRole === 'gestor' && !editingDriver && formData.role === 'Gestor') {
+    if (userRole === 'gestor' && !editingUsuario && formData.papel === 'Gestor') {
       setError('Gestores não podem criar novos gestores');
       return;
     }
 
     // Validação: Gestores não podem alterar usuários Admin existentes
-    if (userRole === 'gestor' && editingDriver && editingDriver.role === 'Admin') {
+    if (userRole === 'gestor' && editingUsuario && editingUsuario.papel === 'Administrador') {
       setError('Gestores não podem editar usuários Administradores');
       return;
     }
 
     // Validação: Gestores não podem editar outros gestores
-    if (userRole === 'gestor' && editingDriver && editingDriver.role === 'Gestor') {
+    if (userRole === 'gestor' && editingUsuario && editingUsuario.papel === 'Gestor') {
       setError('Gestores não podem editar outros gestores');
       return;
     }
 
     // Validação: Administradores não podem editar a si mesmos
-    if (user?.id === editingDriver?.id) {
+    if (user?.id === editingUsuario?.id) {
       setError('Administradores não podem editar a si mesmos');
       return;
     }
@@ -201,18 +201,18 @@ function DriverManagement() {
       setLoading(true);
       setError(null);
       
-      if (editingDriver) {
-        await updateUser(editingDriver.id, formData);
+      if (editingUsuario) {
+        await updateUsuario(editingUsuario.id, formData);
         setSnackbarMessage('Usuário atualizado com sucesso!');
       } else {
         // Para criar um novo usuário, precisamos mapear corretamente os dados
         const userData = {
           email: formData.email,
           password: '123456', // Senha padrão - em produção, isso deveria ser definido pelo usuário
-          name: formData.name,
-          role: formData.role, // Backend vai mapear a string para o enum
+          nome: formData.nome,
+          papel: formData.papel, // Backend vai mapear a string para o enum
           cpf: formData.cpf,
-          phone: formData.phone,
+          telefone: formData.telefone,
         };
         await register(userData);
         setSnackbarMessage('Usuário criado com sucesso!');
@@ -220,34 +220,34 @@ function DriverManagement() {
       
       setSnackbarType('success');
       setOpenSnackbar(true);
-      await loadDrivers();
+      await carregarUsuarios();
       handleCloseDialog();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao salvar usuário');
       setSnackbarMessage('Erro ao salvar usuário');
       setSnackbarType('error');
       setOpenSnackbar(true);
-      console.error('Erro ao salvar motorista:', err);
+      console.error('Erro ao salvar usuário:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDeleteDriver = async (id: string) => {
+  const handleDeleteUsuario = async (id: string) => {
     try {
       setLoading(true);
       setError(null);
-      await deleteUser(id);
+      await deleteUsuario(id);
       setSnackbarMessage('Usuário removido com sucesso!');
       setSnackbarType('success');
       setOpenSnackbar(true);
-      await loadDrivers();
+      await carregarUsuarios();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao remover usuário');
       setSnackbarMessage('Erro ao remover usuário');
       setSnackbarType('error');
       setOpenSnackbar(true);
-      console.error('Erro ao remover motorista:', err);
+      console.error('Erro ao remover usuário:', err);
     } finally {
       setLoading(false);
     }
@@ -263,12 +263,12 @@ function DriverManagement() {
     return str ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() : '';
   }
 
-  const filteredDrivers = drivers.filter(d => {
+  const filteredUsuarios = usuarios.filter(u => {
     const query = normalize(searchQuery);
     return (
-      normalize(d.name).includes(query) ||
-      (d.email && normalize(d.email).includes(query)) ||
-      normalize(d.role).includes(query)
+      normalize(u.nome).includes(query) ||
+      (u.email && normalize(u.email).includes(query)) ||
+      normalize(u.papel).includes(query)
     );
   });
 
@@ -311,31 +311,31 @@ function DriverManagement() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {filteredDrivers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((driver, idx) => (
-              <TableRow key={driver.id}>
+            {filteredUsuarios.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((usuario, idx) => (
+              <TableRow key={usuario.id}>
                 <TableCell>{page * rowsPerPage + idx + 1}</TableCell>
-                <TableCell>{driver.name}</TableCell>
-                <TableCell>{driver.email}</TableCell>
-                <TableCell>{driver.role}</TableCell>
+                <TableCell>{usuario.nome}</TableCell>
+                <TableCell>{usuario.email}</TableCell>
+                <TableCell>{usuario.papel}</TableCell>
                 <TableCell>
                   <Chip
-                    label={driver.active ? 'Ativo' : 'Inativo'}
-                    color={driver.active ? 'success' : 'default'}
+                    label={usuario.ativo ? 'Ativo' : 'Inativo'}
+                    color={usuario.ativo ? 'success' : 'default'}
                     size="small"
                   />
                 </TableCell>
                 <TableCell align="right">
                   <Tooltip title={
-                    userRole === 'gestor' && driver.role === 'Admin' ? 'Gestores não podem editar Administradores' :
-                    userRole === 'gestor' && driver.role === 'Gestor' ? 'Gestores não podem editar outros gestores' :
-                    user?.id === driver.id ? 'Administradores não podem editar a si mesmos' :
+                    userRole === 'gestor' && usuario.papel === 'Administrador' ? 'Gestores não podem editar Administradores' :
+                    userRole === 'gestor' && usuario.papel === 'Gestor' ? 'Gestores não podem editar outros gestores' :
+                    user?.id === usuario.id ? 'Administradores não podem editar a si mesmos' :
                     'Editar'
                   }>
                     <span>
                       <IconButton 
                         color="primary" 
-                        onClick={() => handleOpenDialog(driver)}
-                        disabled={userRole === 'gestor' && (driver.role === 'Admin' || driver.role === 'Gestor') || user?.id === driver.id}
+                        onClick={() => handleOpenDialog(usuario)}
+                        disabled={userRole === 'gestor' && (usuario.papel === 'Administrador' || usuario.papel === 'Gestor') || user?.id === usuario.id}
                       >
                         <Edit />
                       </IconButton>
@@ -343,14 +343,14 @@ function DriverManagement() {
                   </Tooltip>
                   <Tooltip title={
                     userRole !== 'admin' ? 'Apenas Administradores podem excluir usuários' :
-                    user?.id === driver.id ? 'Administradores não podem excluir a si mesmos' :
+                    user?.id === usuario.id ? 'Administradores não podem excluir a si mesmos' :
                     'Excluir'
                   }>
                     <span>
                       <IconButton 
                         color="error" 
-                        onClick={() => handleDeleteDriver(driver.id)}
-                        disabled={userRole !== 'admin' || user?.id === driver.id}
+                        onClick={() => handleDeleteUsuario(usuario.id)}
+                        disabled={userRole !== 'admin' || user?.id === usuario.id}
                       >
                         <Delete />
                       </IconButton>
@@ -367,7 +367,7 @@ function DriverManagement() {
       <TablePagination
         rowsPerPageOptions={[10, 20]}
         component="div"
-        count={filteredDrivers.length}
+        count={filteredUsuarios.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={(event, newPage) => setPage(newPage)}
@@ -379,7 +379,7 @@ function DriverManagement() {
 
       {/* Dialog de Cadastro/Edição */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>
-        <DialogTitle>{editingDriver ? 'Editar Usuário' : 'Novo Usuário'}</DialogTitle>
+        <DialogTitle>{editingUsuario ? 'Editar Usuário' : 'Novo Usuário'}</DialogTitle>
         <DialogContent>
           {error && (
             <Alert severity="error" sx={{ mb: 2 }}>
@@ -389,10 +389,10 @@ function DriverManagement() {
           <Box component="form" sx={{ mt: 1 }}>
             <TextField
               label="Nome completo *"
-              value={formData.name}
-              onChange={e => setFormData({ ...formData, name: e.target.value })}
-              error={!!errors.name}
-              helperText={errors.name}
+              value={formData.nome}
+              onChange={e => setFormData({ ...formData, nome: e.target.value })}
+              error={!!errors.nome}
+              helperText={errors.nome}
               fullWidth
               margin="normal"
               required
@@ -411,24 +411,24 @@ function DriverManagement() {
               <InputLabel id="role-label">Perfil *</InputLabel>
               <Select
                 labelId="role-label"
-                value={formData.role}
+                value={formData.papel}
                 label="Perfil *"
-                onChange={e => setFormData({ ...formData, role: e.target.value })}
-                error={!!errors.role}
+                onChange={e => setFormData({ ...formData, papel: e.target.value })}
+                error={!!errors.papel}
               >
                 <MenuItem value="Condutor">Condutor</MenuItem>
                 <MenuItem value="Gestor" disabled={userRole !== 'admin'}>Gestor de Frota</MenuItem>
-                <MenuItem value="Admin" disabled={userRole !== 'admin'}>
+                <MenuItem value="Administrador" disabled={userRole !== 'admin'}>
                   Administrador
                 </MenuItem>
               </Select>
             </FormControl>
-            {editingDriver && (
+            {editingUsuario && (
               <FormControlLabel
                 control={
                   <Switch
-                    checked={formData.active}
-                    onChange={e => setFormData({ ...formData, active: e.target.checked })}
+                    checked={formData.ativo}
+                    onChange={e => setFormData({ ...formData, ativo: e.target.checked })}
                     color="primary"
                   />
                 }
@@ -439,7 +439,7 @@ function DriverManagement() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="secondary">Cancelar</Button>
-          <Button onClick={handleSaveDriver} color="primary" variant="contained" disabled={!formData.name || !formData.email || !formData.role || Object.keys(errors).length > 0 || loading}>
+          <Button onClick={handleSaveUsuario} color="primary" variant="contained" disabled={!formData.nome || !formData.email || !formData.papel || Object.keys(errors).length > 0 || loading}>
             {loading ? <CircularProgress size={24} color="inherit" /> : 'Salvar'}
           </Button>
         </DialogActions>
@@ -462,4 +462,4 @@ function DriverManagement() {
   );
 }
 
-export default DriverManagement;
+export default GerenciamentoUsuarios;

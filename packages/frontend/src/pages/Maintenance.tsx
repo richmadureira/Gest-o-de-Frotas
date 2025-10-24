@@ -30,48 +30,48 @@ import { useNavigate } from 'react-router-dom';
 import { SelectChangeEvent } from '@mui/material';
 
 // Tipos e interfaces para TypeScript
-interface MaintenanceRequest {
+interface ManutencaoRequest {
   id: number;
-  vehicle: string;
-  description: string;
+  veiculo: string;
+  descricao: string;
   status: string;
-  date?: string;
-  maintenanceType?: string;
-  suggestedDate?: string;
+  data?: string;
+  tipoManutencao?: string;
+  dataSugerida?: string;
 }
 
-type MaintenanceFormData = Omit<MaintenanceRequest, 'id'>;
-type MaintenanceErrors = Partial<Record<keyof MaintenanceFormData, string>>;
+type ManutencaoFormData = Omit<ManutencaoRequest, 'id'>;
+type ManutencaoErrors = Partial<Record<keyof ManutencaoFormData, string>>;
 
-function Maintenance() {
+function Manutencoes() {
   const navigate = useNavigate();
-  const [maintenanceRequests, setMaintenanceRequests] = useState<MaintenanceRequest[]>([
+  const [manutencoesRequests, setManutencoesRequests] = useState<ManutencaoRequest[]>([
     {
       id: 1,
-      vehicle: 'ABC-1234',
-      description: 'Troca de óleo',
+      veiculo: 'ABC-1234',
+      descricao: 'Troca de óleo',
       status: 'Pendente',
     },
     {
       id: 2,
-      vehicle: 'DEF-5678',
-      description: 'Substituição dos pneus',
+      veiculo: 'DEF-5678',
+      descricao: 'Substituição dos pneus',
       status: 'Concluído',
     },
   ]);
   const [openDialog, setOpenDialog] = useState(false);
-  const [formData, setFormData] = useState<MaintenanceFormData>({ vehicle: '', description: '', status: 'Pendente' });
-  const [editingRequest, setEditingRequest] = useState<MaintenanceRequest | null>(null);
-  const [errors, setErrors] = useState<MaintenanceErrors>({});
+  const [formData, setFormData] = useState<ManutencaoFormData>({ veiculo: '', descricao: '', status: 'Pendente' });
+  const [editingRequest, setEditingRequest] = useState<ManutencaoRequest | null>(null);
+  const [errors, setErrors] = useState<ManutencaoErrors>({});
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [openDetails, setOpenDetails] = useState(false);
 
   const statuses = ['Pendente', 'Em andamento', 'Concluído']; // Status possíveis
 
-  const handleOpenDialog = (request: MaintenanceRequest | null = null) => {
+  const handleOpenDialog = (request: ManutencaoRequest | null = null) => {
     setEditingRequest(request);
-    setFormData(request || { vehicle: '', description: '', status: 'Pendente' });
+    setFormData(request || { veiculo: '', descricao: '', status: 'Pendente' });
     setErrors({});
     setOpenDialog(true);
   };
@@ -82,9 +82,9 @@ function Maintenance() {
   };
 
   const validateForm = () => {
-    const newErrors: MaintenanceErrors = {};
-    if (!formData.vehicle) newErrors.vehicle = 'O veículo é obrigatório.';
-    if (!formData.description) newErrors.description = 'A descrição é obrigatória.';
+    const newErrors: ManutencaoErrors = {};
+    if (!formData.veiculo) newErrors.veiculo = 'O veículo é obrigatório.';
+    if (!formData.descricao) newErrors.descricao = 'A descrição é obrigatória.';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -93,14 +93,14 @@ function Maintenance() {
     if (!validateForm()) return;
 
     if (editingRequest) {
-      setMaintenanceRequests((prev) =>
+      setManutencoesRequests((prev) =>
         prev.map((request) =>
           request.id === editingRequest.id ? { ...formData, id: request.id } : request
         )
       );
       setSnackbarMessage('Solicitação de manutenção atualizada com sucesso!');
     } else {
-      setMaintenanceRequests((prev) => [
+      setManutencoesRequests((prev) => [
         ...prev,
         { ...formData, id: prev.length + 1 },
       ]);
@@ -111,22 +111,22 @@ function Maintenance() {
   };
 
   const handleDeleteRequest = (id: number) => {
-    setMaintenanceRequests((prev) => prev.filter((request) => request.id !== id));
+    setManutencoesRequests((prev) => prev.filter((request) => request.id !== id));
     setSnackbarMessage('Solicitação de manutenção removida com sucesso!');
     setSnackbarOpen(true);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name as keyof MaintenanceFormData]: value }));
+    setFormData((prev) => ({ ...prev, [name as keyof ManutencaoFormData]: value }));
   };
 
   const handleSelectChange = (e: SelectChangeEvent<string>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name as keyof MaintenanceFormData]: value }));
+    setFormData((prev) => ({ ...prev, [name as keyof ManutencaoFormData]: value }));
   };
 
-  const handleOpenDetails = (request: MaintenanceRequest) => {
+  const handleOpenDetails = (request: ManutencaoRequest) => {
     setEditingRequest(request);
     setOpenDetails(true);
   };
@@ -174,12 +174,12 @@ function Maintenance() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {maintenanceRequests.map((request) => (
+            {manutencoesRequests.map((request) => (
               <TableRow key={request.id}>
                 <TableCell>{request.id}</TableCell>
-                <TableCell>{request.vehicle}</TableCell>
-                <TableCell>{request.date || '-'}</TableCell>
-                <TableCell>{request.maintenanceType || '-'}</TableCell>
+                <TableCell>{request.veiculo}</TableCell>
+                <TableCell>{request.data || '-'}</TableCell>
+                <TableCell>{request.tipoManutencao || '-'}</TableCell>
                 <TableCell>{request.status}</TableCell>
                 <TableCell align="right">
                   <Tooltip title="Visualizar Detalhes">
@@ -216,8 +216,8 @@ function Maintenance() {
             <FormControl fullWidth margin="normal" required>
               <InputLabel>Veículo</InputLabel>
               <Select
-                value={formData.vehicle}
-                onChange={e => setFormData({ ...formData, vehicle: e.target.value })}
+                value={formData.veiculo}
+                onChange={e => setFormData({ ...formData, veiculo: e.target.value })}
                 label="Veículo"
               >
                 {/* Exemplo de veículos, troque por sua lista real */}
@@ -228,8 +228,8 @@ function Maintenance() {
             <FormControl fullWidth margin="normal" required>
               <InputLabel>Tipo de Manutenção</InputLabel>
               <Select
-                value={formData.maintenanceType || ''}
-                onChange={e => setFormData({ ...formData, maintenanceType: e.target.value })}
+                value={formData.tipoManutencao || ''}
+                onChange={e => setFormData({ ...formData, tipoManutencao: e.target.value })}
                 label="Tipo de Manutenção"
               >
                 <MenuItem value="Preventiva">Preventiva</MenuItem>
@@ -238,10 +238,10 @@ function Maintenance() {
             </FormControl>
             <TextField
               label="Descrição do problema *"
-              value={formData.description}
-              onChange={e => setFormData({ ...formData, description: e.target.value })}
-              error={!!errors.description}
-              helperText={errors.description}
+              value={formData.descricao}
+                onChange={e => setFormData({ ...formData, descricao: e.target.value })}
+              error={!!errors.descricao}
+              helperText={errors.descricao}
               fullWidth
               margin="normal"
               required
@@ -251,8 +251,8 @@ function Maintenance() {
             <TextField
               label="Data sugerida para manutenção"
               type="date"
-              value={formData.suggestedDate || ''}
-              onChange={e => setFormData({ ...formData, suggestedDate: e.target.value })}
+              value={formData.dataSugerida || ''}
+                onChange={e => setFormData({ ...formData, dataSugerida: e.target.value })}
               fullWidth
               margin="normal"
               InputLabelProps={{ shrink: true }}
@@ -269,7 +269,7 @@ function Maintenance() {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="secondary">Cancelar</Button>
-          <Button onClick={handleSaveRequest} color="primary" variant="contained" disabled={!formData.vehicle || !formData.maintenanceType || !formData.description || Object.keys(errors).length > 0}>
+          <Button onClick={handleSaveRequest} color="primary" variant="contained" disabled={!formData.veiculo || !formData.tipoManutencao || !formData.descricao || Object.keys(errors).length > 0}>
             Salvar
           </Button>
         </DialogActions>
@@ -299,4 +299,4 @@ function Maintenance() {
   );
 }
 
-export default Maintenance;
+export default Manutencoes;

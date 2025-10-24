@@ -34,7 +34,7 @@ const gestorAdminMenu = [
   { text: 'Relatórios', icon: <BarChartIcon />, path: '/reports' },
   { text: 'Usuários', icon: <PersonIcon />, path: '/drivers' },
   { text: 'Veículos', icon: <DirectionsCarIcon />, path: '/vehicles' },
-  { text: 'Manutenção', icon: <BuildIcon />, path: '/maintenance' },
+  { text: 'Manutenções', icon: <BuildIcon />, path: '/maintenance' },
   { text: 'Configurações', icon: <SettingsIcon />, path: '/settings' },
 ];
 
