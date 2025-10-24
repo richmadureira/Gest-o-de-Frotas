@@ -10,107 +10,107 @@ public static class DataSeeder
     public static async Task SeedAsync(AppDbContext context)
     {
         // Verificar se já existem dados
-        if (await context.Users.AnyAsync())
+        if (await context.Usuarios.AnyAsync())
         {
             return; // Banco já populado
         }
 
         // Criar usuários de exemplo
-        var admin = new User
+        var admin = new Usuario
         {
             Email = "admin@gestaodefrotas.com",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
-            Name = "Administrador",
-            Role = UserRole.Admin,
+            SenhaHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
+            Nome = "Administrador",
+            Papel = PapelUsuario.Administrador,
             Cpf = "12345678901",
-            Phone = "(11) 98765-4321",
-            Active = true
+            Telefone = "(11) 98765-4321",
+            Ativo = true
         };
 
-        var gestor = new User
+        var gestor = new Usuario
         {
             Email = "gestor@gestaodefrotas.com",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("gestor123"),
-            Name = "Gestor Silva",
-            Role = UserRole.Gestor,
+            SenhaHash = BCrypt.Net.BCrypt.HashPassword("gestor123"),
+            Nome = "Gestor Silva",
+            Papel = PapelUsuario.Gestor,
             Cpf = "98765432109",
-            Phone = "(11) 97654-3210",
-            Active = true
+            Telefone = "(11) 97654-3210",
+            Ativo = true
         };
 
-        var condutor = new User
+        var condutor = new Usuario
         {
             Email = "condutor@gestaodefrotas.com",
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword("condutor123"),
-            Name = "João Condutor",
-            Role = UserRole.Condutor,
+            SenhaHash = BCrypt.Net.BCrypt.HashPassword("condutor123"),
+            Nome = "João Condutor",
+            Papel = PapelUsuario.Condutor,
             Cpf = "45678912345",
-            Phone = "(11) 96543-2109",
-            Active = true
+            Telefone = "(11) 96543-2109",
+            Ativo = true
         };
 
-        context.Users.AddRange(admin, gestor, condutor);
+        context.Usuarios.AddRange(admin, gestor, condutor);
 
         // Criar veículos de exemplo
-        var vehicle1 = new Vehicle
+        var veiculo1 = new Veiculo
         {
-            Plate = "ABC-1234",
-            Model = "Sprinter",
-            Brand = "Mercedes-Benz",
-            Year = 2022,
-            Type = VehicleType.Van,
-            Status = VehicleStatus.Available,
-            Mileage = 15000
+            Placa = "ABC-1234",
+            Modelo = "Sprinter",
+            Marca = "Mercedes-Benz",
+            Ano = 2022,
+            Tipo = TipoVeiculo.Van,
+            Status = StatusVeiculo.Disponivel,
+            Quilometragem = 15000
         };
 
-        var vehicle2 = new Vehicle
+        var veiculo2 = new Veiculo
         {
-            Plate = "XYZ-9876",
-            Model = "Master",
-            Brand = "Renault",
-            Year = 2021,
-            Type = VehicleType.Van,
-            Status = VehicleStatus.Available,
-            Mileage = 32000
+            Placa = "XYZ-9876",
+            Modelo = "Master",
+            Marca = "Renault",
+            Ano = 2021,
+            Tipo = TipoVeiculo.Van,
+            Status = StatusVeiculo.Disponivel,
+            Quilometragem = 32000
         };
 
-        var vehicle3 = new Vehicle
+        var veiculo3 = new Veiculo
         {
-            Plate = "DEF-5678",
-            Model = "Accelo",
-            Brand = "Mercedes-Benz",
-            Year = 2020,
-            Type = VehicleType.Truck,
-            Status = VehicleStatus.Available,
-            Mileage = 48000
+            Placa = "DEF-5678",
+            Modelo = "Accelo",
+            Marca = "Mercedes-Benz",
+            Ano = 2020,
+            Tipo = TipoVeiculo.Caminhao,
+            Status = StatusVeiculo.Disponivel,
+            Quilometragem = 48000
         };
 
-        context.Vehicles.AddRange(vehicle1, vehicle2, vehicle3);
+        context.Veiculos.AddRange(veiculo1, veiculo2, veiculo3);
 
         await context.SaveChangesAsync();
 
         // Criar algumas manutenções de exemplo
-        var maintenance1 = new Maintenance
+        var manutencao1 = new Manutencao
         {
-            VehicleId = vehicle2.Id,
-            Type = MaintenanceType.Preventive,
-            Description = "Revisão dos 30.000 km - Troca de óleo e filtros",
-            Cost = 850.00m,
-            ScheduledAt = DateTime.UtcNow.AddDays(7),
-            Status = MaintenanceStatus.Scheduled
+            VeiculoId = veiculo2.Id,
+            Tipo = TipoManutencao.Preventiva,
+            Descricao = "Revisão dos 30.000 km - Troca de óleo e filtros",
+            Custo = 850.00m,
+            AgendadoPara = DateTime.UtcNow.AddDays(7),
+            Status = StatusManutencao.Agendada
         };
 
-        var maintenance2 = new Maintenance
+        var manutencao2 = new Manutencao
         {
-            VehicleId = vehicle3.Id,
-            Type = MaintenanceType.Preventive,
-            Description = "Revisão dos 50.000 km",
-            Cost = 1200.00m,
-            ScheduledAt = DateTime.UtcNow.AddDays(3),
-            Status = MaintenanceStatus.Scheduled
+            VeiculoId = veiculo3.Id,
+            Tipo = TipoManutencao.Preventiva,
+            Descricao = "Revisão dos 50.000 km",
+            Custo = 1200.00m,
+            AgendadoPara = DateTime.UtcNow.AddDays(3),
+            Status = StatusManutencao.Agendada
         };
 
-        context.Maintenances.AddRange(maintenance1, maintenance2);
+        context.Manutencoes.AddRange(manutencao1, manutencao2);
 
         await context.SaveChangesAsync();
     }

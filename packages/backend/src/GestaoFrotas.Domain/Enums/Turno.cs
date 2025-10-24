@@ -3,21 +3,21 @@ namespace GestaoFrotas.Domain.Enums;
 /// <summary>
 /// Turnos de trabalho para o checklist
 /// </summary>
-public enum Shift
+public enum Turno
 {
     /// <summary>
     /// Turno da manhã
     /// </summary>
-    Morning = 1,
+    Manha = 1,
 
     /// <summary>
     /// Turno da tarde
     /// </summary>
-    Afternoon = 2,
+    Tarde = 2,
 
     /// <summary>
     /// Turno da noite
     /// </summary>
-    Night = 3
+    Noite = 3
 }
 

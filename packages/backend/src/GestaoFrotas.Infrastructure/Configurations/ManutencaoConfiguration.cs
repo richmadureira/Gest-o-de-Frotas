@@ -5,38 +5,38 @@ using GestaoFrotas.Domain.Entities;
 namespace GestaoFrotas.Infrastructure.Configurations;
 
 /// <summary>
-/// Configuração da entidade Maintenance usando Fluent API
+/// Configuração da entidade Manutencao usando Fluent API
 /// </summary>
-public class MaintenanceConfiguration : IEntityTypeConfiguration<Maintenance>
+public class ManutencaoConfiguration : IEntityTypeConfiguration<Manutencao>
 {
-    public void Configure(EntityTypeBuilder<Maintenance> builder)
+    public void Configure(EntityTypeBuilder<Manutencao> builder)
     {
-        builder.ToTable("Maintenances");
+        builder.ToTable("Manutencoes");
 
         // Chave primária
         builder.HasKey(m => m.Id);
 
         // Propriedades obrigatórias
-        builder.Property(m => m.VehicleId)
+        builder.Property(m => m.VeiculoId)
             .IsRequired();
 
-        builder.Property(m => m.Description)
+        builder.Property(m => m.Descricao)
             .IsRequired()
             .HasMaxLength(1000);
 
-        builder.Property(m => m.ScheduledAt)
+        builder.Property(m => m.AgendadoPara)
             .IsRequired();
 
         // Propriedades opcionais
-        builder.Property(m => m.Cost)
+        builder.Property(m => m.Custo)
             .HasColumnType("decimal(18,2)")
             .IsRequired(false);
 
-        builder.Property(m => m.CompletedAt)
+        builder.Property(m => m.ConcluidoEm)
             .IsRequired(false);
 
         // Conversões de enum para string
-        builder.Property(m => m.Type)
+        builder.Property(m => m.Tipo)
             .HasConversion<string>()
             .HasMaxLength(20);
 
@@ -45,15 +45,15 @@ public class MaintenanceConfiguration : IEntityTypeConfiguration<Maintenance>
             .HasMaxLength(20);
 
         // Relacionamentos
-        builder.HasOne(m => m.Vehicle)
-            .WithMany(v => v.Maintenances)
-            .HasForeignKey(m => m.VehicleId)
+        builder.HasOne(m => m.Veiculo)
+            .WithMany(v => v.Manutencoes)
+            .HasForeignKey(m => m.VeiculoId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // Índices para performance
-        builder.HasIndex(m => m.VehicleId);
-        builder.HasIndex(m => m.ScheduledAt);
+        builder.HasIndex(m => m.VeiculoId);
+        builder.HasIndex(m => m.AgendadoPara);
         builder.HasIndex(m => m.Status);
-        builder.HasIndex(m => m.Type);
+        builder.HasIndex(m => m.Tipo);
     }
 }

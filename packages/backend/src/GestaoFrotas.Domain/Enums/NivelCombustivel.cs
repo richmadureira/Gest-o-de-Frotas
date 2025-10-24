@@ -3,31 +3,31 @@ namespace GestaoFrotas.Domain.Enums;
 /// <summary>
 /// Nível de combustível no veículo
 /// </summary>
-public enum FuelLevel
+public enum NivelCombustivel
 {
     /// <summary>
     /// Tanque vazio
     /// </summary>
-    Empty = 0,
+    Vazio = 0,
 
     /// <summary>
     /// Um quarto do tanque
     /// </summary>
-    Quarter = 25,
+    UmQuarto = 25,
 
     /// <summary>
     /// Meio tanque
     /// </summary>
-    Half = 50,
+    Metade = 50,
 
     /// <summary>
     /// Três quartos do tanque
     /// </summary>
-    ThreeQuarters = 75,
+    TresQuartos = 75,
 
     /// <summary>
     /// Tanque cheio
     /// </summary>
-    Full = 100
+    Cheio = 100
 }
 

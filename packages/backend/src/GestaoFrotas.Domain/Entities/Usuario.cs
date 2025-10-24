@@ -5,7 +5,7 @@ namespace GestaoFrotas.Domain.Entities;
 /// <summary>
 /// Entidade que representa um usuário/motorista do sistema
 /// </summary>
-public class User : BaseEntity
+public class Usuario : EntidadeBase
 {
     /// <summary>
     /// Email do usuário (usado para login)
@@ -15,17 +15,17 @@ public class User : BaseEntity
     /// <summary>
     /// Hash da senha do usuário
     /// </summary>
-    public string PasswordHash { get; set; } = string.Empty;
+    public string SenhaHash { get; set; } = string.Empty;
 
     /// <summary>
     /// Nome completo do usuário
     /// </summary>
-    public string Name { get; set; } = string.Empty;
+    public string Nome { get; set; } = string.Empty;
 
     /// <summary>
     /// Perfil/Role do usuário no sistema
     /// </summary>
-    public UserRole Role { get; set; }
+    public PapelUsuario Papel { get; set; }
 
     /// <summary>
     /// CPF do usuário (opcional, apenas para motoristas)
@@ -35,12 +35,12 @@ public class User : BaseEntity
     /// <summary>
     /// Telefone de contato
     /// </summary>
-    public string? Phone { get; set; }
+    public string? Telefone { get; set; }
 
     /// <summary>
     /// Indica se o usuário está ativo no sistema
     /// </summary>
-    public bool Active { get; set; } = true;
+    public bool Ativo { get; set; } = true;
 
     // Navigation Properties
     

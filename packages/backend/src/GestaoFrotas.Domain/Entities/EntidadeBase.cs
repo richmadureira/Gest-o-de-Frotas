@@ -3,7 +3,7 @@ namespace GestaoFrotas.Domain.Entities;
 /// <summary>
 /// Classe base para todas as entidades do domínio
 /// </summary>
-public abstract class BaseEntity
+public abstract class EntidadeBase
 {
     /// <summary>
     /// Identificador único da entidade
@@ -13,11 +13,11 @@ public abstract class BaseEntity
     /// <summary>
     /// Data e hora de criação do registro
     /// </summary>
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime CriadoEm { get; set; } = DateTime.UtcNow;
 
     /// <summary>
     /// Data e hora da última atualização do registro
     /// </summary>
-    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+    public DateTime AtualizadoEm { get; set; } = DateTime.UtcNow;
 }
 

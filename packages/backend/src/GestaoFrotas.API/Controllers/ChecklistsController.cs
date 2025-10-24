@@ -22,25 +22,25 @@ public class ChecklistsController : ControllerBase
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Checklist>>> GetChecklists(
-        [FromQuery] DateTime? startDate,
-        [FromQuery] DateTime? endDate,
-        [FromQuery] ChecklistStatus? status,
-        [FromQuery] Guid? vehicleId,
-        [FromQuery] Guid? driverId)
+        [FromQuery] DateTime? dataInicio,
+        [FromQuery] DateTime? dataFim,
+        [FromQuery] StatusChecklist? status,
+        [FromQuery] Guid? veiculoId,
+        [FromQuery] Guid? motoristaId)
     {
         var query = _context.Checklists
-            .Include(c => c.Vehicle)
-            .Include(c => c.Driver)
+            .Include(c => c.Veiculo)
+            .Include(c => c.Motorista)
             .AsQueryable();
 
-        if (startDate.HasValue)
+        if (dataInicio.HasValue)
         {
-            query = query.Where(c => c.Date >= startDate.Value);
+            query = query.Where(c => c.Data >= dataInicio.Value);
         }
 
-        if (endDate.HasValue)
+        if (dataFim.HasValue)
         {
-            query = query.Where(c => c.Date <= endDate.Value);
+            query = query.Where(c => c.Data <= dataFim.Value);
         }
 
         if (status.HasValue)
@@ -48,18 +48,18 @@ public class ChecklistsController : ControllerBase
             query = query.Where(c => c.Status == status.Value);
         }
 
-        if (vehicleId.HasValue)
+        if (veiculoId.HasValue)
         {
-            query = query.Where(c => c.VehicleId == vehicleId.Value);
+            query = query.Where(c => c.VeiculoId == veiculoId.Value);
         }
 
-        if (driverId.HasValue)
+        if (motoristaId.HasValue)
         {
-            query = query.Where(c => c.DriverId == driverId.Value);
+            query = query.Where(c => c.MotoristaId == motoristaId.Value);
         }
 
         var checklists = await query
-            .OrderByDescending(c => c.Date)
+            .OrderByDescending(c => c.Data)
             .ToListAsync();
 
         return Ok(checklists);
@@ -69,8 +69,8 @@ public class ChecklistsController : ControllerBase
     public async Task<ActionResult<Checklist>> GetChecklist(Guid id)
     {
         var checklist = await _context.Checklists
-            .Include(c => c.Vehicle)
-            .Include(c => c.Driver)
+            .Include(c => c.Veiculo)
+            .Include(c => c.Motorista)
             .FirstOrDefaultAsync(c => c.Id == id);
 
         if (checklist == null)
@@ -85,42 +85,42 @@ public class ChecklistsController : ControllerBase
     public async Task<ActionResult<Checklist>> CreateChecklist([FromBody] ChecklistRequest request)
     {
         // Verificar se o veículo existe
-        var vehicle = await _context.Vehicles.FindAsync(request.VehicleId);
-        if (vehicle == null)
+        var veiculo = await _context.Veiculos.FindAsync(request.VeiculoId);
+        if (veiculo == null)
         {
             return BadRequest(new { message = "Veículo não encontrado" });
         }
 
         // Obter o ID do usuário logado
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-        if (!Guid.TryParse(userIdClaim, out var driverId))
+        if (!Guid.TryParse(userIdClaim, out var motoristaId))
         {
             return Unauthorized();
         }
 
         var checklist = new Checklist
         {
-            VehicleId = request.VehicleId,
-            DriverId = driverId,
-            Date = DateTime.UtcNow,
-            Shift = request.Shift,
-            VehiclePlate = vehicle.Plate,
-            VehicleKm = request.VehicleKm,
-            Tires = request.Tires,
-            Lights = request.Lights,
-            Mirrors = request.Mirrors,
-            Windshield = request.Windshield,
-            Horn = request.Horn,
-            Brakes = request.Brakes,
-            Fuel = request.Fuel,
-            Documents = request.Documents,
-            Cleaning = request.Cleaning,
-            TiresImage = request.TiresImage,
-            LightsImage = request.LightsImage,
-            WindshieldImage = request.WindshieldImage,
-            BrakesImage = request.BrakesImage,
-            Observations = request.Observations,
-            Status = ChecklistStatus.Pending
+            VeiculoId = request.VeiculoId,
+            MotoristaId = motoristaId,
+            Data = DateTime.UtcNow,
+            Turno = request.Turno,
+            PlacaVeiculo = veiculo.Placa,
+            KmVeiculo = request.KmVeiculo,
+            Pneus = request.Pneus,
+            Luzes = request.Luzes,
+            Retrovisores = request.Retrovisores,
+            ParaBrisa = request.ParaBrisa,
+            Buzina = request.Buzina,
+            Freios = request.Freios,
+            Combustivel = request.Combustivel,
+            Documentos = request.Documentos,
+            Limpeza = request.Limpeza,
+            ImagemPneus = request.ImagemPneus,
+            ImagemLuzes = request.ImagemLuzes,
+            ImagemParaBrisa = request.ImagemParaBrisa,
+            ImagemFreios = request.ImagemFreios,
+            Observacoes = request.Observacoes,
+            Status = StatusChecklist.Pendente
         };
 
         _context.Checklists.Add(checklist);
@@ -129,7 +129,7 @@ public class ChecklistsController : ControllerBase
         return CreatedAtAction(nameof(GetChecklist), new { id = checklist.Id }, checklist);
     }
 
-    [Authorize(Roles = "Admin,Gestor")]
+    [Authorize(Roles = "Administrador,Gestor")]
     [HttpPut("{id}/status")]
     public async Task<ActionResult> UpdateChecklistStatus(Guid id, [FromBody] UpdateStatusRequest request)
     {
@@ -161,34 +161,34 @@ public class ChecklistsController : ControllerBase
         var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
         
         if (!Guid.TryParse(userIdClaim, out var userId) || 
-            (checklist.DriverId != userId && userRole != "Admin" && userRole != "Gestor"))
+            (checklist.MotoristaId != userId && userRole != "Administrador" && userRole != "Gestor"))
         {
             return Forbid();
         }
 
-        checklist.Shift = request.Shift;
-        checklist.VehicleKm = request.VehicleKm;
-        checklist.Tires = request.Tires;
-        checklist.Lights = request.Lights;
-        checklist.Mirrors = request.Mirrors;
-        checklist.Windshield = request.Windshield;
-        checklist.Horn = request.Horn;
-        checklist.Brakes = request.Brakes;
-        checklist.Fuel = request.Fuel;
-        checklist.Documents = request.Documents;
-        checklist.Cleaning = request.Cleaning;
-        checklist.TiresImage = request.TiresImage;
-        checklist.LightsImage = request.LightsImage;
-        checklist.WindshieldImage = request.WindshieldImage;
-        checklist.BrakesImage = request.BrakesImage;
-        checklist.Observations = request.Observations;
+        checklist.Turno = request.Turno;
+        checklist.KmVeiculo = request.KmVeiculo;
+        checklist.Pneus = request.Pneus;
+        checklist.Luzes = request.Luzes;
+        checklist.Retrovisores = request.Retrovisores;
+        checklist.ParaBrisa = request.ParaBrisa;
+        checklist.Buzina = request.Buzina;
+        checklist.Freios = request.Freios;
+        checklist.Combustivel = request.Combustivel;
+        checklist.Documentos = request.Documentos;
+        checklist.Limpeza = request.Limpeza;
+        checklist.ImagemPneus = request.ImagemPneus;
+        checklist.ImagemLuzes = request.ImagemLuzes;
+        checklist.ImagemParaBrisa = request.ImagemParaBrisa;
+        checklist.ImagemFreios = request.ImagemFreios;
+        checklist.Observacoes = request.Observacoes;
 
         await _context.SaveChangesAsync();
 
         return Ok(checklist);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Administrador")]
     [HttpDelete("{id}")]
     public async Task<ActionResult> DeleteChecklist(Guid id)
     {
@@ -207,23 +207,23 @@ public class ChecklistsController : ControllerBase
 }
 
 public record ChecklistRequest(
-    Guid VehicleId,
-    Shift Shift,
-    int VehicleKm,
-    bool Tires,
-    bool Lights,
-    bool Mirrors,
-    bool Windshield,
-    bool Horn,
-    bool Brakes,
-    FuelLevel Fuel,
-    bool Documents,
-    bool Cleaning,
-    string? TiresImage,
-    string? LightsImage,
-    string? WindshieldImage,
-    string? BrakesImage,
-    string? Observations
+    Guid VeiculoId,
+    Turno Turno,
+    int KmVeiculo,
+    bool Pneus,
+    bool Luzes,
+    bool Retrovisores,
+    bool ParaBrisa,
+    bool Buzina,
+    bool Freios,
+    NivelCombustivel Combustivel,
+    bool Documentos,
+    bool Limpeza,
+    string? ImagemPneus,
+    string? ImagemLuzes,
+    string? ImagemParaBrisa,
+    string? ImagemFreios,
+    string? Observacoes
 );
 
-public record UpdateStatusRequest(ChecklistStatus Status);
+public record UpdateStatusRequest(StatusChecklist Status);

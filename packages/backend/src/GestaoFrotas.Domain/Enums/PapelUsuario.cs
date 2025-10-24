@@ -3,12 +3,12 @@ namespace GestaoFrotas.Domain.Enums;
 /// <summary>
 /// Perfis de usuário do sistema
 /// </summary>
-public enum UserRole
+public enum PapelUsuario
 {
     /// <summary>
     /// Administrador do sistema - Acesso total
     /// </summary>
-    Admin = 1,
+    Administrador = 1,
 
     /// <summary>
     /// Gestor de frota - Gerencia veículos, motoristas e relatórios

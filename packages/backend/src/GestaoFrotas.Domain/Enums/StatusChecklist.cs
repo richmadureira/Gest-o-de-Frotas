@@ -3,21 +3,21 @@ namespace GestaoFrotas.Domain.Enums;
 /// <summary>
 /// Status de aprovação do checklist
 /// </summary>
-public enum ChecklistStatus
+public enum StatusChecklist
 {
     /// <summary>
     /// Aguardando aprovação
     /// </summary>
-    Pending = 1,
+    Pendente = 1,
 
     /// <summary>
     /// Aprovado pelo gestor
     /// </summary>
-    Approved = 2,
+    Aprovado = 2,
 
     /// <summary>
     /// Rejeitado pelo gestor
     /// </summary>
-    Rejected = 3
+    Rejeitado = 3
 }
 

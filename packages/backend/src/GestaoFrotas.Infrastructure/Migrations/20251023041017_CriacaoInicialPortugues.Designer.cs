@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace GestaoFrotas.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251013021531_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20251023041017_CriacaoInicialPortugues")]
+    partial class CriacaoInicialPortugues
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,171 +31,174 @@ namespace GestaoFrotas.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("Brakes")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("BrakesImage")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<bool>("Cleaning")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime>("AtualizadoEm")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("Date")
+                    b.Property<bool>("Buzina")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Combustivel")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("Data")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.Property<bool>("Documents")
+                    b.Property<bool>("Documentos")
                         .HasColumnType("bit");
 
-                    b.Property<Guid>("DriverId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Fuel")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<bool>("Horn")
+                    b.Property<bool>("Freios")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("Lights")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("LightsImage")
+                    b.Property<string>("ImagemFreios")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<bool>("Mirrors")
+                    b.Property<string>("ImagemLuzes")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ImagemParaBrisa")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ImagemPneus")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int>("KmVeiculo")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("Limpeza")
                         .HasColumnType("bit");
 
-                    b.Property<string>("Observations")
+                    b.Property<bool>("Luzes")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("MotoristaId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Observacoes")
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<string>("Shift")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<bool>("Tires")
+                    b.Property<bool>("ParaBrisa")
                         .HasColumnType("bit");
 
-                    b.Property<string>("TiresImage")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("VehicleId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<int>("VehicleKm")
-                        .HasColumnType("int");
-
-                    b.Property<string>("VehiclePlate")
+                    b.Property<string>("PlacaVeiculo")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
 
-                    b.Property<bool>("Windshield")
+                    b.Property<bool>("Pneus")
                         .HasColumnType("bit");
 
-                    b.Property<string>("WindshieldImage")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Date");
-
-                    b.HasIndex("DriverId");
-
-                    b.HasIndex("Status");
-
-                    b.HasIndex("VehicleId");
-
-                    b.ToTable("Checklists", (string)null);
-                });
-
-            modelBuilder.Entity("GestaoFrotas.Domain.Entities.Maintenance", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal?>("Cost")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<DateTime>("ScheduledAt")
-                        .HasColumnType("datetime2");
+                    b.Property<bool>("Retrovisores")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("Type")
+                    b.Property<string>("Turno")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<Guid>("VehicleId")
+                    b.Property<Guid>("VeiculoId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ScheduledAt");
+                    b.HasIndex("Data");
+
+                    b.HasIndex("MotoristaId");
 
                     b.HasIndex("Status");
 
-                    b.HasIndex("Type");
+                    b.HasIndex("VeiculoId");
 
-                    b.HasIndex("VehicleId");
-
-                    b.ToTable("Maintenances", (string)null);
+                    b.ToTable("Checklists", (string)null);
                 });
 
-            modelBuilder.Entity("GestaoFrotas.Domain.Entities.User", b =>
+            modelBuilder.Entity("GestaoFrotas.Domain.Entities.Manutencao", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<bool>("Active")
+                    b.Property<DateTime>("AgendadoPara")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("AtualizadoEm")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("ConcluidoEm")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal?>("Custo")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("Descricao")
+                        .IsRequired()
+                        .HasMaxLength(1000)
+                        .HasColumnType("nvarchar(1000)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<Guid>("VeiculoId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AgendadoPara");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("Tipo");
+
+                    b.HasIndex("VeiculoId");
+
+                    b.ToTable("Manutencoes", (string)null);
+                });
+
+            modelBuilder.Entity("GestaoFrotas.Domain.Entities.Usuario", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("Ativo")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
+
+                    b.Property<DateTime>("AtualizadoEm")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Cpf")
                         .HasMaxLength(11)
                         .HasColumnType("nvarchar(11)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime>("CriadoEm")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
@@ -203,27 +206,24 @@ namespace GestaoFrotas.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("Nome")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("PasswordHash")
+                    b.Property<string>("Papel")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("SenhaHash")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
 
-                    b.Property<string>("Phone")
+                    b.Property<string>("Telefone")
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
-
-                    b.Property<string>("Role")
-                        .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
@@ -234,106 +234,106 @@ namespace GestaoFrotas.Infrastructure.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Usuarios", (string)null);
                 });
 
-            modelBuilder.Entity("GestaoFrotas.Domain.Entities.Vehicle", b =>
+            modelBuilder.Entity("GestaoFrotas.Domain.Entities.Veiculo", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Brand")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LastMaintenance")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("Mileage")
+                    b.Property<int>("Ano")
                         .HasColumnType("int");
 
-                    b.Property<string>("Model")
+                    b.Property<DateTime>("AtualizadoEm")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Marca")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
-                    b.Property<DateTime?>("NextMaintenance")
-                        .HasColumnType("datetime2");
+                    b.Property<string>("Modelo")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
-                    b.Property<string>("Plate")
+                    b.Property<string>("Placa")
                         .IsRequired()
                         .HasMaxLength(10)
                         .HasColumnType("nvarchar(10)");
+
+                    b.Property<DateTime?>("ProximaManutencao")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("Quilometragem")
+                        .HasColumnType("int");
 
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<string>("Type")
+                    b.Property<string>("Tipo")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<DateTime>("UpdatedAt")
+                    b.Property<DateTime?>("UltimaManutencao")
                         .HasColumnType("datetime2");
-
-                    b.Property<int>("Year")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Plate")
+                    b.HasIndex("Placa")
                         .IsUnique();
 
-                    b.ToTable("Vehicles", (string)null);
+                    b.ToTable("Veiculos", (string)null);
                 });
 
             modelBuilder.Entity("GestaoFrotas.Domain.Entities.Checklist", b =>
                 {
-                    b.HasOne("GestaoFrotas.Domain.Entities.User", "Driver")
+                    b.HasOne("GestaoFrotas.Domain.Entities.Usuario", "Motorista")
                         .WithMany("Checklists")
-                        .HasForeignKey("DriverId")
+                        .HasForeignKey("MotoristaId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("GestaoFrotas.Domain.Entities.Vehicle", "Vehicle")
+                    b.HasOne("GestaoFrotas.Domain.Entities.Veiculo", "Veiculo")
                         .WithMany("Checklists")
-                        .HasForeignKey("VehicleId")
+                        .HasForeignKey("VeiculoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Driver");
+                    b.Navigation("Motorista");
 
-                    b.Navigation("Vehicle");
+                    b.Navigation("Veiculo");
                 });
 
-            modelBuilder.Entity("GestaoFrotas.Domain.Entities.Maintenance", b =>
+            modelBuilder.Entity("GestaoFrotas.Domain.Entities.Manutencao", b =>
                 {
-                    b.HasOne("GestaoFrotas.Domain.Entities.Vehicle", "Vehicle")
-                        .WithMany("Maintenances")
-                        .HasForeignKey("VehicleId")
+                    b.HasOne("GestaoFrotas.Domain.Entities.Veiculo", "Veiculo")
+                        .WithMany("Manutencoes")
+                        .HasForeignKey("VeiculoId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.Navigation("Vehicle");
+                    b.Navigation("Veiculo");
                 });
 
-            modelBuilder.Entity("GestaoFrotas.Domain.Entities.User", b =>
+            modelBuilder.Entity("GestaoFrotas.Domain.Entities.Usuario", b =>
                 {
                     b.Navigation("Checklists");
                 });
 
-            modelBuilder.Entity("GestaoFrotas.Domain.Entities.Vehicle", b =>
+            modelBuilder.Entity("GestaoFrotas.Domain.Entities.Veiculo", b =>
                 {
                     b.Navigation("Checklists");
 
-                    b.Navigation("Maintenances");
+                    b.Navigation("Manutencoes");
                 });
 #pragma warning restore 612, 618
         }

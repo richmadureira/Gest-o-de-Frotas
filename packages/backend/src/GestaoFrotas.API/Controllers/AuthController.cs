@@ -32,25 +32,25 @@ public class AuthController : ControllerBase
             return BadRequest(new { message = "Email e senha são obrigatórios" });
         }
 
-        var user = await _context.Users
-            .FirstOrDefaultAsync(u => u.Email == request.Email && u.Active);
+        var usuario = await _context.Usuarios
+            .FirstOrDefaultAsync(u => u.Email == request.Email && u.Ativo);
 
-        if (user == null || !BCrypt.Net.BCrypt.Verify(request.Password, user.PasswordHash))
+        if (usuario == null || !BCrypt.Net.BCrypt.Verify(request.Password, usuario.SenhaHash))
         {
             return Unauthorized(new { message = "Email ou senha inválidos" });
         }
 
-        var token = GenerateJwtToken(user);
+        var token = GenerateJwtToken(usuario);
 
         return Ok(new
         {
             token,
             user = new
             {
-                id = user.Id,
-                email = user.Email,
-                name = user.Name,
-                role = user.Role.ToString()
+                id = usuario.Id,
+                email = usuario.Email,
+                name = usuario.Nome,
+                role = usuario.Papel.ToString()
             }
         });
     }
@@ -64,47 +64,47 @@ public class AuthController : ControllerBase
         }
 
         // Verificar se o email já existe
-        if (await _context.Users.AnyAsync(u => u.Email == request.Email))
+        if (await _context.Usuarios.AnyAsync(u => u.Email == request.Email))
         {
             return BadRequest(new { message = "Email já cadastrado" });
         }
 
         // Verificar se o CPF já existe (se fornecido)
-        if (!string.IsNullOrEmpty(request.Cpf) && await _context.Users.AnyAsync(u => u.Cpf == request.Cpf))
+        if (!string.IsNullOrEmpty(request.Cpf) && await _context.Usuarios.AnyAsync(u => u.Cpf == request.Cpf))
         {
             return BadRequest(new { message = "CPF já cadastrado" });
         }
 
-        var user = new User
+        var usuario = new Usuario
         {
             Email = request.Email,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
-            Name = request.Name,
-            Role = request.Role ?? UserRole.Condutor,
+            SenhaHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            Nome = request.Nome,
+            Papel = request.Papel ?? PapelUsuario.Condutor,
             Cpf = request.Cpf,
-            Phone = request.Phone,
-            Active = true
+            Telefone = request.Telefone,
+            Ativo = true
         };
 
-        _context.Users.Add(user);
+        _context.Usuarios.Add(usuario);
         await _context.SaveChangesAsync();
 
-        var token = GenerateJwtToken(user);
+        var token = GenerateJwtToken(usuario);
 
         return Ok(new
         {
             token,
             user = new
             {
-                id = user.Id,
-                email = user.Email,
-                name = user.Name,
-                role = user.Role.ToString()
+                id = usuario.Id,
+                email = usuario.Email,
+                name = usuario.Nome,
+                role = usuario.Papel.ToString()
             }
         });
     }
 
-    private string GenerateJwtToken(User user)
+    private string GenerateJwtToken(Usuario usuario)
     {
         var jwtKey = _configuration["Jwt:Key"];
         var jwtIssuer = _configuration["Jwt:Issuer"];
@@ -118,10 +118,10 @@ public class AuthController : ControllerBase
         {
             Subject = new ClaimsIdentity(new[]
             {
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Name, user.Name),
-                new Claim(ClaimTypes.Role, user.Role.ToString())
+                new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
+                new Claim(ClaimTypes.Email, usuario.Email),
+                new Claim(ClaimTypes.Name, usuario.Nome),
+                new Claim(ClaimTypes.Role, usuario.Papel.ToString())
             }),
             Expires = DateTime.UtcNow.AddDays(jwtExpiresInDays),
             Issuer = jwtIssuer,
@@ -141,8 +141,8 @@ public record LoginRequest(string Email, string Password);
 public record RegisterRequest(
     string Email,
     string Password,
-    string Name,
-    UserRole? Role,
+    string Nome,
+    PapelUsuario? Papel,
     string? Cpf,
-    string? Phone
+    string? Telefone
 );

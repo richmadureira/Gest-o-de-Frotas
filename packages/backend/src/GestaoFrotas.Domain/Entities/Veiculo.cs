@@ -5,52 +5,52 @@ namespace GestaoFrotas.Domain.Entities;
 /// <summary>
 /// Entidade que representa um veículo da frota
 /// </summary>
-public class Vehicle : BaseEntity
+public class Veiculo : EntidadeBase
 {
     /// <summary>
     /// Placa do veículo (único)
     /// </summary>
-    public string Plate { get; set; } = string.Empty;
+    public string Placa { get; set; } = string.Empty;
 
     /// <summary>
     /// Modelo do veículo
     /// </summary>
-    public string Model { get; set; } = string.Empty;
+    public string Modelo { get; set; } = string.Empty;
 
     /// <summary>
     /// Marca/Fabricante do veículo
     /// </summary>
-    public string Brand { get; set; } = string.Empty;
+    public string Marca { get; set; } = string.Empty;
 
     /// <summary>
     /// Ano de fabricação
     /// </summary>
-    public int Year { get; set; }
+    public int Ano { get; set; }
 
     /// <summary>
     /// Tipo de veículo
     /// </summary>
-    public VehicleType Type { get; set; }
+    public TipoVeiculo Tipo { get; set; }
 
     /// <summary>
     /// Status atual do veículo
     /// </summary>
-    public VehicleStatus Status { get; set; } = VehicleStatus.Available;
+    public StatusVeiculo Status { get; set; } = StatusVeiculo.Disponivel;
 
     /// <summary>
     /// Quilometragem atual do veículo
     /// </summary>
-    public int? Mileage { get; set; }
+    public int? Quilometragem { get; set; }
 
     /// <summary>
     /// Data da última manutenção realizada
     /// </summary>
-    public DateTime? LastMaintenance { get; set; }
+    public DateTime? UltimaManutencao { get; set; }
 
     /// <summary>
     /// Data prevista para próxima manutenção
     /// </summary>
-    public DateTime? NextMaintenance { get; set; }
+    public DateTime? ProximaManutencao { get; set; }
 
     // Navigation Properties
 
@@ -62,6 +62,6 @@ public class Vehicle : BaseEntity
     /// <summary>
     /// Manutenções agendadas/realizadas neste veículo
     /// </summary>
-    public virtual ICollection<Maintenance> Maintenances { get; set; } = new List<Maintenance>();
+    public virtual ICollection<Manutencao> Manutencoes { get; set; } = new List<Manutencao>();
 }
 

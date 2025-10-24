@@ -5,49 +5,49 @@ using GestaoFrotas.Domain.Entities;
 namespace GestaoFrotas.Infrastructure.Configurations;
 
 /// <summary>
-/// Configuração da entidade Vehicle usando Fluent API
+/// Configuração da entidade Veiculo usando Fluent API
 /// </summary>
-public class VehicleConfiguration : IEntityTypeConfiguration<Vehicle>
+public class VeiculoConfiguration : IEntityTypeConfiguration<Veiculo>
 {
-    public void Configure(EntityTypeBuilder<Vehicle> builder)
+    public void Configure(EntityTypeBuilder<Veiculo> builder)
     {
-        builder.ToTable("Vehicles");
+        builder.ToTable("Veiculos");
 
         // Chave primária
         builder.HasKey(v => v.Id);
 
         // Propriedades obrigatórias
-        builder.Property(v => v.Plate)
+        builder.Property(v => v.Placa)
             .IsRequired()
             .HasMaxLength(10);
 
-        builder.Property(v => v.Model)
+        builder.Property(v => v.Modelo)
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.Property(v => v.Brand)
+        builder.Property(v => v.Marca)
             .IsRequired()
             .HasMaxLength(100);
 
-        builder.Property(v => v.Year)
+        builder.Property(v => v.Ano)
             .IsRequired();
 
         // Propriedades opcionais
-        builder.Property(v => v.Mileage)
+        builder.Property(v => v.Quilometragem)
             .IsRequired(false);
 
-        builder.Property(v => v.LastMaintenance)
+        builder.Property(v => v.UltimaManutencao)
             .IsRequired(false);
 
-        builder.Property(v => v.NextMaintenance)
+        builder.Property(v => v.ProximaManutencao)
             .IsRequired(false);
 
         // Índices únicos
-        builder.HasIndex(v => v.Plate)
+        builder.HasIndex(v => v.Placa)
             .IsUnique();
 
         // Conversões de enum para string
-        builder.Property(v => v.Type)
+        builder.Property(v => v.Tipo)
             .HasConversion<string>()
             .HasMaxLength(20);
 
@@ -57,13 +57,13 @@ public class VehicleConfiguration : IEntityTypeConfiguration<Vehicle>
 
         // Relacionamentos
         builder.HasMany(v => v.Checklists)
-            .WithOne(c => c.Vehicle)
-            .HasForeignKey(c => c.VehicleId)
+            .WithOne(c => c.Veiculo)
+            .HasForeignKey(c => c.VeiculoId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasMany(v => v.Maintenances)
-            .WithOne(m => m.Vehicle)
-            .HasForeignKey(m => m.VehicleId)
+        builder.HasMany(v => v.Manutencoes)
+            .WithOne(m => m.Veiculo)
+            .HasForeignKey(m => m.VeiculoId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

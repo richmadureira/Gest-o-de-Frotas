@@ -17,37 +17,37 @@ public class ChecklistConfiguration : IEntityTypeConfiguration<Checklist>
         builder.HasKey(c => c.Id);
 
         // Propriedades obrigatórias
-        builder.Property(c => c.VehicleId)
+        builder.Property(c => c.VeiculoId)
             .IsRequired();
 
-        builder.Property(c => c.DriverId)
+        builder.Property(c => c.MotoristaId)
             .IsRequired();
 
-        builder.Property(c => c.VehiclePlate)
+        builder.Property(c => c.PlacaVeiculo)
             .IsRequired()
             .HasMaxLength(10);
 
-        builder.Property(c => c.VehicleKm)
+        builder.Property(c => c.KmVeiculo)
             .IsRequired();
 
         // Propriedades opcionais
-        builder.Property(c => c.TiresImage)
+        builder.Property(c => c.ImagemPneus)
             .HasMaxLength(500);
 
-        builder.Property(c => c.LightsImage)
+        builder.Property(c => c.ImagemLuzes)
             .HasMaxLength(500);
 
-        builder.Property(c => c.WindshieldImage)
+        builder.Property(c => c.ImagemParaBrisa)
             .HasMaxLength(500);
 
-        builder.Property(c => c.BrakesImage)
+        builder.Property(c => c.ImagemFreios)
             .HasMaxLength(500);
 
-        builder.Property(c => c.Observations)
+        builder.Property(c => c.Observacoes)
             .HasMaxLength(1000);
 
         // Conversões de enum para string
-        builder.Property(c => c.Shift)
+        builder.Property(c => c.Turno)
             .HasConversion<string>()
             .HasMaxLength(20);
 
@@ -55,29 +55,29 @@ public class ChecklistConfiguration : IEntityTypeConfiguration<Checklist>
             .HasConversion<string>()
             .HasMaxLength(20);
 
-        builder.Property(c => c.Fuel)
+        builder.Property(c => c.Combustivel)
             .HasConversion<string>()
             .HasMaxLength(20);
 
         // Valores padrão
-        builder.Property(c => c.Date)
+        builder.Property(c => c.Data)
             .HasDefaultValueSql("GETUTCDATE()");
 
         // Relacionamentos
-        builder.HasOne(c => c.Vehicle)
+        builder.HasOne(c => c.Veiculo)
             .WithMany(v => v.Checklists)
-            .HasForeignKey(c => c.VehicleId)
+            .HasForeignKey(c => c.VeiculoId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(c => c.Driver)
+        builder.HasOne(c => c.Motorista)
             .WithMany(u => u.Checklists)
-            .HasForeignKey(c => c.DriverId)
+            .HasForeignKey(c => c.MotoristaId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // Índices para performance
-        builder.HasIndex(c => c.VehicleId);
-        builder.HasIndex(c => c.DriverId);
-        builder.HasIndex(c => c.Date);
+        builder.HasIndex(c => c.VeiculoId);
+        builder.HasIndex(c => c.MotoristaId);
+        builder.HasIndex(c => c.Data);
         builder.HasIndex(c => c.Status);
     }
 }

@@ -5,129 +5,129 @@ namespace GestaoFrotas.Domain.Entities;
 /// <summary>
 /// Entidade que representa um checklist veicular
 /// </summary>
-public class Checklist : BaseEntity
+public class Checklist : EntidadeBase
 {
     /// <summary>
     /// ID do veículo verificado
     /// </summary>
-    public Guid VehicleId { get; set; }
+    public Guid VeiculoId { get; set; }
 
     /// <summary>
     /// ID do motorista/condutor que realizou o checklist
     /// </summary>
-    public Guid DriverId { get; set; }
+    public Guid MotoristaId { get; set; }
 
     /// <summary>
     /// Data e hora da realização do checklist
     /// </summary>
-    public DateTime Date { get; set; } = DateTime.UtcNow;
+    public DateTime Data { get; set; } = DateTime.UtcNow;
 
     /// <summary>
     /// Turno em que o checklist foi realizado
     /// </summary>
-    public Shift Shift { get; set; }
+    public Turno Turno { get; set; }
 
     /// <summary>
     /// Status de aprovação do checklist
     /// </summary>
-    public ChecklistStatus Status { get; set; } = ChecklistStatus.Pending;
+    public StatusChecklist Status { get; set; } = StatusChecklist.Pendente;
 
     // Dados do veículo no momento do checklist
     
     /// <summary>
     /// Placa do veículo (snapshot)
     /// </summary>
-    public string VehiclePlate { get; set; } = string.Empty;
+    public string PlacaVeiculo { get; set; } = string.Empty;
 
     /// <summary>
     /// Quilometragem registrada no momento do checklist
     /// </summary>
-    public int VehicleKm { get; set; }
+    public int KmVeiculo { get; set; }
 
     // Itens de verificação do checklist (true = OK, false = NOK)
 
     /// <summary>
     /// Estado dos pneus
     /// </summary>
-    public bool Tires { get; set; }
+    public bool Pneus { get; set; }
 
     /// <summary>
     /// Funcionamento das luzes/faróis
     /// </summary>
-    public bool Lights { get; set; }
+    public bool Luzes { get; set; }
 
     /// <summary>
     /// Estado dos retrovisores
     /// </summary>
-    public bool Mirrors { get; set; }
+    public bool Retrovisores { get; set; }
 
     /// <summary>
     /// Estado do para-brisa
     /// </summary>
-    public bool Windshield { get; set; }
+    public bool ParaBrisa { get; set; }
 
     /// <summary>
     /// Funcionamento da buzina
     /// </summary>
-    public bool Horn { get; set; }
+    public bool Buzina { get; set; }
 
     /// <summary>
     /// Funcionamento dos freios
     /// </summary>
-    public bool Brakes { get; set; }
+    public bool Freios { get; set; }
 
     /// <summary>
     /// Nível de combustível
     /// </summary>
-    public FuelLevel Fuel { get; set; }
+    public NivelCombustivel Combustivel { get; set; }
 
     /// <summary>
     /// Documentos do veículo em ordem
     /// </summary>
-    public bool Documents { get; set; }
+    public bool Documentos { get; set; }
 
     /// <summary>
     /// Limpeza geral do veículo
     /// </summary>
-    public bool Cleaning { get; set; }
+    public bool Limpeza { get; set; }
 
     // URLs das imagens (armazenadas no servidor)
 
     /// <summary>
     /// Caminho da imagem dos pneus
     /// </summary>
-    public string? TiresImage { get; set; }
+    public string? ImagemPneus { get; set; }
 
     /// <summary>
     /// Caminho da imagem das luzes
     /// </summary>
-    public string? LightsImage { get; set; }
+    public string? ImagemLuzes { get; set; }
 
     /// <summary>
     /// Caminho da imagem do para-brisa
     /// </summary>
-    public string? WindshieldImage { get; set; }
+    public string? ImagemParaBrisa { get; set; }
 
     /// <summary>
     /// Caminho da imagem dos freios
     /// </summary>
-    public string? BrakesImage { get; set; }
+    public string? ImagemFreios { get; set; }
 
     /// <summary>
     /// Observações adicionais do motorista
     /// </summary>
-    public string? Observations { get; set; }
+    public string? Observacoes { get; set; }
 
     // Navigation Properties
 
     /// <summary>
     /// Veículo relacionado a este checklist
     /// </summary>
-    public virtual Vehicle Vehicle { get; set; } = null!;
+    public virtual Veiculo Veiculo { get; set; } = null!;
 
     /// <summary>
     /// Motorista que realizou o checklist
     /// </summary>
-    public virtual User Driver { get; set; } = null!;
+    public virtual Usuario Motorista { get; set; } = null!;
 }
 

@@ -5,48 +5,48 @@ namespace GestaoFrotas.Domain.Entities;
 /// <summary>
 /// Entidade que representa uma manutenção de veículo
 /// </summary>
-public class Maintenance : BaseEntity
+public class Manutencao : EntidadeBase
 {
     /// <summary>
     /// ID do veículo que receberá/recebeu a manutenção
     /// </summary>
-    public Guid VehicleId { get; set; }
+    public Guid VeiculoId { get; set; }
 
     /// <summary>
     /// Tipo de manutenção
     /// </summary>
-    public MaintenanceType Type { get; set; }
+    public TipoManutencao Tipo { get; set; }
 
     /// <summary>
     /// Descrição detalhada da manutenção
     /// </summary>
-    public string Description { get; set; } = string.Empty;
+    public string Descricao { get; set; } = string.Empty;
 
     /// <summary>
     /// Custo da manutenção (opcional)
     /// </summary>
-    public decimal? Cost { get; set; }
+    public decimal? Custo { get; set; }
 
     /// <summary>
     /// Status atual da manutenção
     /// </summary>
-    public MaintenanceStatus Status { get; set; } = MaintenanceStatus.Scheduled;
+    public StatusManutencao Status { get; set; } = StatusManutencao.Agendada;
 
     /// <summary>
     /// Data e hora agendada para a manutenção
     /// </summary>
-    public DateTime ScheduledAt { get; set; }
+    public DateTime AgendadoPara { get; set; }
 
     /// <summary>
     /// Data e hora em que a manutenção foi concluída
     /// </summary>
-    public DateTime? CompletedAt { get; set; }
+    public DateTime? ConcluidoEm { get; set; }
 
     // Navigation Properties
 
     /// <summary>
     /// Veículo relacionado a esta manutenção
     /// </summary>
-    public virtual Vehicle Vehicle { get; set; } = null!;
+    public virtual Veiculo Veiculo { get; set; } = null!;
 }
 

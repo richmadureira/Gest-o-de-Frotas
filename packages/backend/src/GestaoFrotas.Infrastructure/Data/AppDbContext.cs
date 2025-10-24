@@ -11,10 +11,10 @@ public class AppDbContext : DbContext
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
     // DbSets - Tabelas do banco de dados
-    public DbSet<User> Users { get; set; }
-    public DbSet<Vehicle> Vehicles { get; set; }
+    public DbSet<Usuario> Usuarios { get; set; }
+    public DbSet<Veiculo> Veiculos { get; set; }
     public DbSet<Checklist> Checklists { get; set; }
-    public DbSet<Maintenance> Maintenances { get; set; }
+    public DbSet<Manutencao> Manutencoes { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -26,13 +26,13 @@ public class AppDbContext : DbContext
 
     public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
-        // Atualizar UpdatedAt automaticamente para todas as entidades modificadas
-        var entries = ChangeTracker.Entries<BaseEntity>()
+        // Atualizar AtualizadoEm automaticamente para todas as entidades modificadas
+        var entries = ChangeTracker.Entries<EntidadeBase>()
             .Where(e => e.State == EntityState.Modified);
 
         foreach (var entry in entries)
         {
-            entry.Entity.UpdatedAt = DateTime.UtcNow;
+            entry.Entity.AtualizadoEm = DateTime.UtcNow;
         }
 
         return base.SaveChangesAsync(cancellationToken);

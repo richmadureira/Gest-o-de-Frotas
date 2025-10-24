@@ -5,13 +5,13 @@ using GestaoFrotas.Domain.Entities;
 namespace GestaoFrotas.Infrastructure.Configurations;
 
 /// <summary>
-/// Configuração da entidade User usando Fluent API
+/// Configuração da entidade Usuario usando Fluent API
 /// </summary>
-public class UserConfiguration : IEntityTypeConfiguration<User>
+public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
 {
-    public void Configure(EntityTypeBuilder<User> builder)
+    public void Configure(EntityTypeBuilder<Usuario> builder)
     {
-        builder.ToTable("Users");
+        builder.ToTable("Usuarios");
 
         // Chave primária
         builder.HasKey(u => u.Id);
@@ -21,11 +21,11 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .IsRequired()
             .HasMaxLength(255);
 
-        builder.Property(u => u.PasswordHash)
+        builder.Property(u => u.SenhaHash)
             .IsRequired()
             .HasMaxLength(255);
 
-        builder.Property(u => u.Name)
+        builder.Property(u => u.Nome)
             .IsRequired()
             .HasMaxLength(255);
 
@@ -33,7 +33,7 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
         builder.Property(u => u.Cpf)
             .HasMaxLength(11);
 
-        builder.Property(u => u.Phone)
+        builder.Property(u => u.Telefone)
             .HasMaxLength(20);
 
         // Índices únicos
@@ -45,18 +45,18 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasFilter("[Cpf] IS NOT NULL");
 
         // Conversão de enum para string
-        builder.Property(u => u.Role)
+        builder.Property(u => u.Papel)
             .HasConversion<string>()
             .HasMaxLength(20);
 
         // Valor padrão
-        builder.Property(u => u.Active)
+        builder.Property(u => u.Ativo)
             .HasDefaultValue(true);
 
         // Relacionamentos
         builder.HasMany(u => u.Checklists)
-            .WithOne(c => c.Driver)
-            .HasForeignKey(c => c.DriverId)
+            .WithOne(c => c.Motorista)
+            .HasForeignKey(c => c.MotoristaId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

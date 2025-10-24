@@ -1,28 +1,28 @@
 namespace GestaoFrotas.Domain.Enums;
 
 /// <summary>
-/// Tipos de veículos da frota
+/// Status da manutenção
 /// </summary>
-public enum VehicleType
+public enum StatusManutencao
 {
     /// <summary>
-    /// Carro de passeio
+    /// Agendada
     /// </summary>
-    Car = 1,
+    Agendada = 1,
 
     /// <summary>
-    /// Caminhão
+    /// Em andamento
     /// </summary>
-    Truck = 2,
+    EmAndamento = 2,
 
     /// <summary>
-    /// Van/Utilitário
+    /// Concluída
     /// </summary>
-    Van = 3,
+    Concluida = 3,
 
     /// <summary>
-    /// Motocicleta
+    /// Cancelada
     /// </summary>
-    Motorcycle = 4
+    Cancelada = 4
 }
 
