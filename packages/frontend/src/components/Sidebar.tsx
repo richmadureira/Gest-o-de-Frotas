@@ -31,7 +31,6 @@ const drawerWidth = 240;
 const gestorAdminMenu = [
   { text: 'Início', icon: <HomeIcon />, path: '/' },
   { text: 'Checklists', icon: <AssignmentIcon />, path: '/checklist' },
-  { text: 'Relatórios', icon: <BarChartIcon />, path: '/reports' },
   { text: 'Usuários', icon: <PersonIcon />, path: '/drivers' },
   { text: 'Veículos', icon: <DirectionsCarIcon />, path: '/vehicles' },
   { text: 'Manutenções', icon: <BuildIcon />, path: '/maintenance' },
@@ -39,8 +38,8 @@ const gestorAdminMenu = [
 ];
 
 const permissions = {
-  admin: ['checklist', 'reports', 'vehicles', 'drivers', 'maintenance', 'settings'],
-  gestor: ['checklist', 'reports', 'vehicles', 'drivers', 'maintenance'],
+  admin: ['checklist', 'vehicles', 'drivers', 'maintenance', 'settings'],
+  gestor: ['checklist', 'vehicles', 'drivers', 'maintenance'],
   condutor: ['checklist'],
 };
 

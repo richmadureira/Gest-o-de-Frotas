@@ -7,7 +7,6 @@ import MenuIcon from '@mui/icons-material/Menu';
 import theme from './theme';
 import Dashboard from './pages/Dashboard';
 import Checklist from './pages/Checklist';
-import Reports from './pages/Reports';
 import Vehicles from './pages/Vehicles';
 import Login from './components/Login';
 import Summary from './pages/Summary'; // Importa a nova página de resumo
@@ -24,7 +23,6 @@ const drawerWidth = 240;
 
 const routePermissions = {
   '/checklist': ['admin', 'gestor', 'condutor'],
-  '/reports': ['admin', 'gestor'],
   '/vehicles': ['admin', 'gestor'],
   '/summary': ['admin', 'gestor'],
   '/drivers': ['admin', 'gestor'],
@@ -108,13 +106,13 @@ function App() {
                     ? <ProtectedRoute path="/checklist" element={<Checklist />} />
                     : <ProtectedRoute path="/checklist" element={<ChecklistManagement />} />
                 } />
-                <Route path="/reports" element={<ProtectedRoute path="/reports" element={<Reports />} />} />
                 <Route path="/vehicles" element={<ProtectedRoute path="/vehicles" element={<Vehicles />} />} />
                 <Route path="/summary" element={<ProtectedRoute path="/summary" element={<Summary />} />} />
                 <Route path="/drivers" element={<ProtectedRoute path="/drivers" element={<Drivers />} />} />
                 <Route path="/report-details" element={<ProtectedRoute path="/report-details" element={<ReportDetails />} />} />
                 <Route path="/settings" element={<ProtectedRoute path="/settings" element={<Settings />} />} />
                 <Route path="/maintenance" element={<ProtectedRoute path="/maintenance" element={<Maintenance />} />} />
+                <Route path="/maintenance/new" element={<ProtectedRoute path="/maintenance" element={<Maintenance />} />} />
                 <Route path="*" element={<Dashboard onLogout={handleLogout} />} />
               </Routes>
               <Box sx={{ position: 'fixed', bottom: 16, right: 24, zIndex: 1300 }}>

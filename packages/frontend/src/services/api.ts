@@ -177,6 +177,76 @@ export const deleteVeiculo = async (id: string) => {
   return response.data;
 };
 
+// ===== MANUTENÇÕES =====
+export const getManutencoes = async (params?: {
+  status?: string;
+  tipo?: string;
+  veiculoId?: string;
+  dataInicio?: string;
+  dataFim?: string;
+}) => {
+  const response = await api.get('/manutencoes', { params });
+  return response.data;
+};
+
+export const getManutencao = async (id: string) => {
+  const response = await api.get(`/manutencoes/${id}`);
+  return response.data;
+};
+
+export const createManutencao = async (data: {
+  veiculoId: string;
+  tipo: string;
+  descricao: string;
+  custo?: number;
+  agendadoPara: string;
+}) => {
+  const backendData = {
+    VeiculoId: data.veiculoId,
+    Tipo: data.tipo,
+    Descricao: data.descricao,
+    Custo: data.custo,
+    AgendadoPara: data.agendadoPara
+  };
+  const response = await api.post('/manutencoes', backendData);
+  return response.data;
+};
+
+export const updateManutencao = async (id: string, data: {
+  veiculoId: string;
+  tipo: string;
+  descricao: string;
+  custo?: number;
+  agendadoPara: string;
+}) => {
+  const backendData = {
+    VeiculoId: data.veiculoId,
+    Tipo: data.tipo,
+    Descricao: data.descricao,
+    Custo: data.custo,
+    AgendadoPara: data.agendadoPara
+  };
+  const response = await api.put(`/manutencoes/${id}`, backendData);
+  return response.data;
+};
+
+export const updateManutencaoStatus = async (id: string, data: {
+  status: string;
+  custo?: number;
+}) => {
+  const backendData = {
+    Status: data.status,
+    Custo: data.custo
+  };
+  const response = await api.put(`/manutencoes/${id}/status`, backendData);
+  return response.data;
+};
+
+export const deleteManutencao = async (id: string) => {
+  const response = await api.delete(`/manutencoes/${id}`);
+  return response.data;
+};
+
 // ===== CHECKLISTS =====
 export const getChecklists = async (params?: {
   dataInicio?: string;
@@ -250,53 +320,6 @@ export const uploadImagemChecklist = async (file: File): Promise<string> => {
   return response.data.url;
 };
 
-// ===== MANUTENCOES =====
-export const getManutencoes = async (params?: {
-  status?: string;
-  tipo?: string;
-  veiculoId?: string;
-  dataInicio?: string;
-  dataFim?: string;
-}) => {
-  const response = await api.get('/manutencoes', { params });
-  return response.data;
-};
-
-export const getManutencao = async (id: string) => {
-  const response = await api.get(`/manutencoes/${id}`);
-  return response.data;
-};
-
-export const createManutencao = async (data: {
-  veiculoId: string;
-  tipo: string;
-  descricao: string;
-  custo?: number;
-  agendadoPara: string;
-}) => {
-  const response = await api.post('/manutencoes', data);
-  return response.data;
-};
-
-export const updateManutencao = async (id: string, data: {
-  tipo: string;
-  descricao: string;
-  custo?: number;
-  agendadoPara: string;
-}) => {
-  const response = await api.put(`/manutencoes/${id}`, data);
-  return response.data;
-};
-
-export const updateManutencaoStatus = async (id: string, status: string, custo?: number) => {
-  const response = await api.put(`/manutencoes/${id}/status`, { status, custo });
-  return response.data;
-};
-
-export const deleteManutencao = async (id: string) => {
-  const response = await api.delete(`/manutencoes/${id}`);
-  return response.data;
-};
 
 export const getMeuChecklistHoje = async () => {
   const response = await api.get('/checklists/meu-checklist-hoje');
