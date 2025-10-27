@@ -23,11 +23,6 @@ public class Checklist : EntidadeBase
     public DateTime Data { get; set; } = DateTime.UtcNow;
 
     /// <summary>
-    /// Turno em que o checklist foi realizado
-    /// </summary>
-    public Turno Turno { get; set; }
-
-    /// <summary>
     /// Status de aprovação do checklist
     /// </summary>
     public StatusChecklist Status { get; set; } = StatusChecklist.Pendente;
@@ -57,34 +52,9 @@ public class Checklist : EntidadeBase
     public bool Luzes { get; set; }
 
     /// <summary>
-    /// Estado dos retrovisores
-    /// </summary>
-    public bool Retrovisores { get; set; }
-
-    /// <summary>
-    /// Estado do para-brisa
-    /// </summary>
-    public bool ParaBrisa { get; set; }
-
-    /// <summary>
-    /// Funcionamento da buzina
-    /// </summary>
-    public bool Buzina { get; set; }
-
-    /// <summary>
     /// Funcionamento dos freios
     /// </summary>
     public bool Freios { get; set; }
-
-    /// <summary>
-    /// Nível de combustível
-    /// </summary>
-    public NivelCombustivel Combustivel { get; set; }
-
-    /// <summary>
-    /// Documentos do veículo em ordem
-    /// </summary>
-    public bool Documentos { get; set; }
 
     /// <summary>
     /// Limpeza geral do veículo
@@ -104,9 +74,9 @@ public class Checklist : EntidadeBase
     public string? ImagemLuzes { get; set; }
 
     /// <summary>
-    /// Caminho da imagem do para-brisa
+    /// Caminho da imagem de outras avarias
     /// </summary>
-    public string? ImagemParaBrisa { get; set; }
+    public string? ImagemOutrasAvarias { get; set; }
 
     /// <summary>
     /// Caminho da imagem dos freios
@@ -117,6 +87,11 @@ public class Checklist : EntidadeBase
     /// Observações adicionais do motorista
     /// </summary>
     public string? Observacoes { get; set; }
+
+    /// <summary>
+    /// Indica se o checklist foi enviado pelo condutor
+    /// </summary>
+    public bool Enviado { get; set; } = false;
 
     // Navigation Properties
 

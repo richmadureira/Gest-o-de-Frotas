@@ -196,21 +196,15 @@ export const getChecklist = async (id: string) => {
 
 export const createChecklist = async (data: {
   veiculoId: string;
-  turno: string;
   kmVeiculo: number;
   pneus: boolean;
   luzes: boolean;
-  retrovisores: boolean;
-  paraBrisa: boolean;
-  buzina: boolean;
   freios: boolean;
-  combustivel: string;
-  documentos: boolean;
   limpeza: boolean;
   imagemPneus?: string;
   imagemLuzes?: string;
-  imagemParaBrisa?: string;
   imagemFreios?: string;
+  imagemOutrasAvarias?: string;
   observacoes?: string;
 }) => {
   const response = await api.post('/checklists', data);
@@ -218,21 +212,15 @@ export const createChecklist = async (data: {
 };
 
 export const updateChecklist = async (id: string, data: {
-  turno: string;
   kmVeiculo: number;
   pneus: boolean;
   luzes: boolean;
-  retrovisores: boolean;
-  paraBrisa: boolean;
-  buzina: boolean;
   freios: boolean;
-  combustivel: string;
-  documentos: boolean;
   limpeza: boolean;
   imagemPneus?: string;
   imagemLuzes?: string;
-  imagemParaBrisa?: string;
   imagemFreios?: string;
+  imagemOutrasAvarias?: string;
   observacoes?: string;
 }) => {
   const response = await api.put(`/checklists/${id}`, data);
@@ -247,6 +235,19 @@ export const updateChecklistStatus = async (id: string, status: string) => {
 export const deleteChecklist = async (id: string) => {
   const response = await api.delete(`/checklists/${id}`);
   return response.data;
+};
+
+export const uploadImagemChecklist = async (file: File): Promise<string> => {
+  const formData = new FormData();
+  formData.append('file', file);
+  
+  const response = await api.post('/checklists/upload-image', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  
+  return response.data.url;
 };
 
 // ===== MANUTENCOES =====
@@ -297,4 +298,7 @@ export const deleteManutencao = async (id: string) => {
   return response.data;
 };
 
-export default api;
+export const getMeuChecklistHoje = async () => {
+  const response = await api.get('/checklists/meu-checklist-hoje');
+  return response.data;
+};

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Grid,
   Card,
@@ -34,18 +34,14 @@ import {
 } from '@mui/icons-material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { useAuth } from '../components/AuthContext';
+import { getMeuChecklistHoje } from '../services/api';
+import { useNavigate } from 'react-router-dom';
 import translogLogo from '../image/translog.png';
 
 interface DashboardProps {
   onLogout?: () => void;
   userName?: string;
 }
-
-// Mock data for condutor
-const checklistData = {
-  status: 'Pendente',
-  lastCheck: '2024-06-07 08:30',
-};
 
 const pendingItems = [
   { id: 1, description: 'Há 2 avarias não registradas', type: 'avaria', link: '/checklist' },
@@ -79,12 +75,34 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, userName }) => {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [supportModalOpen, setSupportModalOpen] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
+  const [checklistHoje, setChecklistHoje] = useState<any>(null);
+  const [loadingChecklist, setLoadingChecklist] = useState(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { userRole, logout } = useAuth();
+  const navigate = useNavigate();
 
   // Helper: get full user name if available
   const displayName = userName || 'Usuário';
+
+  // Carregar checklist do dia para condutores
+  useEffect(() => {
+    const carregarChecklistHoje = async () => {
+      try {
+        setLoadingChecklist(true);
+        const resultado = await getMeuChecklistHoje();
+        setChecklistHoje(resultado);
+      } catch (err) {
+        console.error('Erro ao carregar checklist:', err);
+      } finally {
+        setLoadingChecklist(false);
+      }
+    };
+    
+    if (userRole === 'condutor') {
+      carregarChecklistHoje();
+    }
+  }, [userRole]);
 
   // Condutor view
   if (userRole === 'condutor') {
@@ -110,18 +128,55 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, userName }) => {
                 <Typography variant="h6" gutterBottom>
                   Checklist de Hoje
                 </Typography>
-                <Typography color="textSecondary" gutterBottom>
-                  Status: {checklistData.status}
-                </Typography>
-                <Button
-                  variant="contained"
-                  color={checklistData.status === 'Pendente' ? 'primary' : 'secondary'}
-                  fullWidth
-                  sx={{ mt: 2 }}
-                  href="/checklist"
-                >
-                  {checklistData.status === 'Pendente' ? 'Preencher agora' : 'Ver detalhes'}
-                </Button>
+                
+                {loadingChecklist ? (
+                  <Typography color="textSecondary">
+                    Carregando...
+                  </Typography>
+                ) : (
+                  <>
+                    <Typography color="textSecondary" gutterBottom>
+                      Status: {checklistHoje?.enviado ? 'Enviado' : 'Pendente'}
+                    </Typography>
+                    
+                    {checklistHoje?.enviado && checklistHoje?.checklist && (
+                      <Box sx={{ mt: 2, mb: 2 }}>
+                        <Typography variant="body2" color="textSecondary">
+                          Veículo: {checklistHoje.checklist.veiculo?.placa || checklistHoje.checklist.placaVeiculo}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          KM: {checklistHoje.checklist.kmVeiculo}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          Enviado em: {new Date(checklistHoje.checklist.data).toLocaleString('pt-BR')}
+                        </Typography>
+                      </Box>
+                    )}
+                    
+                    <Button
+                      variant="contained"
+                      color={checklistHoje?.enviado ? 'success' : 'primary'}
+                      fullWidth
+                      sx={{ mt: 2 }}
+                      onClick={() => navigate('/checklist')}
+                      disabled={checklistHoje?.enviado}
+                    >
+                      {checklistHoje?.enviado ? 'Checklist já enviado hoje' : 'Preencher agora'}
+                    </Button>
+                    
+                    {checklistHoje?.enviado && (
+                      <Button
+                        variant="outlined"
+                        color="primary"
+                        fullWidth
+                        sx={{ mt: 1 }}
+                        onClick={() => navigate('/checklist')}
+                      >
+                        Ver checklist enviado
+                      </Button>
+                    )}
+                  </>
+                )}
               </CardContent>
             </Card>
           </Grid>

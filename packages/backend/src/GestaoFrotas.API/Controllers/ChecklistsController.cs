@@ -98,28 +98,37 @@ public class ChecklistsController : ControllerBase
             return Unauthorized();
         }
 
+        // Verificar se já existe checklist enviado hoje
+        var hoje = DateTime.UtcNow.Date;
+        var amanha = hoje.AddDays(1);
+
+        var checklistHoje = await _context.Checklists
+            .AnyAsync(c => c.MotoristaId == motoristaId 
+                        && c.Data >= hoje 
+                        && c.Data < amanha
+                        && c.Enviado);
+
+        if (checklistHoje)
+        {
+            return BadRequest(new { message = "Você já enviou um checklist hoje. Apenas um checklist por dia é permitido." });
+        }
+
         var checklist = new Checklist
         {
             VeiculoId = request.VeiculoId,
             MotoristaId = motoristaId,
-            Data = DateTime.UtcNow,
-            Turno = request.Turno,
             PlacaVeiculo = veiculo.Placa,
             KmVeiculo = request.KmVeiculo,
             Pneus = request.Pneus,
             Luzes = request.Luzes,
-            Retrovisores = request.Retrovisores,
-            ParaBrisa = request.ParaBrisa,
-            Buzina = request.Buzina,
             Freios = request.Freios,
-            Combustivel = request.Combustivel,
-            Documentos = request.Documentos,
             Limpeza = request.Limpeza,
             ImagemPneus = request.ImagemPneus,
             ImagemLuzes = request.ImagemLuzes,
-            ImagemParaBrisa = request.ImagemParaBrisa,
             ImagemFreios = request.ImagemFreios,
+            ImagemOutrasAvarias = request.ImagemOutrasAvarias,
             Observacoes = request.Observacoes,
+            Enviado = true, // Marca como enviado ao criar
             Status = StatusChecklist.Pendente
         };
 
@@ -127,6 +136,32 @@ public class ChecklistsController : ControllerBase
         await _context.SaveChangesAsync();
 
         return CreatedAtAction(nameof(GetChecklist), new { id = checklist.Id }, checklist);
+    
+    }
+
+    [Authorize(Roles = "Condutor")]
+    [HttpGet("meu-checklist-hoje")]
+    public async Task<ActionResult<object>> GetMeuChecklistHoje()
+    {
+        var motoristaId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var hoje = DateTime.UtcNow.Date;
+        var amanha = hoje.AddDays(1);
+        
+        var checklist = await _context.Checklists
+            .Include(c => c.Veiculo)
+            .Where(c => c.MotoristaId == motoristaId 
+                     && c.Data >= hoje 
+                     && c.Data < amanha
+                     && c.Enviado)
+            .OrderByDescending(c => c.Data)
+            .FirstOrDefaultAsync();
+        
+        if (checklist == null)
+        {
+            return Ok(new { enviado = false, checklist = (object?)null });
+        }
+        
+        return Ok(new { enviado = true, checklist });
     }
 
     [Authorize(Roles = "Administrador,Gestor")]
@@ -166,21 +201,15 @@ public class ChecklistsController : ControllerBase
             return Forbid();
         }
 
-        checklist.Turno = request.Turno;
         checklist.KmVeiculo = request.KmVeiculo;
         checklist.Pneus = request.Pneus;
         checklist.Luzes = request.Luzes;
-        checklist.Retrovisores = request.Retrovisores;
-        checklist.ParaBrisa = request.ParaBrisa;
-        checklist.Buzina = request.Buzina;
         checklist.Freios = request.Freios;
-        checklist.Combustivel = request.Combustivel;
-        checklist.Documentos = request.Documentos;
         checklist.Limpeza = request.Limpeza;
         checklist.ImagemPneus = request.ImagemPneus;
         checklist.ImagemLuzes = request.ImagemLuzes;
-        checklist.ImagemParaBrisa = request.ImagemParaBrisa;
         checklist.ImagemFreios = request.ImagemFreios;
+        checklist.ImagemOutrasAvarias = request.ImagemOutrasAvarias;
         checklist.Observacoes = request.Observacoes;
 
         await _context.SaveChangesAsync();
@@ -204,25 +233,71 @@ public class ChecklistsController : ControllerBase
 
         return NoContent();
     }
+
+    [HttpPost("upload-image")]
+    public async Task<ActionResult<object>> UploadImage(IFormFile file)
+    {
+        try
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest(new { message = "Arquivo inválido" });
+
+            // Validar tipo de arquivo
+            var allowedTypes = new[] { "image/jpeg", "image/jpg", "image/png" };
+            if (!allowedTypes.Contains(file.ContentType.ToLower()))
+                return BadRequest(new { message = "Apenas imagens JPG e PNG são permitidas" });
+
+            // Validar tamanho (máximo 5MB)
+            if (file.Length > 5 * 1024 * 1024)
+                return BadRequest(new { message = "Imagem muito grande. Máximo 5MB" });
+
+            // Gerar nome único com timestamp para evitar conflitos
+            var timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            var fileName = $"{timestamp}_{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
+            var uploadsFolder = Path.Combine("wwwroot", "uploads", "checklists");
+            
+            // Criar pasta se não existir
+            if (!Directory.Exists(uploadsFolder))
+                Directory.CreateDirectory(uploadsFolder);
+
+            var filePath = Path.Combine(uploadsFolder, fileName);
+
+            // Salvar arquivo com FileShare.ReadWrite para permitir acesso simultâneo
+            using (var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.ReadWrite))
+            {
+                await file.CopyToAsync(stream);
+                await stream.FlushAsync(); // Garantir que os dados foram escritos
+            }
+
+            // Aguardar um pouco para garantir que o arquivo foi completamente escrito
+            await Task.Delay(100);
+
+            // Retornar URL relativa
+            return Ok(new { url = $"/uploads/checklists/{fileName}" });
+        }
+        catch (IOException ioEx)
+        {
+            // Erro específico de acesso ao arquivo
+            return StatusCode(500, new { message = $"Erro de acesso ao arquivo: {ioEx.Message}" });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = $"Erro ao fazer upload: {ex.Message}" });
+        }
+    }
 }
 
 public record ChecklistRequest(
     Guid VeiculoId,
-    Turno Turno,
     int KmVeiculo,
     bool Pneus,
     bool Luzes,
-    bool Retrovisores,
-    bool ParaBrisa,
-    bool Buzina,
     bool Freios,
-    NivelCombustivel Combustivel,
-    bool Documentos,
     bool Limpeza,
     string? ImagemPneus,
     string? ImagemLuzes,
-    string? ImagemParaBrisa,
     string? ImagemFreios,
+    string? ImagemOutrasAvarias,
     string? Observacoes
 );
 

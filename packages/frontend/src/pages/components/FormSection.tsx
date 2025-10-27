@@ -1,5 +1,6 @@
 import React from 'react';
-import { Paper, Divider, Typography, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, TextField, Button } from '@mui/material';
+import { Paper, Divider, Typography, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, TextField, Button, CircularProgress, Box } from '@mui/material';
+import { CloudUpload, CheckCircle } from '@mui/icons-material';
 
 interface FormSectionProps {
   title: string;
@@ -10,8 +11,10 @@ interface FormSectionProps {
   description?: { condition: string };
   descriptionValue?: string;
   onDescriptionChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  image?: File | null;
+  image?: string | null;
   onImageChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  uploadingImage?: boolean;
+  disabled?: boolean;
 }
 
 const FormSection = ({
@@ -25,8 +28,10 @@ const FormSection = ({
   onDescriptionChange,
   image,
   onImageChange,
+  uploadingImage = false,
+  disabled = false,
 }: FormSectionProps) => (
-  <Paper elevation={3} sx={{ p: 3, mb: 2 }}>
+  <>
     <Divider textAlign="left">
       <Typography variant="h6" color="primary">
         {title}
@@ -36,7 +41,12 @@ const FormSection = ({
       <FormLabel component="legend">{title}</FormLabel>
       <RadioGroup value={value} onChange={onChange} row>
         {options.map((option) => (
-          <FormControlLabel key={option.value} value={option.value} control={<Radio />} label={option.label} />
+          <FormControlLabel 
+            key={option.value} 
+            value={option.value} 
+            control={<Radio disabled={disabled} />} 
+            label={option.label} 
+          />
         ))}
       </RadioGroup>
       {error && <Typography color="error">{error}</Typography>}
@@ -49,24 +59,43 @@ const FormSection = ({
             margin="normal"
             value={descriptionValue}
             onChange={onDescriptionChange}
+            multiline
+            rows={2}
+            disabled={disabled}
           />
-          <Button
-            variant="contained"
-            component="label"
-            sx={{ mt: 2 }}
-          >
-            Upload Imagem
-            <input
-              type="file"
-              hidden
-              onChange={onImageChange}
-            />
-          </Button>
-          {image && <Typography variant="body2" sx={{ mt: 1 }}>{image.name}</Typography>}
+          {onImageChange && (
+            <Box sx={{ mt: 2 }}>
+              <Button
+                variant="outlined"
+                component="label"
+                startIcon={uploadingImage ? <CircularProgress size={20} /> : image ? <CheckCircle /> : <CloudUpload />}
+                disabled={uploadingImage || disabled}
+                color={image ? 'success' : 'primary'}
+              >
+                {uploadingImage ? 'Enviando...' : image ? 'Imagem Enviada' : 'Upload Imagem (Opcional)'}
+                <input
+                  type="file"
+                  hidden
+                  accept="image/jpeg,image/jpg,image/png"
+                  onChange={onImageChange}
+                  disabled={uploadingImage || disabled}
+                />
+              </Button>
+              {image && (
+                <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
+                  <img 
+                    src={`http://localhost:5000${image}`} 
+                    alt="Preview" 
+                    style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '8px' }} 
+                  />
+                </Box>
+              )}
+            </Box>
+          )}
         </>
       )}
     </FormControl>
-  </Paper>
+  </>
 );
 
 export default FormSection;

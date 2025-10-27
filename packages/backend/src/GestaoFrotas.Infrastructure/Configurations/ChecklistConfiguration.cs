@@ -37,7 +37,7 @@ public class ChecklistConfiguration : IEntityTypeConfiguration<Checklist>
         builder.Property(c => c.ImagemLuzes)
             .HasMaxLength(500);
 
-        builder.Property(c => c.ImagemParaBrisa)
+        builder.Property(c => c.ImagemOutrasAvarias)
             .HasMaxLength(500);
 
         builder.Property(c => c.ImagemFreios)
@@ -46,16 +46,12 @@ public class ChecklistConfiguration : IEntityTypeConfiguration<Checklist>
         builder.Property(c => c.Observacoes)
             .HasMaxLength(1000);
 
+        builder.Property(c => c.Enviado)
+            .IsRequired()
+            .HasDefaultValue(false);
+
         // Conversões de enum para string
-        builder.Property(c => c.Turno)
-            .HasConversion<string>()
-            .HasMaxLength(20);
-
         builder.Property(c => c.Status)
-            .HasConversion<string>()
-            .HasMaxLength(20);
-
-        builder.Property(c => c.Combustivel)
             .HasConversion<string>()
             .HasMaxLength(20);
 
