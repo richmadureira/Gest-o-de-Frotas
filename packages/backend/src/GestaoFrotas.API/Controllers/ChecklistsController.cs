@@ -234,6 +234,41 @@ public class ChecklistsController : ControllerBase
         return NoContent();
     }
 
+    [HttpGet("validar-placa/{veiculoId}")]
+    public async Task<ActionResult<object>> ValidarPlacaHoje(Guid veiculoId)
+    {
+        try
+        {
+            var hoje = DateTime.UtcNow.Date;
+            var amanha = hoje.AddDays(1);
+            
+            // Buscar checklist para este veículo hoje
+            var checklistExistente = await _context.Checklists
+                .Include(c => c.Motorista)
+                .Where(c => c.VeiculoId == veiculoId 
+                         && c.Data >= hoje 
+                         && c.Data < amanha
+                         && c.Enviado)
+                .FirstOrDefaultAsync();
+            
+            if (checklistExistente != null)
+            {
+                return Ok(new 
+                { 
+                    existe = true, 
+                    motivo = $"Já existe um checklist para este veículo hoje, preenchido por {checklistExistente.Motorista?.Nome ?? "outro usuário"} às {checklistExistente.Data.ToLocalTime():HH:mm}.",
+                    checklist = checklistExistente
+                });
+            }
+            
+            return Ok(new { existe = false });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = $"Erro ao validar placa: {ex.Message}" });
+        }
+    }
+
     [HttpPost("upload-image")]
     public async Task<ActionResult<object>> UploadImage(IFormFile file)
     {

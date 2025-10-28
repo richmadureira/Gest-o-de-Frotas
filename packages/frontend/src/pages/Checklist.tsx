@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Container, Box, Typography, TextField, Button, Snackbar, Paper, Divider, Alert, CircularProgress, Autocomplete } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import FormSection from './components/FormSection';
 import { getVeiculos, createChecklist, uploadImagemChecklist, getMeuChecklistHoje } from '../services/api';
 
@@ -18,6 +18,8 @@ type ChecklistErrors = {
 
 function Checklist() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const veiculoIdPreSelecionado = location.state?.veiculoId;
   
   // Estados para veículos
   const [veiculos, setVeiculos] = useState<any[]>([]);
@@ -69,6 +71,11 @@ function Checklist() {
         setLoadingVeiculos(true);
         const data = await getVeiculos({ status: 'Disponivel' });
         setVeiculos(data);
+        
+        // Pré-selecionar veículo se veio da tela anterior
+        if (veiculoIdPreSelecionado) {
+          setVeiculoSelecionado(veiculoIdPreSelecionado);
+        }
       } catch (err) {
         console.error('Erro ao carregar veículos:', err);
         setError('Erro ao carregar veículos disponíveis');
@@ -93,7 +100,7 @@ function Checklist() {
 
     carregarVeiculos();
     verificarChecklistHoje();
-  }, []);
+  }, [veiculoIdPreSelecionado]);
 
   // Função para preencher formulário em modo leitura
   const preencherFormularioLeitura = (checklist: any) => {
@@ -313,7 +320,6 @@ function Checklist() {
       {modoLeitura && (
         <Alert severity="info" sx={{ mb: 2 }}>
           Você já enviou seu checklist hoje. 
-          Status: {checklistEnviado?.status}. 
           Abaixo você pode visualizar os dados enviados.
         </Alert>
       )}
@@ -335,14 +341,14 @@ function Checklist() {
               setVeiculoSelecionado(newValue ? newValue.id : '');
             }}
             loading={loadingVeiculos}
-            disabled={loading || modoLeitura}
+            disabled={loading || modoLeitura || !!veiculoIdPreSelecionado}
             renderInput={(params) => (
               <TextField
                 {...params}
-                label="Digite ou selecione o veículo *"
+                label={veiculoIdPreSelecionado ? "Veículo selecionado *" : "Digite ou selecione o veículo *"}
                 margin="normal"
                 error={!!errors['veiculo']}
-                helperText={errors['veiculo']}
+                helperText={errors['veiculo'] || (veiculoIdPreSelecionado ? "Veículo pré-selecionado na tela anterior" : "")}
                 InputProps={{
                   ...params.InputProps,
                   endAdornment: (

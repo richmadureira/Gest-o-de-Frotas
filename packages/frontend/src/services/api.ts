@@ -328,3 +328,8 @@ export const getMeuChecklistHoje = async () => {
   const response = await api.get('/checklists/meu-checklist-hoje');
   return response.data;
 };
+
+export const validarPlacaHoje = async (veiculoId: string) => {
+  const response = await api.get(`/checklists/validar-placa/${veiculoId}`);
+  return response.data;
+};
