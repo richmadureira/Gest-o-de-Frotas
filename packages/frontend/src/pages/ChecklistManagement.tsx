@@ -372,30 +372,20 @@ const ChecklistManagement: React.FC = () => {
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Box sx={{
-                          width: 24,
-                          height: 24,
-                          borderRadius: '50%',
-                          background: `conic-gradient(from 0deg, 
-                            ${avarias === 0 ? '#4caf50' : avarias === 1 ? '#ff9800' : '#f44336'} 0deg, 
-                            ${avarias === 0 ? '#4caf50' : avarias === 1 ? '#ff9800' : '#f44336'} ${(5 - avarias) * 72}deg, 
-                            #e0e0e0 ${(5 - avarias) * 72}deg, 
-                            #e0e0e0 360deg)`,
-                          display: 'flex',
+                          display: 'inline-flex',
                           alignItems: 'center',
                           justifyContent: 'center',
-                          position: 'relative'
+                          minWidth: 32,
+                          height: 24,
+                          px: 1,
+                          borderRadius: 1,
+                          backgroundColor: avarias === 0 ? '#e8f5e9' : avarias <= 2 ? '#fff3e0' : '#ffebee',
+                          color: avarias === 0 ? '#2e7d32' : avarias <= 2 ? '#e65100' : '#c62828',
+                          fontWeight: 600,
+                          fontSize: '0.875rem'
                         }}>
-                          <Box sx={{
-                            width: 8,
-                            height: 8,
-                            borderRadius: '50%',
-                            backgroundColor: 'white',
-                            border: '1px solid #ccc'
-                          }} />
+                          {avarias}
                         </Box>
-                        <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                          {avarias === 0 ? 'Excelente' : avarias === 1 ? 'Bom' : 'Ruim'}
-                        </Typography>
                         {temImagens && <CameraAlt color="action" fontSize="small" />}
                       </Box>
                   </TableCell>
