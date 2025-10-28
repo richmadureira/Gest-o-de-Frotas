@@ -1,6 +1,7 @@
 import React from 'react';
 import { Paper, Divider, Typography, FormControl, FormLabel, RadioGroup, FormControlLabel, Radio, TextField, Button, CircularProgress, Box } from '@mui/material';
 import { CloudUpload, CheckCircle } from '@mui/icons-material';
+import { IMAGE_BASE_URL } from '../../services/api';
 
 interface FormSectionProps {
   title: string;
@@ -84,7 +85,7 @@ const FormSection = ({
               {image && (
                 <Box sx={{ mt: 2, display: 'flex', alignItems: 'center', gap: 1 }}>
                   <img 
-                    src={`http://localhost:5000${image}`} 
+                    src={`${IMAGE_BASE_URL}${image}`} 
                     alt="Preview" 
                     style={{ maxWidth: '200px', maxHeight: '200px', borderRadius: '8px' }} 
                   />

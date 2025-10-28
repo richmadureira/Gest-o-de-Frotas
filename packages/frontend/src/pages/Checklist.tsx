@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Container, Box, Typography, TextField, Button, Snackbar, Paper, Divider, AppBar, Toolbar, Alert, CircularProgress, Autocomplete } from '@mui/material';
+import { Container, Box, Typography, TextField, Button, Snackbar, Paper, Divider, Alert, CircularProgress, Autocomplete } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -280,15 +280,6 @@ function Checklist() {
 
   return (
     <Container maxWidth="md" sx={{ mt: 4 }}>
-
-      {/* Barra Superior */}
-      <AppBar position="static" color="primary">
-        <Toolbar>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Checklist Diário do Veículo
-          </Typography>
-        </Toolbar>
-      </AppBar>
       
       {/* Ícone de Checkmark com Animação */}
       {showCheckmark && (
