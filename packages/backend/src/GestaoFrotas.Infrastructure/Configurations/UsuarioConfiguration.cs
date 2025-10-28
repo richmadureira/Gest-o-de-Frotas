@@ -53,6 +53,26 @@ public class UsuarioConfiguration : IEntityTypeConfiguration<Usuario>
         builder.Property(u => u.Ativo)
             .HasDefaultValue(true);
 
+        // Campos específicos de condutor
+        builder.Property(u => u.CnhNumero)
+            .HasMaxLength(11);
+
+        builder.Property(u => u.CnhCategoria)
+            .HasConversion<string>()
+            .HasMaxLength(5);
+
+        builder.Property(u => u.Matricula)
+            .HasMaxLength(20);
+
+        builder.Property(u => u.TurnoTrabalho)
+            .HasConversion<string>()
+            .HasMaxLength(10);
+
+        // Índice único para matrícula
+        builder.HasIndex(u => u.Matricula)
+            .IsUnique()
+            .HasFilter("[Matricula] IS NOT NULL");
+
         // Relacionamentos
         builder.HasMany(u => u.Checklists)
             .WithOne(c => c.Motorista)

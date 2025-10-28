@@ -30,6 +30,7 @@ interface Usuario {
   cpf?: string;
   telefone?: string;
   ativo: boolean;
+  cnhVencida?: boolean;
   criadoEm: string;
 }
 
@@ -368,7 +369,16 @@ const ChecklistManagement: React.FC = () => {
                   <TableCell>
                       {veiculo ? `${veiculo.placa} - ${veiculo.modelo}` : checklist.placaVeiculo}
                     </TableCell>
-                    <TableCell>{motorista?.nome || 'N/A'}</TableCell>
+                    <TableCell>
+                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                        <Typography variant="body2">{motorista?.nome || 'N/A'}</Typography>
+                        {motorista?.cnhVencida && (
+                          <Tooltip title="CNH Vencida - Atenção necessária">
+                            <Warning sx={{ color: '#f44336', fontSize: 18 }} />
+                          </Tooltip>
+                        )}
+                      </Box>
+                    </TableCell>
                     <TableCell>
                       <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         <Box sx={{

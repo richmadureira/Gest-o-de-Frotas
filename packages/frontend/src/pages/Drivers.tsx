@@ -49,6 +49,14 @@ interface Usuario {
   email: string;
   papel: string;
   ativo: boolean;
+  cpf?: string;
+  telefone?: string;
+  cnhNumero?: string;
+  cnhCategoria?: string;
+  cnhValidade?: string;
+  cnhVencida?: boolean;
+  matricula?: string;
+  turnoTrabalho?: string;
   criadoEm: string;
   atualizadoEm: string;
 }
@@ -60,6 +68,11 @@ type UsuarioFormData = {
   ativo: boolean;
   cpf?: string;
   telefone?: string;
+  cnhNumero?: string;
+  cnhCategoria?: string;
+  cnhValidade?: string;
+  matricula?: string;
+  turnoTrabalho?: string;
 };
 type UsuarioErrors = Partial<Record<keyof UsuarioFormData, string>>;
 
@@ -109,8 +122,17 @@ function GerenciamentoUsuarios() {
   useEffect(() => {
     const newErrors: UsuarioErrors = {};
     if (!formData.nome) newErrors.nome = 'Nome obrigatório';
-    if (!formData.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email)) newErrors.email = 'E-mail inválido';
+    if (!formData.email || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(formData.email)) 
+      newErrors.email = 'E-mail inválido';
     if (!formData.papel) newErrors.papel = 'Perfil obrigatório';
+    
+    // Validações específicas para Condutor
+    if (formData.papel === 'Condutor') {
+      if (!formData.cnhNumero) newErrors.cnhNumero = 'CNH obrigatória para condutores';
+      if (!formData.cnhCategoria) newErrors.cnhCategoria = 'Categoria obrigatória';
+      if (!formData.cnhValidade) newErrors.cnhValidade = 'Validade obrigatória';
+    }
+    
     setErrors(newErrors);
   }, [formData]);
 
@@ -146,7 +168,14 @@ function GerenciamentoUsuarios() {
             nome: usuario.nome, 
             email: usuario.email, 
             papel: usuario.papel, 
-            ativo: usuario.ativo 
+            ativo: usuario.ativo,
+            cpf: usuario.cpf,
+            telefone: usuario.telefone,
+            cnhNumero: usuario.cnhNumero,
+            cnhCategoria: usuario.cnhCategoria,
+            cnhValidade: usuario.cnhValidade ? usuario.cnhValidade.split('T')[0] : '',
+            matricula: usuario.matricula,
+            turnoTrabalho: usuario.turnoTrabalho
           }
         : { nome: '', email: '', papel: 'Condutor', ativo: true }
     );
@@ -213,6 +242,11 @@ function GerenciamentoUsuarios() {
           papel: formData.papel, // Backend vai mapear a string para o enum
           cpf: formData.cpf,
           telefone: formData.telefone,
+          cnhNumero: formData.cnhNumero,
+          cnhCategoria: formData.cnhCategoria,
+          cnhValidade: formData.cnhValidade ? new Date(formData.cnhValidade).toISOString() : null,
+          matricula: formData.matricula,
+          turnoTrabalho: formData.turnoTrabalho
         };
         await register(userData);
         setSnackbarMessage('Usuário criado com sucesso!');
@@ -387,6 +421,39 @@ function GerenciamentoUsuarios() {
             </Alert>
           )}
           <Box component="form" sx={{ mt: 1 }}>
+            {/* 1. PERFIL - Primeiro campo */}
+            <FormControl fullWidth margin="normal" required>
+              <InputLabel id="role-label">Perfil *</InputLabel>
+              <Select
+                labelId="role-label"
+                value={formData.papel}
+                label="Perfil *"
+                onChange={e => {
+                  const novoPapel = e.target.value;
+                  setFormData({ 
+                    ...formData, 
+                    papel: novoPapel,
+                    // Limpar campos de condutor se não for condutor
+                    ...(novoPapel !== 'Condutor' && {
+                      cnhNumero: '',
+                      cnhCategoria: '',
+                      cnhValidade: '',
+                      matricula: '',
+                      turnoTrabalho: ''
+                    })
+                  });
+                }}
+                error={!!errors.papel}
+              >
+                <MenuItem value="Condutor">Condutor</MenuItem>
+                <MenuItem value="Gestor" disabled={userRole !== 'admin'}>Gestor de Frota</MenuItem>
+                <MenuItem value="Administrador" disabled={userRole !== 'admin'}>
+                  Administrador
+                </MenuItem>
+              </Select>
+            </FormControl>
+            
+            {/* 2. NOME */}
             <TextField
               label="Nome completo *"
               value={formData.nome}
@@ -397,6 +464,8 @@ function GerenciamentoUsuarios() {
               margin="normal"
               required
             />
+            
+            {/* 3. E-MAIL */}
             <TextField
               label="E-mail *"
               value={formData.email}
@@ -407,22 +476,114 @@ function GerenciamentoUsuarios() {
               margin="normal"
               required
             />
-            <FormControl fullWidth margin="normal" required>
-              <InputLabel id="role-label">Perfil *</InputLabel>
-              <Select
-                labelId="role-label"
-                value={formData.papel}
-                label="Perfil *"
-                onChange={e => setFormData({ ...formData, papel: e.target.value })}
-                error={!!errors.papel}
-              >
-                <MenuItem value="Condutor">Condutor</MenuItem>
-                <MenuItem value="Gestor" disabled={userRole !== 'admin'}>Gestor de Frota</MenuItem>
-                <MenuItem value="Administrador" disabled={userRole !== 'admin'}>
-                  Administrador
-                </MenuItem>
-              </Select>
-            </FormControl>
+            
+            {/* 4. CAMPOS ESPECÍFICOS PARA CONDUTOR */}
+            {formData.papel === 'Condutor' && (
+              <>
+                <Typography variant="subtitle2" sx={{ mt: 2, mb: 1, color: 'text.secondary' }}>
+                  Informações do Condutor
+                </Typography>
+                
+                <TextField
+                  label="CPF"
+                  fullWidth
+                  margin="normal"
+                  value={formData.cpf || ''}
+                  onChange={e => setFormData({ ...formData, cpf: e.target.value })}
+                />
+                
+                <TextField
+                  label="Telefone"
+                  fullWidth
+                  margin="normal"
+                  value={formData.telefone || ''}
+                  onChange={e => setFormData({ ...formData, telefone: e.target.value })}
+                />
+                
+                <TextField
+                  label="Número da CNH *"
+                  fullWidth
+                  margin="normal"
+                  value={formData.cnhNumero || ''}
+                  onChange={e => setFormData({ ...formData, cnhNumero: e.target.value })}
+                  error={!!errors.cnhNumero}
+                  helperText={errors.cnhNumero}
+                />
+                
+                <FormControl fullWidth margin="normal" error={!!errors.cnhCategoria}>
+                  <InputLabel>Categoria CNH *</InputLabel>
+                  <Select
+                    value={formData.cnhCategoria || ''}
+                    label="Categoria CNH *"
+                    onChange={e => setFormData({ ...formData, cnhCategoria: e.target.value })}
+                  >
+                    <MenuItem value="A">A</MenuItem>
+                    <MenuItem value="AB">AB</MenuItem>
+                    <MenuItem value="B">B</MenuItem>
+                    <MenuItem value="C">C</MenuItem>
+                    <MenuItem value="D">D</MenuItem>
+                    <MenuItem value="E">E</MenuItem>
+                  </Select>
+                </FormControl>
+                
+                <TextField
+                  label="Validade da CNH *"
+                  type="date"
+                  fullWidth
+                  margin="normal"
+                  InputLabelProps={{ shrink: true }}
+                  value={formData.cnhValidade || ''}
+                  onChange={e => setFormData({ ...formData, cnhValidade: e.target.value })}
+                  error={!!errors.cnhValidade}
+                  helperText={errors.cnhValidade}
+                />
+                
+                <TextField
+                  label="Matrícula Interna"
+                  fullWidth
+                  margin="normal"
+                  value={formData.matricula || ''}
+                  onChange={e => setFormData({ ...formData, matricula: e.target.value })}
+                />
+                
+                <FormControl fullWidth margin="normal">
+                  <InputLabel>Turno de Trabalho</InputLabel>
+                  <Select
+                    value={formData.turnoTrabalho || ''}
+                    label="Turno de Trabalho"
+                    onChange={e => setFormData({ ...formData, turnoTrabalho: e.target.value })}
+                  >
+                    <MenuItem value="">Nenhum</MenuItem>
+                    <MenuItem value="Manha">Manhã</MenuItem>
+                    <MenuItem value="Tarde">Tarde</MenuItem>
+                    <MenuItem value="Noite">Noite</MenuItem>
+                  </Select>
+                </FormControl>
+              </>
+            )}
+            
+            {/* 5. CAMPOS PARA OUTROS PERFIS (OPCIONAL) */}
+            {(formData.papel === 'Gestor' || formData.papel === 'Administrador') && (
+              <>
+                <TextField
+                  label="CPF"
+                  fullWidth
+                  margin="normal"
+                  value={formData.cpf || ''}
+                  onChange={e => setFormData({ ...formData, cpf: e.target.value })}
+                />
+                
+                <TextField
+                  label="Telefone"
+                  fullWidth
+                  margin="normal"
+                  value={formData.telefone || ''}
+                  onChange={e => setFormData({ ...formData, telefone: e.target.value })}
+                />
+              </>
+            )}
+            
+            {/* 6. SWITCH ATIVO (apenas em edição) */}
             {editingUsuario && (
               <FormControlLabel
                 control={
@@ -433,6 +594,7 @@ function GerenciamentoUsuarios() {
                   />
                 }
                 label="Usuário ativo"
+                sx={{ mt: 2 }}
               />
             )}
           </Box>

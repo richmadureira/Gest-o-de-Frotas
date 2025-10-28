@@ -42,6 +42,37 @@ public class Usuario : EntidadeBase
     /// </summary>
     public bool Ativo { get; set; } = true;
 
+    // Campos específicos para condutores
+    /// <summary>
+    /// Número da CNH do condutor
+    /// </summary>
+    public string? CnhNumero { get; set; }
+
+    /// <summary>
+    /// Categoria da CNH do condutor
+    /// </summary>
+    public CategoriaCNH? CnhCategoria { get; set; }
+
+    /// <summary>
+    /// Data de validade da CNH
+    /// </summary>
+    public DateTime? CnhValidade { get; set; }
+
+    /// <summary>
+    /// Matrícula interna do condutor
+    /// </summary>
+    public string? Matricula { get; set; }
+
+    /// <summary>
+    /// Turno de trabalho do condutor
+    /// </summary>
+    public Turno? TurnoTrabalho { get; set; }
+
+    /// <summary>
+    /// Propriedade computada para verificar se a CNH está vencida
+    /// </summary>
+    public bool CnhVencida => CnhValidade.HasValue && CnhValidade.Value.Date < DateTime.UtcNow.Date;
+
     // Navigation Properties
     
     /// <summary>

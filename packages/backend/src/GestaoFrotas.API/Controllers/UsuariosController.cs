@@ -57,7 +57,13 @@ public class UsuariosController : ControllerBase
                 u.Cpf,
                 Telefone = u.Telefone,
                 Ativo = u.Ativo,
-                CriadoEm = u.CriadoEm
+                CriadoEm = u.CriadoEm,
+                CnhNumero = u.CnhNumero,
+                CnhCategoria = u.CnhCategoria.HasValue ? u.CnhCategoria.ToString() : null,
+                CnhValidade = u.CnhValidade,
+                CnhVencida = u.CnhValidade.HasValue && u.CnhValidade.Value.Date < DateTime.UtcNow.Date,
+                Matricula = u.Matricula,
+                TurnoTrabalho = u.TurnoTrabalho.HasValue ? u.TurnoTrabalho.ToString() : null
             })
             .ToListAsync();
 
@@ -79,7 +85,13 @@ public class UsuariosController : ControllerBase
                 Telefone = u.Telefone,
                 Ativo = u.Ativo,
                 CriadoEm = u.CriadoEm,
-                ChecklistsCount = u.Checklists.Count
+                ChecklistsCount = u.Checklists.Count,
+                CnhNumero = u.CnhNumero,
+                CnhCategoria = u.CnhCategoria.HasValue ? u.CnhCategoria.ToString() : null,
+                CnhValidade = u.CnhValidade,
+                CnhVencida = u.CnhValidade.HasValue && u.CnhValidade.Value.Date < DateTime.UtcNow.Date,
+                Matricula = u.Matricula,
+                TurnoTrabalho = u.TurnoTrabalho.HasValue ? u.TurnoTrabalho.ToString() : null
             })
             .FirstOrDefaultAsync();
 
@@ -115,12 +127,24 @@ public class UsuariosController : ControllerBase
             return BadRequest(new { message = "CPF já cadastrado em outro usuário" });
         }
 
+        // Verificar se a matrícula já existe em outro usuário
+        if (!string.IsNullOrEmpty(request.Matricula) && 
+            await _context.Usuarios.AnyAsync(u => u.Matricula == request.Matricula && u.Id != id))
+        {
+            return BadRequest(new { message = "Matrícula já cadastrada em outro usuário" });
+        }
+
         usuario.Email = request.Email;
         usuario.Nome = request.Nome;
         usuario.Papel = request.Papel;
         usuario.Cpf = request.Cpf;
         usuario.Telefone = request.Telefone;
         usuario.Ativo = request.Ativo;
+        usuario.CnhNumero = request.CnhNumero;
+        usuario.CnhCategoria = request.CnhCategoria;
+        usuario.CnhValidade = request.CnhValidade;
+        usuario.Matricula = request.Matricula;
+        usuario.TurnoTrabalho = request.TurnoTrabalho;
 
         await _context.SaveChangesAsync();
 
@@ -132,7 +156,12 @@ public class UsuariosController : ControllerBase
             Papel = usuario.Papel.ToString(),
             usuario.Cpf,
             Telefone = usuario.Telefone,
-            Ativo = usuario.Ativo
+            Ativo = usuario.Ativo,
+            CnhNumero = usuario.CnhNumero,
+            CnhCategoria = usuario.CnhCategoria.HasValue ? usuario.CnhCategoria.ToString() : null,
+            CnhValidade = usuario.CnhValidade,
+            Matricula = usuario.Matricula,
+            TurnoTrabalho = usuario.TurnoTrabalho.HasValue ? usuario.TurnoTrabalho.ToString() : null
         });
     }
 
@@ -183,5 +212,10 @@ public record UpdateUsuarioRequest(
     PapelUsuario Papel,
     string? Cpf,
     string? Telefone,
-    bool Ativo
+    bool Ativo,
+    string? CnhNumero,
+    CategoriaCNH? CnhCategoria,
+    DateTime? CnhValidade,
+    string? Matricula,
+    Turno? TurnoTrabalho
 );

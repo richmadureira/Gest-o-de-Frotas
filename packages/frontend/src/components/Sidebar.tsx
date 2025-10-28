@@ -17,7 +17,6 @@ import AssessmentIcon from '@mui/icons-material/Assessment';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import PeopleIcon from '@mui/icons-material/People';
 import BuildIcon from '@mui/icons-material/Build';
-import SettingsIcon from '@mui/icons-material/Settings';
 import HomeIcon from '@mui/icons-material/Home';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import BarChartIcon from '@mui/icons-material/BarChart';
@@ -34,12 +33,11 @@ const gestorAdminMenu = [
   { text: 'Usuários', icon: <PersonIcon />, path: '/drivers' },
   { text: 'Veículos', icon: <DirectionsCarIcon />, path: '/vehicles' },
   { text: 'Manutenções', icon: <BuildIcon />, path: '/maintenance' },
-  { text: 'Configurações', icon: <SettingsIcon />, path: '/settings' },
 ];
 
 const permissions = {
-  admin: ['checklist', 'vehicles', 'drivers', 'maintenance', 'settings'],
-  gestor: ['checklist', 'vehicles', 'drivers', 'maintenance'],
+  admin: ['', 'checklist', 'vehicles', 'drivers', 'maintenance'],
+  gestor: ['', 'checklist', 'vehicles', 'drivers', 'maintenance'],
   condutor: ['checklist'],
 };
 

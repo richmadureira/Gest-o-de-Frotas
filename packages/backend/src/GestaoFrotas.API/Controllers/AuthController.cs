@@ -40,6 +40,14 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "Email ou senha inválidos" });
         }
 
+        // Verificar CNH vencida para condutores
+        if (usuario.Papel == PapelUsuario.Condutor && 
+            usuario.CnhValidade.HasValue && 
+            usuario.CnhValidade.Value.Date < DateTime.UtcNow.Date)
+        {
+            return Unauthorized(new { message = "CNH vencida. Entre em contato com o gestor." });
+        }
+
         var token = GenerateJwtToken(usuario);
 
         return Ok(new
@@ -75,6 +83,30 @@ public class AuthController : ControllerBase
             return BadRequest(new { message = "CPF já cadastrado" });
         }
 
+        // Validar matrícula única
+        if (!string.IsNullOrEmpty(request.Matricula) && 
+            await _context.Usuarios.AnyAsync(u => u.Matricula == request.Matricula))
+        {
+            return BadRequest(new { message = "Matrícula já cadastrada" });
+        }
+
+        // Validar CNH para condutores
+        if (request.Papel == PapelUsuario.Condutor)
+        {
+            if (string.IsNullOrEmpty(request.CnhNumero))
+            {
+                return BadRequest(new { message = "Número da CNH é obrigatório para condutores" });
+            }
+            if (!request.CnhCategoria.HasValue)
+            {
+                return BadRequest(new { message = "Categoria da CNH é obrigatória para condutores" });
+            }
+            if (!request.CnhValidade.HasValue)
+            {
+                return BadRequest(new { message = "Validade da CNH é obrigatória para condutores" });
+            }
+        }
+
         var usuario = new Usuario
         {
             Email = request.Email,
@@ -83,6 +115,11 @@ public class AuthController : ControllerBase
             Papel = request.Papel ?? PapelUsuario.Condutor,
             Cpf = request.Cpf,
             Telefone = request.Telefone,
+            CnhNumero = request.CnhNumero,
+            CnhCategoria = request.CnhCategoria,
+            CnhValidade = request.CnhValidade,
+            Matricula = request.Matricula,
+            TurnoTrabalho = request.TurnoTrabalho,
             Ativo = true
         };
 
@@ -144,5 +181,10 @@ public record RegisterRequest(
     string Nome,
     PapelUsuario? Papel,
     string? Cpf,
-    string? Telefone
+    string? Telefone,
+    string? CnhNumero,
+    CategoriaCNH? CnhCategoria,
+    DateTime? CnhValidade,
+    string? Matricula,
+    Turno? TurnoTrabalho
 );

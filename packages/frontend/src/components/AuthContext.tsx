@@ -22,9 +22,26 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Função para mapear o role do backend para o formato usado no frontend
+const mapRole = (backendRole: string): UserRole => {
+  const roleMap: Record<string, UserRole> = {
+    'Administrador': 'admin',
+    'administrador': 'admin',
+    'Gestor': 'gestor',
+    'gestor': 'gestor',
+    'Condutor': 'condutor',
+    'condutor': 'condutor'
+  };
+  
+  return roleMap[backendRole] || null;
+};
+
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(() => !!localStorage.getItem('token'));
-  const [userRole, setUserRole] = useState<UserRole>(() => (localStorage.getItem('role') as UserRole) || null);
+  const [userRole, setUserRole] = useState<UserRole>(() => {
+    const role = localStorage.getItem('role');
+    return role ? mapRole(role) : null;
+  });
   const [user, setUser] = useState<User | null>(() => {
     const userData = localStorage.getItem('user');
     return userData ? JSON.parse(userData) : null;
@@ -39,14 +56,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const response = await apiLogin(email, password);
       
+      // Mapear o role corretamente
+      const mappedRole = mapRole(response.user.role);
+      
       // Armazenar dados no localStorage
       localStorage.setItem('token', response.token);
       localStorage.setItem('user', JSON.stringify(response.user));
-      localStorage.setItem('role', response.user.role.toLowerCase());
+      localStorage.setItem('role', mappedRole || '');
       
       // Atualizar estado
       setIsAuthenticated(true);
-      setUserRole(response.user.role.toLowerCase() as UserRole);
+      setUserRole(mappedRole);
       setUser(response.user);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao fazer login');

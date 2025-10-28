@@ -12,7 +12,7 @@ import Login from './components/Login';
 import Summary from './pages/Summary'; // Importa a nova página de resumo
 import Drivers from './pages/Drivers'; // Certifique-se de que a grafia corresponde ao nome real do arquivo
 import ReportDetails from './pages/ReportDetails'; // Importa a nova página de detalhes do relatório
-import Settings from './pages/Settings'; // Importa a nova página de configurações
+ // Importa a nova página de configurações
 import Maintenance from './pages/Maintenance'; 
 import Sidebar from './components/Sidebar';
 import { useAuth } from './components/AuthContext';
@@ -28,7 +28,6 @@ const routePermissions = {
   '/summary': ['admin', 'gestor'],
   '/drivers': ['admin', 'gestor'],
   '/report-details': ['admin', 'gestor'],
-  '/settings': ['admin'],
   '/maintenance': ['admin', 'gestor'],
 };
 
@@ -129,7 +128,6 @@ function App() {
           <Route path="/summary" element={<ProtectedRoute path="/summary" element={<Summary />} />} />
           <Route path="/drivers" element={<ProtectedRoute path="/drivers" element={<Drivers />} />} />
           <Route path="/report-details" element={<ProtectedRoute path="/report-details" element={<ReportDetails />} />} />
-          <Route path="/settings" element={<ProtectedRoute path="/settings" element={<Settings />} />} />
           <Route path="/maintenance" element={<ProtectedRoute path="/maintenance" element={<Maintenance />} />} />
           <Route path="/maintenance/new" element={<ProtectedRoute path="/maintenance" element={<Maintenance />} />} />
           <Route path="*" element={<Dashboard onLogout={handleLogout} />} />
