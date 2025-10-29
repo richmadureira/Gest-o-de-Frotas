@@ -204,14 +204,12 @@ export const createManutencao = async (data: {
   custo?: number;
   agendadoPara: string;
 }) => {
-  const backendData = {
-    VeiculoId: data.veiculoId,
-    Tipo: data.tipo,
-    Descricao: data.descricao,
-    Custo: data.custo,
-    AgendadoPara: data.agendadoPara
-  };
-  const response = await api.post('/manutencoes', backendData);
+  const response = await api.post('/manutencoes', data);
+  return response.data;
+};
+
+export const simularProximoStatusManutencao = async (id: string) => {
+  const response = await api.post(`/manutencoes/${id}/simular-proximo-status`);
   return response.data;
 };
 

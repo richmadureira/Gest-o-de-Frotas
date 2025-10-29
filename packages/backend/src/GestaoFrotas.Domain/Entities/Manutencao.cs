@@ -42,6 +42,26 @@ public class Manutencao : EntidadeBase
     /// </summary>
     public DateTime? ConcluidoEm { get; set; }
 
+    /// <summary>
+    /// Número da ordem de serviço no SAP
+    /// </summary>
+    public string? NumeroOrdemSAP { get; set; }
+
+    /// <summary>
+    /// Fornecedor responsável pela manutenção no SAP
+    /// </summary>
+    public string? FornecedorSAP { get; set; }
+
+    /// <summary>
+    /// Status atual da manutenção no SAP
+    /// </summary>
+    public StatusManutencaoSAP? StatusSAP { get; set; }
+
+    /// <summary>
+    /// Progresso da manutenção (0-100)
+    /// </summary>
+    public int Progresso { get; set; } = 0;
+
     // Navigation Properties
 
     /// <summary>

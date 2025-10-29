@@ -95,7 +95,10 @@ public class ManutencoesController : ControllerBase
             Descricao = request.Descricao,
             Custo = request.Custo,
             AgendadoPara = request.AgendadoPara,
-            Status = StatusManutencao.Agendada
+            Status = StatusManutencao.Agendada,
+            // Inicializar campos SAP
+            StatusSAP = StatusManutencaoSAP.Solicitada,
+            Progresso = 10
         };
 
         _context.Manutencoes.Add(manutencao);
@@ -171,6 +174,56 @@ public class ManutencoesController : ControllerBase
         await _context.SaveChangesAsync();
 
         return NoContent();
+    }
+
+    [HttpPost("{id}/simular-proximo-status")]
+    public async Task<ActionResult> SimularProximoStatus(Guid id)
+    {
+        var manutencao = await _context.Manutencoes.FindAsync(id);
+        if (manutencao == null) return NotFound();
+
+        var proximoStatus = ObterProximoStatus(manutencao.StatusSAP);
+        manutencao.StatusSAP = proximoStatus;
+        manutencao.Progresso = CalcularProgresso(proximoStatus);
+        
+        if (proximoStatus == StatusManutencaoSAP.OrdemCriada)
+        {
+            manutencao.NumeroOrdemSAP = $"OS-{DateTime.UtcNow.Year}-{Random.Shared.Next(100, 999)}";
+            manutencao.FornecedorSAP = "Oficina Central";
+        }
+
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    private StatusManutencaoSAP? ObterProximoStatus(StatusManutencaoSAP? atual)
+    {
+        // Sequência: Solicitada -> Aprovada -> EnviadaSAP -> ProcessandoSAP -> OrdemCriada -> EmExecucao -> Finalizada
+        return atual switch
+        {
+            StatusManutencaoSAP.Solicitada => StatusManutencaoSAP.Aprovada,
+            StatusManutencaoSAP.Aprovada => StatusManutencaoSAP.EnviadaSAP,
+            StatusManutencaoSAP.EnviadaSAP => StatusManutencaoSAP.ProcessandoSAP,
+            StatusManutencaoSAP.ProcessandoSAP => StatusManutencaoSAP.OrdemCriada,
+            StatusManutencaoSAP.OrdemCriada => StatusManutencaoSAP.EmExecucao,
+            StatusManutencaoSAP.EmExecucao => StatusManutencaoSAP.Finalizada,
+            _ => atual
+        };
+    }
+
+    private int CalcularProgresso(StatusManutencaoSAP? status)
+    {
+        return status switch
+        {
+            StatusManutencaoSAP.Solicitada => 10,
+            StatusManutencaoSAP.Aprovada => 25,
+            StatusManutencaoSAP.EnviadaSAP => 40,
+            StatusManutencaoSAP.ProcessandoSAP => 55,
+            StatusManutencaoSAP.OrdemCriada => 70,
+            StatusManutencaoSAP.EmExecucao => 85,
+            StatusManutencaoSAP.Finalizada => 100,
+            _ => 0
+        };
     }
 }
 
