@@ -331,3 +331,8 @@ export const validarPlacaHoje = async (veiculoId: string) => {
   const response = await api.get(`/checklists/validar-placa/${veiculoId}`);
   return response.data;
 };
+
+export const getEstatisticasChecklists = async () => {
+  const response = await api.get('/checklists/estatisticas');
+  return response.data;
+};

@@ -21,48 +21,124 @@ public class ChecklistsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Checklist>>> GetChecklists(
+    public async Task<ActionResult<IEnumerable<object>>> GetChecklists(
         [FromQuery] DateTime? dataInicio,
         [FromQuery] DateTime? dataFim,
-        [FromQuery] StatusChecklist? status,
+        [FromQuery] string? status,
         [FromQuery] Guid? veiculoId,
         [FromQuery] Guid? motoristaId)
     {
-        var query = _context.Checklists
-            .Include(c => c.Veiculo)
-            .Include(c => c.Motorista)
-            .AsQueryable();
-
-        if (dataInicio.HasValue)
+        try
         {
-            query = query.Where(c => c.Data >= dataInicio.Value);
-        }
+            var query = _context.Checklists
+                .Include(c => c.Veiculo)
+                .Include(c => c.Motorista)
+                .AsQueryable();
 
-        if (dataFim.HasValue)
+            // Aplicar filtros
+            if (dataInicio.HasValue)
+                query = query.Where(c => c.Data >= dataInicio.Value);
+                
+            if (dataFim.HasValue)
+                query = query.Where(c => c.Data <= dataFim.Value);
+                
+            if (!string.IsNullOrEmpty(status))
+                query = query.Where(c => c.Status.ToString() == status);
+                
+            if (veiculoId.HasValue)
+                query = query.Where(c => c.VeiculoId == veiculoId.Value);
+                
+            if (motoristaId.HasValue)
+                query = query.Where(c => c.MotoristaId == motoristaId.Value);
+
+            var checklists = await query
+                .OrderByDescending(c => c.Data)
+                .Select(c => new
+                {
+                    c.Id,
+                    c.Data,
+                    c.VeiculoId,
+                    c.MotoristaId,
+                    c.PlacaVeiculo,
+                    c.KmVeiculo,
+                    c.Status,
+                    c.Pneus,
+                    c.Luzes,
+                    c.Freios,
+                    c.Limpeza,
+                    c.ImagemPneus,
+                    c.ImagemLuzes,
+                    c.ImagemFreios,
+                    c.ImagemOutrasAvarias,
+                    c.Observacoes,
+                    c.Enviado,
+                    Veiculo = new
+                    {
+                        c.Veiculo.Id,
+                        c.Veiculo.Placa,
+                        c.Veiculo.Modelo,
+                        c.Veiculo.Marca
+                    },
+                    Motorista = new
+                    {
+                        c.Motorista.Id,
+                        c.Motorista.Nome,
+                        c.Motorista.Email,
+                        CnhVencida = c.Motorista.CnhValidade.HasValue && 
+                                    c.Motorista.CnhValidade.Value.Date < DateTime.UtcNow.Date
+                    }
+                })
+                .ToListAsync();
+
+            return Ok(checklists);
+        }
+        catch (Exception ex)
         {
-            query = query.Where(c => c.Data <= dataFim.Value);
+            return StatusCode(500, new { message = $"Erro ao buscar checklists: {ex.Message}" });
         }
+    }
 
-        if (status.HasValue)
+    [HttpGet("estatisticas")]
+    public async Task<ActionResult<object>> GetEstatisticas()
+    {
+        try
         {
-            query = query.Where(c => c.Status == status.Value);
+            var hoje = DateTime.UtcNow.Date;
+            var amanha = hoje.AddDays(1);
+            
+            // Checklists de hoje
+            var checklistsHoje = await _context.Checklists
+                .Where(c => c.Data >= hoje && c.Data < amanha)
+                .ToListAsync();
+                
+            var pendentes = checklistsHoje.Count(c => c.Status == StatusChecklist.Pendente);
+            var concluidos = checklistsHoje.Count(c => c.Status == StatusChecklist.Aprovado);
+            
+            // Avarias não resolvidas (checklists rejeitados recentes)
+            var avariasNaoResolvidas = await _context.Checklists
+                .Include(c => c.Veiculo)
+                .Where(c => c.Status == StatusChecklist.Rejeitado && 
+                           c.Data >= DateTime.UtcNow.AddDays(-7))
+                .Select(c => new
+                {
+                    c.Id,
+                    Veiculo = c.Veiculo.Placa + " - " + c.Veiculo.Modelo,
+                    Desc = c.Observacoes ?? "Avaria detectada",
+                    Status = "Pendente"
+                })
+                .Take(5)
+                .ToListAsync();
+            
+            return Ok(new
+            {
+                checklistsHoje = new { pendentes, concluidos },
+                avariasNaoResolvidas
+            });
         }
-
-        if (veiculoId.HasValue)
+        catch (Exception ex)
         {
-            query = query.Where(c => c.VeiculoId == veiculoId.Value);
+            return StatusCode(500, new { message = $"Erro ao buscar estatísticas: {ex.Message}" });
         }
-
-        if (motoristaId.HasValue)
-        {
-            query = query.Where(c => c.MotoristaId == motoristaId.Value);
-        }
-
-        var checklists = await query
-            .OrderByDescending(c => c.Data)
-            .ToListAsync();
-
-        return Ok(checklists);
     }
 
     [HttpGet("{id}")]

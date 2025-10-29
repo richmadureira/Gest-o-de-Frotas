@@ -177,23 +177,32 @@ public class ManutencoesController : ControllerBase
     }
 
     [HttpPost("{id}/simular-proximo-status")]
-    public async Task<ActionResult> SimularProximoStatus(Guid id)
+    public async Task<ActionResult<Manutencao>> SimularProximoStatus(Guid id)
     {
-        var manutencao = await _context.Manutencoes.FindAsync(id);
+        var manutencao = await _context.Manutencoes
+            .Include(m => m.Veiculo)
+            .FirstOrDefaultAsync(m => m.Id == id);
+            
         if (manutencao == null) return NotFound();
+        
+        // Não permitir avançar se já está finalizada
+        if (manutencao.StatusSAP == StatusManutencaoSAP.Finalizada)
+            return BadRequest(new { message = "Manutenção já está finalizada" });
 
         var proximoStatus = ObterProximoStatus(manutencao.StatusSAP);
         manutencao.StatusSAP = proximoStatus;
         manutencao.Progresso = CalcularProgresso(proximoStatus);
         
-        if (proximoStatus == StatusManutencaoSAP.OrdemCriada)
+        if (proximoStatus == StatusManutencaoSAP.OrdemCriada && string.IsNullOrEmpty(manutencao.NumeroOrdemSAP))
         {
             manutencao.NumeroOrdemSAP = $"OS-{DateTime.UtcNow.Year}-{Random.Shared.Next(100, 999)}";
             manutencao.FornecedorSAP = "Oficina Central";
         }
 
         await _context.SaveChangesAsync();
-        return NoContent();
+        
+        // Retornar dados atualizados
+        return Ok(manutencao);
     }
 
     private StatusManutencaoSAP? ObterProximoStatus(StatusManutencaoSAP? atual)

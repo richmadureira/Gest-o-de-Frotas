@@ -17,7 +17,8 @@ import {
   useMediaQuery,
   Modal,
   AppBar,
-  Toolbar
+  Toolbar,
+  CircularProgress
 } from '@mui/material';
 import {
   Menu as MenuIcon,
@@ -34,7 +35,7 @@ import {
 } from '@mui/icons-material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
 import { useAuth } from '../components/AuthContext';
-import { getMeuChecklistHoje } from '../services/api';
+import { getMeuChecklistHoje, getEstatisticasChecklists } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import translogLogo from '../image/translog.png';
 
@@ -77,6 +78,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, userName }) => {
   const [selectedPhoto, setSelectedPhoto] = useState<any>(null);
   const [checklistHoje, setChecklistHoje] = useState<any>(null);
   const [loadingChecklist, setLoadingChecklist] = useState(true);
+  const [estatisticas, setEstatisticas] = useState<any>(null);
+  const [loadingStats, setLoadingStats] = useState(true);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const { userRole, logout } = useAuth();
@@ -101,6 +104,25 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, userName }) => {
     
     if (userRole === 'condutor') {
       carregarChecklistHoje();
+    }
+  }, [userRole]);
+
+  // Carregar estatísticas para gestores/admin
+  useEffect(() => {
+    const carregarEstatisticas = async () => {
+      try {
+        setLoadingStats(true);
+        const data = await getEstatisticasChecklists();
+        setEstatisticas(data);
+      } catch (err) {
+        console.error('Erro ao carregar estatísticas:', err);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+    
+    if (userRole === 'gestor' || userRole === 'admin') {
+      carregarEstatisticas();
     }
   }, [userRole]);
 
@@ -229,24 +251,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, userName }) => {
     );
   }
 
-  // Visão padrão para admin/gestor (mantém como está)
+  // Visão padrão para admin/gestor
   if (userRole === 'gestor' || userRole === 'admin') {
-    // Mock data para cards e gráfico
-    const totalChecklistsHoje = { pendentes: 5, concluidos: 18 };
-    const avariasNaoResolvidas = [
-      { id: 1, veiculo: 'Fiat Strada', desc: 'Risco na porta', status: 'Pendente' },
-      { id: 2, veiculo: 'Volkswagen Gol', desc: 'Trinca no vidro', status: 'Pendente' },
-    ];
-    const conformidadeData = [
-      { name: 'Realizados', value: 85 },
-      { name: 'Faltantes', value: 15 },
-    ];
-    const COLORS = ['#4caf50', '#f44336'];
-    const ultimasManutencoes = [
-      { id: 1, veiculo: 'Fiat Strada', data: '2024-06-07', status: 'Aguardando Aprovação' },
-      { id: 2, veiculo: 'Volkswagen Gol', data: '2024-06-06', status: 'Aprovado' },
-      { id: 3, veiculo: 'Chevrolet Onix', data: '2024-06-05', status: 'Concluído' },
-    ];
+    // Usar dados reais das estatísticas
+    const totalChecklistsHoje = estatisticas?.checklistsHoje || { pendentes: 0, concluidos: 0 };
+    const avariasNaoResolvidas = estatisticas?.avariasNaoResolvidas || [];
 
     return (
       <Box
@@ -262,6 +271,11 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, userName }) => {
           alignItems: 'center',
         }}
       >
+        {loadingStats ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+            <CircularProgress />
+          </Box>
+        ) : (
         <Box
           sx={{
             width: '100%',
@@ -353,61 +367,12 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, userName }) => {
             </Grid>
           </Grid>
         </Box>
+        )}
       </Box>
     );
   }
 
-  // Visão padrão para admin/gestor (mantém como está)
-  const quickSummary = [
-    {
-      label: 'Veículos',
-      value: 24,
-      icon: <HomeIcon color="primary" fontSize="large" />,
-    },
-    {
-      label: 'Checklists Pendentes',
-      value: 3,
-      icon: <AssignmentIcon color="warning" fontSize="large" />,
-    },
-    {
-      label: 'Manutenções',
-      value: 2,
-      icon: <HistoryIcon color="secondary" fontSize="large" />,
-    },
-    {
-      label: 'Alertas',
-      value: 1,
-      icon: <PersonIcon color="error" fontSize="large" />,
-    },
-  ];
-
-  return (
-    <Box sx={{ width: '100%' }}>
-      <Grid container spacing={{ xs: 2, sm: 3, md: 4 }} mb={3}>
-        {quickSummary.map((item: any) => (
-          <Grid item xs={12} sm={6} md={3} key={item.label}>
-            <Card
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                p: { xs: 1.5, sm: 2 },
-                minHeight: { xs: 80, sm: 100 },
-                boxShadow: 3,
-                borderRadius: 2,
-              }}
-            >
-              <Box sx={{ mr: { xs: 1.5, sm: 2 }, display: 'flex', alignItems: 'center' }}>{item.icon}</Box>
-              <CardContent sx={{ flex: 1, p: '8px !important' }}>
-                <Typography variant="h5" sx={{ fontSize: { xs: '1.3rem', sm: '1.7rem' } }}>{item.value}</Typography>
-                <Typography color="textSecondary" sx={{ fontSize: { xs: '0.95rem', sm: '1.1rem' } }}>{item.label}</Typography>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
-      {/* ...restante do dashboard admin/gestor... */}
-    </Box>
-  );
+  return null;
 };
 
 export default Dashboard;

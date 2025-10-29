@@ -69,9 +69,11 @@ const MaintenanceSAP = () => {
   const handleSimularProximoStatus = async (id: string) => {
     try {
       await simularProximoStatusManutencao(id);
+      // Recarregar dados após simulação
       await carregarManutencoes();
-    } catch (error) {
+    } catch (error: any) {
       console.error('Erro ao simular status:', error);
+      alert(error.response?.data?.message || 'Erro ao simular próximo status');
     }
   };
 
