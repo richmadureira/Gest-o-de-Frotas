@@ -336,3 +336,8 @@ export const getEstatisticasChecklists = async () => {
   const response = await api.get('/checklists/estatisticas');
   return response.data;
 };
+
+export const getDashboardData = async () => {
+  const response = await api.get('/dashboard');
+  return response.data;
+};
