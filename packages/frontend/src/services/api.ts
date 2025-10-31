@@ -200,11 +200,21 @@ export const getManutencao = async (id: string) => {
 export const createManutencao = async (data: {
   veiculoId: string;
   tipo: string;
+  prioridade: string;
+  quilometragemNoAto?: number;
   descricao: string;
   custo?: number;
-  agendadoPara: string;
 }) => {
-  const response = await api.post('/manutencoes', data);
+  // Backend espera PascalCase e enums como string (convertidos no servidor)
+  const backendData = {
+    VeiculoId: data.veiculoId,
+    Tipo: data.tipo,
+    Prioridade: data.prioridade,
+    QuilometragemNoAto: data.quilometragemNoAto,
+    Descricao: data.descricao,
+    Custo: data.custo
+  };
+  const response = await api.post('/manutencoes', backendData);
   return response.data;
 };
 
@@ -216,16 +226,18 @@ export const simularProximoStatusManutencao = async (id: string) => {
 export const updateManutencao = async (id: string, data: {
   veiculoId: string;
   tipo: string;
+  prioridade: string;
+  quilometragemNoAto?: number;
   descricao: string;
   custo?: number;
-  agendadoPara: string;
 }) => {
   const backendData = {
     VeiculoId: data.veiculoId,
     Tipo: data.tipo,
+    Prioridade: data.prioridade,
+    QuilometragemNoAto: data.quilometragemNoAto,
     Descricao: data.descricao,
-    Custo: data.custo,
-    AgendadoPara: data.agendadoPara
+    Custo: data.custo
   };
   const response = await api.put(`/manutencoes/${id}`, backendData);
   return response.data;

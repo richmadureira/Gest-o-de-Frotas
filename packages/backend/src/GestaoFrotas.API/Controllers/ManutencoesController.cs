@@ -21,20 +21,12 @@ public class ManutencoesController : ControllerBase
 
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Manutencao>>> GetManutencoes(
-        [FromQuery] StatusManutencao? status,
         [FromQuery] TipoManutencao? tipo,
-        [FromQuery] Guid? veiculoId,
-        [FromQuery] DateTime? dataInicio,
-        [FromQuery] DateTime? dataFim)
+        [FromQuery] Guid? veiculoId)
     {
         var query = _context.Manutencoes
             .Include(m => m.Veiculo)
             .AsQueryable();
-
-        if (status.HasValue)
-        {
-            query = query.Where(m => m.Status == status.Value);
-        }
 
         if (tipo.HasValue)
         {
@@ -46,18 +38,8 @@ public class ManutencoesController : ControllerBase
             query = query.Where(m => m.VeiculoId == veiculoId.Value);
         }
 
-        if (dataInicio.HasValue)
-        {
-            query = query.Where(m => m.AgendadoPara >= dataInicio.Value);
-        }
-
-        if (dataFim.HasValue)
-        {
-            query = query.Where(m => m.AgendadoPara <= dataFim.Value);
-        }
-
         var manutencoes = await query
-            .OrderBy(m => m.AgendadoPara)
+            .OrderByDescending(m => m.CriadoEm)
             .ToListAsync();
 
         return Ok(manutencoes);
@@ -96,18 +78,7 @@ public class ManutencoesController : ControllerBase
             solicitanteId = sid;
         }
 
-        // Validações de negócio
-        var existeAberta = await _context.Manutencoes.AnyAsync(m => m.VeiculoId == request.VeiculoId && (m.Status == StatusManutencao.Agendada || m.Status == StatusManutencao.EmAndamento));
-        if (existeAberta)
-        {
-            return BadRequest(new { message = "Já existe uma manutenção aberta para este veículo." });
-        }
-
-        if (request.AgendadoPara.Date < DateTime.UtcNow.Date || request.AgendadoPara.Date > DateTime.UtcNow.Date.AddDays(90))
-        {
-            return BadRequest(new { message = "Data de agendamento deve estar entre hoje e 90 dias." });
-        }
-
+        // Validações
         if (request.QuilometragemNoAto.HasValue && request.QuilometragemNoAto.Value < 0)
         {
             return BadRequest(new { message = "Quilometragem não pode ser negativa." });
@@ -119,29 +90,12 @@ public class ManutencoesController : ControllerBase
             Tipo = request.Tipo,
             Descricao = request.Descricao,
             Custo = request.Custo,
-            AgendadoPara = request.AgendadoPara,
-            Status = StatusManutencao.Agendada,
             Prioridade = request.Prioridade,
             QuilometragemNoAto = request.QuilometragemNoAto,
-            CentroCusto = request.CentroCusto,
-            Observacoes = request.Observacoes,
             SolicitanteId = solicitanteId,
-            StatusSAP = StatusManutencaoSAP.Solicitada,
-            Progresso = 10
+            StatusSAP = StatusManutencaoSAP.Solicitada
         };
-
-        // Enriquecer observações com avarias recentes (últimos 3 dias)
-        var tresDias = DateTime.UtcNow.AddDays(-3);
-        var checklistRejeitado = await _context.Checklists
-            .Include(c => c.Veiculo)
-            .Where(c => c.VeiculoId == request.VeiculoId && c.Status == StatusChecklist.Rejeitado && c.Data >= tresDias)
-            .OrderByDescending(c => c.Data)
-            .FirstOrDefaultAsync();
-        if (checklistRejeitado != null)
-        {
-            var resumo = $"Checklist rejeitado em {checklistRejeitado.Data:dd/MM/yyyy}: {checklistRejeitado.Observacoes ?? "avarias registradas"}. ";
-            manutencao.Observacoes = string.Concat(resumo, manutencao.Observacoes);
-        }
+        // Observações e centro de custo removidos do modelo; enriquecimento omitido
 
         _context.Manutencoes.Add(manutencao);
         await _context.SaveChangesAsync();
@@ -162,7 +116,6 @@ public class ManutencoesController : ControllerBase
         manutencao.Tipo = request.Tipo;
         manutencao.Descricao = request.Descricao;
         manutencao.Custo = request.Custo;
-        manutencao.AgendadoPara = request.AgendadoPara;
 
         await _context.SaveChangesAsync();
 
@@ -181,15 +134,7 @@ public class ManutencoesController : ControllerBase
             return NotFound(new { message = "Manutenção não encontrada" });
         }
 
-        manutencao.Status = request.Status;
-
-        if (request.Status == StatusManutencao.Concluida)
-        {
-            manutencao.ConcluidoEm = DateTime.UtcNow;
-            
-            // Atualizar a data de última manutenção do veículo
-            manutencao.Veiculo.UltimaManutencao = DateTime.UtcNow;
-        }
+        // Status removido; endpoint mantém atualização de custo apenas
 
         if (request.Custo.HasValue)
         {
@@ -233,7 +178,7 @@ public class ManutencoesController : ControllerBase
 
         var proximoStatus = ObterProximoStatus(manutencao.StatusSAP);
         manutencao.StatusSAP = proximoStatus;
-        manutencao.Progresso = CalcularProgresso(proximoStatus);
+        // Progresso removido; progresso calculado no frontend
         
         if (proximoStatus == StatusManutencaoSAP.OrdemCriada && string.IsNullOrEmpty(manutencao.NumeroOrdemSAP))
         {
@@ -283,11 +228,8 @@ public record ManutencaoRequest(
     TipoManutencao Tipo,
     string Descricao,
     decimal? Custo,
-    DateTime AgendadoPara,
     PrioridadeManutencao Prioridade,
-    int? QuilometragemNoAto,
-    string? CentroCusto,
-    string? Observacoes
+    int? QuilometragemNoAto
 );
 
 public record UpdateManutencaoStatusRequest(

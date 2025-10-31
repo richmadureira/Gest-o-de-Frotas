@@ -43,19 +43,18 @@ public class DashboardController : ControllerBase
             var totalChecklistsHoje = checklistsHoje.Count;
             var taxaConclusao = totalChecklistsHoje > 0 ? (checklistsConcluidos * 100) / totalChecklistsHoje : 0;
 
-            // KPI 3: Manutenções
+            // KPI 3: Manutenções (baseado em StatusSAP)
             var manutencoesAtivas = await _context.Manutencoes
-                .Where(m => m.Status == StatusManutencao.EmAndamento || 
-                           m.Status == StatusManutencao.Agendada)
+                .Where(m => m.StatusSAP != null && m.StatusSAP != StatusManutencaoSAP.Finalizada)
                 .CountAsync();
             
             var manutencoesAtrasadas = await _context.Veiculos
                 .Where(v => v.ProximaManutencao.HasValue && v.ProximaManutencao.Value < hoje)
                 .CountAsync();
 
-            // KPI 4: Custos do Mês
+            // KPI 4: Custos do Mês (baseado em data de criação)
             var custosMes = await _context.Manutencoes
-                .Where(m => m.AgendadoPara >= inicioMes && m.Custo.HasValue)
+                .Where(m => m.CriadoEm >= inicioMes && m.Custo.HasValue)
                 .SumAsync(m => m.Custo!.Value);
 
             // Alertas: CNH Vencida

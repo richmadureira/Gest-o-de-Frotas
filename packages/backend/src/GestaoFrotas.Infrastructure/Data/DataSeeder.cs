@@ -588,136 +588,7 @@ public static class DataSeeder
         var veiculos = await context.Veiculos.ToListAsync();
         if (veiculos.Count == 0) return;
 
-        var manutencoes = new List<Manutencao>();
-        var random = new Random();
-
-        // Manutenções normais (sem StatusSAP) - 12 manutenções
-        var manutencoesNormais = new[]
-        {
-            new Manutencao
-            {
-                VeiculoId = veiculos[0].Id,
-            Tipo = TipoManutencao.Preventiva,
-                Descricao = "Revisão dos 50.000 km - Troca de óleo e filtros",
-            Custo = 850.00m,
-                Status = StatusManutencao.Concluida,
-                AgendadoPara = DateTime.UtcNow.AddDays(-10),
-                ConcluidoEm = DateTime.UtcNow.AddDays(-8)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[1].Id,
-                Tipo = TipoManutencao.Corretiva,
-                Descricao = "Reparo no sistema de freios - Pastilhas e discos",
-                Custo = 1200.00m,
-                Status = StatusManutencao.Concluida,
-                AgendadoPara = DateTime.UtcNow.AddDays(-15),
-                ConcluidoEm = DateTime.UtcNow.AddDays(-12)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[2].Id,
-                Tipo = TipoManutencao.Preventiva,
-                Descricao = "Revisão dos 20.000 km",
-                Custo = 650.00m,
-                Status = StatusManutencao.Concluida,
-                AgendadoPara = DateTime.UtcNow.AddDays(-5),
-                ConcluidoEm = DateTime.UtcNow.AddDays(-3)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[3].Id,
-                Tipo = TipoManutencao.Corretiva,
-                Descricao = "Troca de pneus - 4 unidades",
-                Custo = 1800.00m,
-                Status = StatusManutencao.Concluida,
-                AgendadoPara = DateTime.UtcNow.AddDays(-20),
-                ConcluidoEm = DateTime.UtcNow.AddDays(-18)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[4].Id,
-                Tipo = TipoManutencao.Preventiva,
-                Descricao = "Manutenção do ar condicionado",
-                Custo = 400.00m,
-                Status = StatusManutencao.Concluida,
-                AgendadoPara = DateTime.UtcNow.AddDays(-7),
-                ConcluidoEm = DateTime.UtcNow.AddDays(-5)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[5].Id,
-                Tipo = TipoManutencao.Corretiva,
-                Descricao = "Reparo na suspensão dianteira",
-                Custo = 950.00m,
-                Status = StatusManutencao.Concluida,
-                AgendadoPara = DateTime.UtcNow.AddDays(-12),
-                ConcluidoEm = DateTime.UtcNow.AddDays(-10)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[6].Id,
-                Tipo = TipoManutencao.Preventiva,
-                Descricao = "Revisão dos 30.000 km completa",
-                Custo = 1100.00m,
-                Status = StatusManutencao.Concluida,
-                AgendadoPara = DateTime.UtcNow.AddDays(-8),
-                ConcluidoEm = DateTime.UtcNow.AddDays(-6)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[7].Id,
-                Tipo = TipoManutencao.Corretiva,
-                Descricao = "Reparo no sistema elétrico",
-                Custo = 750.00m,
-                Status = StatusManutencao.Concluida,
-                AgendadoPara = DateTime.UtcNow.AddDays(-25),
-                ConcluidoEm = DateTime.UtcNow.AddDays(-22)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[8].Id,
-                Tipo = TipoManutencao.Preventiva,
-                Descricao = "Troca de correia dentada e bomba d'água",
-                Custo = 600.00m,
-                Status = StatusManutencao.Concluida,
-                AgendadoPara = DateTime.UtcNow.AddDays(-18),
-                ConcluidoEm = DateTime.UtcNow.AddDays(-16)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[9].Id,
-                Tipo = TipoManutencao.Corretiva,
-                Descricao = "Reparo na transmissão",
-                Custo = 2500.00m,
-                Status = StatusManutencao.Concluida,
-                AgendadoPara = DateTime.UtcNow.AddDays(-30),
-                ConcluidoEm = DateTime.UtcNow.AddDays(-25)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[10].Id,
-                Tipo = TipoManutencao.Preventiva,
-                Descricao = "Revisão dos 25.000 km",
-                Custo = 500.00m,
-                Status = StatusManutencao.EmAndamento,
-                AgendadoPara = DateTime.UtcNow.AddDays(-2)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[11].Id,
-                Tipo = TipoManutencao.Corretiva,
-                Descricao = "Troca de embreagem",
-                Custo = 1800.00m,
-                Status = StatusManutencao.Agendada,
-                AgendadoPara = DateTime.UtcNow.AddDays(3)
-            }
-        };
-
-        manutencoes.AddRange(manutencoesNormais);
-
-        // Manutenções SAP (7 exemplos existentes + 6 adicionais)
-        var manutencoesSAP = new[]
+        var manutencoes = new List<Manutencao>
         {
             new Manutencao
             {
@@ -725,10 +596,9 @@ public static class DataSeeder
                 Tipo = TipoManutencao.Preventiva,
                 Descricao = "Troca de óleo e filtros",
                 Custo = 150.00m,
-                Status = StatusManutencao.Agendada,
-                StatusSAP = StatusManutencaoSAP.Solicitada,
-                Progresso = 10,
-                AgendadoPara = DateTime.UtcNow.AddDays(2)
+                Prioridade = PrioridadeManutencao.Media,
+                QuilometragemNoAto = veiculos[0].Quilometragem,
+                StatusSAP = StatusManutencaoSAP.Solicitada
             },
             new Manutencao
             {
@@ -736,10 +606,9 @@ public static class DataSeeder
                 Tipo = TipoManutencao.Corretiva,
                 Descricao = "Reparo no sistema de freios",
                 Custo = 450.00m,
-                Status = StatusManutencao.Agendada,
-                StatusSAP = StatusManutencaoSAP.Aprovada,
-                Progresso = 25,
-                AgendadoPara = DateTime.UtcNow.AddDays(1)
+                Prioridade = PrioridadeManutencao.Alta,
+                QuilometragemNoAto = veiculos[1].Quilometragem,
+                StatusSAP = StatusManutencaoSAP.Aprovada
             },
             new Manutencao
             {
@@ -747,47 +616,43 @@ public static class DataSeeder
                 Tipo = TipoManutencao.Preventiva,
                 Descricao = "Revisão geral 20.000km",
                 Custo = 800.00m,
-                Status = StatusManutencao.Agendada,
-                StatusSAP = StatusManutencaoSAP.EnviadaSAP,
-                Progresso = 40,
-                AgendadoPara = DateTime.UtcNow.AddDays(3)
+                Prioridade = PrioridadeManutencao.Media,
+                QuilometragemNoAto = veiculos[2].Quilometragem,
+                StatusSAP = StatusManutencaoSAP.EnviadaSAP
             },
             new Manutencao
             {
                 VeiculoId = veiculos[3].Id,
                 Tipo = TipoManutencao.Corretiva,
                 Descricao = "Troca de pneus",
-                Custo = 600.00m,
-                Status = StatusManutencao.Agendada,
-                StatusSAP = StatusManutencaoSAP.ProcessandoSAP,
-                Progresso = 55,
-                AgendadoPara = DateTime.UtcNow.AddDays(4)
+                Custo = 1800.00m,
+                Prioridade = PrioridadeManutencao.Alta,
+                QuilometragemNoAto = veiculos[3].Quilometragem,
+                StatusSAP = StatusManutencaoSAP.ProcessandoSAP
             },
             new Manutencao
             {
                 VeiculoId = veiculos[4].Id,
-            Tipo = TipoManutencao.Preventiva,
+                Tipo = TipoManutencao.Preventiva,
                 Descricao = "Manutenção do ar condicionado",
                 Custo = 300.00m,
-                Status = StatusManutencao.Agendada,
+                Prioridade = PrioridadeManutencao.Baixa,
+                QuilometragemNoAto = veiculos[4].Quilometragem,
                 StatusSAP = StatusManutencaoSAP.OrdemCriada,
                 NumeroOrdemSAP = $"OS-{DateTime.UtcNow.Year}-001",
-                FornecedorSAP = "Oficina Central",
-                Progresso = 70,
-                AgendadoPara = DateTime.UtcNow.AddDays(5)
+                FornecedorSAP = "Oficina Central"
             },
             new Manutencao
             {
                 VeiculoId = veiculos[5].Id,
                 Tipo = TipoManutencao.Corretiva,
                 Descricao = "Reparo na transmissão",
-            Custo = 1200.00m,
-                Status = StatusManutencao.Agendada,
+                Custo = 1200.00m,
+                Prioridade = PrioridadeManutencao.Urgente,
+                QuilometragemNoAto = veiculos[5].Quilometragem,
                 StatusSAP = StatusManutencaoSAP.EmExecucao,
                 NumeroOrdemSAP = $"OS-{DateTime.UtcNow.Year}-002",
-                FornecedorSAP = "Auto Center SP",
-                Progresso = 85,
-                AgendadoPara = DateTime.UtcNow.AddDays(6)
+                FornecedorSAP = "Auto Center SP"
             },
             new Manutencao
             {
@@ -795,192 +660,14 @@ public static class DataSeeder
                 Tipo = TipoManutencao.Preventiva,
                 Descricao = "Troca de correia dentada",
                 Custo = 350.00m,
-                Status = StatusManutencao.Agendada,
+                Prioridade = PrioridadeManutencao.Media,
+                QuilometragemNoAto = veiculos[6].Quilometragem,
                 StatusSAP = StatusManutencaoSAP.Finalizada,
                 NumeroOrdemSAP = $"OS-{DateTime.UtcNow.Year}-003",
                 FornecedorSAP = "Oficina Central",
-                Progresso = 100,
-                AgendadoPara = DateTime.UtcNow.AddDays(-1)
-            },
-            // Manutenções SAP adicionais
-            new Manutencao
-            {
-                VeiculoId = veiculos[7].Id,
-                Tipo = TipoManutencao.Preventiva,
-                Descricao = "Revisão dos 40.000 km",
-                Custo = 900.00m,
-                Status = StatusManutencao.Agendada,
-                StatusSAP = StatusManutencaoSAP.Solicitada,
-                Progresso = 10,
-                AgendadoPara = DateTime.UtcNow.AddDays(7)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[8].Id,
-                Tipo = TipoManutencao.Corretiva,
-                Descricao = "Reparo no sistema de suspensão",
-                Custo = 750.00m,
-                Status = StatusManutencao.Agendada,
-                StatusSAP = StatusManutencaoSAP.Aprovada,
-                Progresso = 25,
-                AgendadoPara = DateTime.UtcNow.AddDays(8)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[9].Id,
-                Tipo = TipoManutencao.Preventiva,
-                Descricao = "Manutenção do sistema de freios",
-                Custo = 550.00m,
-                Status = StatusManutencao.Agendada,
-                StatusSAP = StatusManutencaoSAP.EnviadaSAP,
-                Progresso = 40,
-                AgendadoPara = DateTime.UtcNow.AddDays(9)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[10].Id,
-                Tipo = TipoManutencao.Corretiva,
-                Descricao = "Reparo no motor",
-                Custo = 2200.00m,
-                Status = StatusManutencao.Agendada,
-                StatusSAP = StatusManutencaoSAP.ProcessandoSAP,
-                Progresso = 55,
-                AgendadoPara = DateTime.UtcNow.AddDays(10)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[11].Id,
-                Tipo = TipoManutencao.Preventiva,
-                Descricao = "Troca de filtros e fluidos",
-                Custo = 280.00m,
-                Status = StatusManutencao.Agendada,
-                StatusSAP = StatusManutencaoSAP.OrdemCriada,
-                NumeroOrdemSAP = $"OS-{DateTime.UtcNow.Year}-004",
-                FornecedorSAP = "Oficina Norte",
-                Progresso = 70,
-                AgendadoPara = DateTime.UtcNow.AddDays(11)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[12].Id,
-                Tipo = TipoManutencao.Corretiva,
-                Descricao = "Reparo no sistema elétrico",
-                Custo = 650.00m,
-                Status = StatusManutencao.Agendada,
-                StatusSAP = StatusManutencaoSAP.EmExecucao,
-                NumeroOrdemSAP = $"OS-{DateTime.UtcNow.Year}-005",
-                FornecedorSAP = "Auto Elétrica SP",
-                Progresso = 85,
-                AgendadoPara = DateTime.UtcNow.AddDays(12)
-            },
-            
-            // Manutenções SAP adicionais para expandir dados
-            new Manutencao
-            {
-                VeiculoId = veiculos[13 % veiculos.Count].Id,
-                Tipo = TipoManutencao.Preventiva,
-                Descricao = "Revisão dos 60.000 km",
-                Custo = 1150.00m,
-                Status = StatusManutencao.Agendada,
-                StatusSAP = StatusManutencaoSAP.Solicitada,
-                Progresso = 10,
-                AgendadoPara = DateTime.UtcNow.AddDays(1)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[14 % veiculos.Count].Id,
-                Tipo = TipoManutencao.Corretiva,
-                Descricao = "Substituição de embreagem",
-                Custo = 1900.00m,
-                Status = StatusManutencao.Agendada,
-                StatusSAP = StatusManutencaoSAP.Aprovada,
-                Progresso = 25,
-                AgendadoPara = DateTime.UtcNow.AddDays(2)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[0].Id,
-                Tipo = TipoManutencao.Preventiva,
-                Descricao = "Troca de amortecedores",
-                Custo = 820.00m,
-                Status = StatusManutencao.Agendada,
-                StatusSAP = StatusManutencaoSAP.EnviadaSAP,
-                Progresso = 40,
-                AgendadoPara = DateTime.UtcNow
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[1].Id,
-                Tipo = TipoManutencao.Corretiva,
-                Descricao = "Reparo no radiador",
-                Custo = 680.00m,
-                Status = StatusManutencao.Agendada,
-                StatusSAP = StatusManutencaoSAP.ProcessandoSAP,
-                Progresso = 55,
-                AgendadoPara = DateTime.UtcNow
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[2].Id,
-                Tipo = TipoManutencao.Preventiva,
-                Descricao = "Manutenção do sistema de injeção",
-                Custo = 450.00m,
-                Status = StatusManutencao.Agendada,
-                StatusSAP = StatusManutencaoSAP.OrdemCriada,
-                NumeroOrdemSAP = $"OS-{DateTime.UtcNow.Year}-006",
-                FornecedorSAP = "Centro Automotivo",
-                Progresso = 70,
-                AgendadoPara = DateTime.UtcNow.AddDays(-1)
+                ConcluidoEm = DateTime.UtcNow.AddDays(-1)
             }
         };
-
-        manutencoes.AddRange(manutencoesSAP);
-
-        // Manutenções normais adicionais para expandir dados
-        var manutencoesNormaisAdicionais = new[]
-        {
-            new Manutencao
-            {
-                VeiculoId = veiculos[3].Id,
-                Tipo = TipoManutencao.Preventiva,
-                Descricao = "Limpeza de bicos injetores",
-                Custo = 180.00m,
-                Status = StatusManutencao.Concluida,
-                AgendadoPara = DateTime.UtcNow.AddDays(-4),
-                ConcluidoEm = DateTime.UtcNow.AddDays(-3)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[4].Id,
-                Tipo = TipoManutencao.Corretiva,
-                Descricao = "Troca de bateria",
-                Custo = 320.00m,
-                Status = StatusManutencao.Concluida,
-                AgendadoPara = DateTime.UtcNow.AddDays(-6),
-                ConcluidoEm = DateTime.UtcNow.AddDays(-5)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[5].Id,
-                Tipo = TipoManutencao.Preventiva,
-                Descricao = "Alinhamento e balanceamento",
-                Custo = 120.00m,
-                Status = StatusManutencao.Concluida,
-                AgendadoPara = DateTime.UtcNow.AddDays(-9),
-                ConcluidoEm = DateTime.UtcNow.AddDays(-8)
-            },
-            new Manutencao
-            {
-                VeiculoId = veiculos[6].Id,
-                Tipo = TipoManutencao.Preventiva,
-                Descricao = "Troca de lâmpadas",
-                Custo = 85.00m,
-                Status = StatusManutencao.EmAndamento,
-                AgendadoPara = DateTime.UtcNow.AddDays(-1)
-            }
-        };
-
-        manutencoes.AddRange(manutencoesNormaisAdicionais);
 
         context.Manutencoes.AddRange(manutencoes);
         await context.SaveChangesAsync();

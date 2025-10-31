@@ -27,15 +27,7 @@ public class Manutencao : EntidadeBase
     /// </summary>
     public decimal? Custo { get; set; }
 
-    /// <summary>
-    /// Status atual da manutenção
-    /// </summary>
-    public StatusManutencao Status { get; set; } = StatusManutencao.Agendada;
-
-    /// <summary>
-    /// Data e hora agendada para a manutenção
-    /// </summary>
-    public DateTime AgendadoPara { get; set; }
+    // Campos removidos: Status e AgendadoPara (fluxo controlado via StatusSAP)
 
     /// <summary>
     /// Data e hora em que a manutenção foi concluída
@@ -57,10 +49,7 @@ public class Manutencao : EntidadeBase
     /// </summary>
     public StatusManutencaoSAP? StatusSAP { get; set; }
 
-    /// <summary>
-    /// Progresso da manutenção (0-100)
-    /// </summary>
-    public int Progresso { get; set; } = 0;
+    // Campo removido: Progresso (calculado no front a partir de StatusSAP)
 
     /// <summary>
     /// Prioridade atribuída à manutenção (Baixa, Média, Alta, Urgente)
@@ -72,15 +61,7 @@ public class Manutencao : EntidadeBase
     /// </summary>
     public int? QuilometragemNoAto { get; set; }
 
-    /// <summary>
-    /// Centro de custo associado (quando aplicável)
-    /// </summary>
-    public string? CentroCusto { get; set; }
-
-    /// <summary>
-    /// Observações adicionais para contexto da solicitação
-    /// </summary>
-    public string? Observacoes { get; set; }
+    // Campos removidos: CentroCusto e Observacoes
 
     /// <summary>
     /// Usuário que abriu a solicitação (solicitante)

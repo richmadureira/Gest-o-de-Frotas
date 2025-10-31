@@ -24,8 +24,7 @@ public class ManutencaoConfiguration : IEntityTypeConfiguration<Manutencao>
             .IsRequired()
             .HasMaxLength(1000);
 
-        builder.Property(m => m.AgendadoPara)
-            .IsRequired();
+        // Campo AgendadoPara removido
 
         // Propriedades opcionais
         builder.Property(m => m.Custo)
@@ -40,21 +39,13 @@ public class ManutencaoConfiguration : IEntityTypeConfiguration<Manutencao>
             .HasConversion<string>()
             .HasMaxLength(20);
 
-        builder.Property(m => m.Status)
-            .HasConversion<string>()
-            .HasMaxLength(20);
+        // Campo Status removido; usar somente StatusSAP
 
         builder.Property(m => m.Prioridade)
             .HasConversion<string>()
             .HasMaxLength(10);
 
-        builder.Property(m => m.CentroCusto)
-            .HasMaxLength(50)
-            .IsRequired(false);
-
-        builder.Property(m => m.Observacoes)
-            .HasMaxLength(1000)
-            .IsRequired(false);
+        // Campos CentroCusto e Observacoes removidos
 
         builder.Property(m => m.QuilometragemNoAto)
             .IsRequired(false);
@@ -70,8 +61,7 @@ public class ManutencaoConfiguration : IEntityTypeConfiguration<Manutencao>
 
         // Índices para performance
         builder.HasIndex(m => m.VeiculoId);
-        builder.HasIndex(m => m.AgendadoPara);
-        builder.HasIndex(m => m.Status);
+        // Índices removidos: AgendadoPara e Status
         builder.HasIndex(m => m.Tipo);
         builder.HasIndex(m => m.Prioridade);
     }

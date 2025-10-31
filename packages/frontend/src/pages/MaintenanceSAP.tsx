@@ -7,7 +7,7 @@ import {
   FormControl, InputLabel, Select, MenuItem, Autocomplete, InputAdornment, Alert
 } from '@mui/material';
 import { PlayArrow, Refresh, Add } from '@mui/icons-material';
-import { getManutencoes, simularProximoStatusManutencao, createManutencao, getVeiculos } from '../services/api';
+import { getManutencoes, simularProximoStatusManutencao, createManutencao, getVeiculos, getVeiculo } from '../services/api';
 
 interface ManutencaoSAP {
   id: string;
@@ -35,10 +35,7 @@ const MaintenanceSAP = () => {
     prioridade: 'Media',
     quilometragemNoAto: '',
     descricao: '',
-    observacoes: '',
-    centroCusto: '',
-    custo: '',
-    agendadoPara: ''
+    custo: ''
   });
 
   useEffect(() => {
@@ -90,10 +87,7 @@ const MaintenanceSAP = () => {
       prioridade: 'Media',
       quilometragemNoAto: '',
       descricao: '',
-      observacoes: '',
-      centroCusto: '',
-      custo: '',
-      agendadoPara: ''
+      custo: ''
     });
   };
 
@@ -104,7 +98,7 @@ const MaintenanceSAP = () => {
 
   const handleSalvarManutencao = async () => {
     // Validações
-    if (!formData.veiculoId || !formData.tipo || !formData.prioridade || !formData.descricao || !formData.agendadoPara || formData.quilometragemNoAto === '') {
+    if (!formData.veiculoId || !formData.tipo || !formData.prioridade || !formData.descricao || formData.quilometragemNoAto === '') {
       setErro('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
@@ -113,17 +107,14 @@ const MaintenanceSAP = () => {
       setSalvando(true);
       setErro('');
 
-      // Preparar payload com novo campo
+      // Preparar payload simplificado
       const payload = {
         veiculoId: formData.veiculoId,
         tipo: formData.tipo,
         prioridade: formData.prioridade,
         quilometragemNoAto: formData.quilometragemNoAto ? parseInt(formData.quilometragemNoAto, 10) : undefined,
         descricao: formData.descricao,
-        observacoes: formData.observacoes || undefined,
-        centroCusto: formData.centroCusto || undefined,
-        custo: formData.custo ? parseFloat(formData.custo) : undefined,
-        agendadoPara: formData.agendadoPara
+        custo: formData.custo ? parseFloat(formData.custo) : undefined
       };
       
       await createManutencao(payload);
@@ -151,6 +142,19 @@ const MaintenanceSAP = () => {
       Finalizada: 'success'
     };
     return colors[status] || 'default';
+  };
+
+  const getStatusProgress = (status: string) => {
+    const map: Record<string, number> = {
+      Solicitada: 0,
+      Aprovada: 10,
+      EnviadaSAP: 25,
+      ProcessandoSAP: 50,
+      OrdemCriada: 70,
+      EmExecucao: 85,
+      Finalizada: 100
+    };
+    return map[status] ?? 0;
   };
 
   const metricas = {
@@ -253,10 +257,10 @@ const MaintenanceSAP = () => {
                   <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                     <LinearProgress
                       variant="determinate"
-                      value={manutencao.progresso}
+                      value={getStatusProgress(manutencao.statusSAP)}
                       sx={{ flexGrow: 1, height: 8, borderRadius: 4 }}
                     />
-                    <Typography variant="body2">{manutencao.progresso}%</Typography>
+                    <Typography variant="body2">{getStatusProgress(manutencao.statusSAP)}%</Typography>
                   </Box>
                 </TableCell>
                 <TableCell>{manutencao.numeroOrdemSAP || '-'}</TableCell>
@@ -296,7 +300,23 @@ const MaintenanceSAP = () => {
             options={veiculos}
             getOptionLabel={(option) => `${option.placa} - ${option.modelo}`}
             loading={loadingVeiculos}
-            onChange={(e, value) => setFormData({ ...formData, veiculoId: value?.id || '' })}
+            onChange={async (e, value) => {
+              const veiculoId = value?.id || '';
+              if (veiculoId) {
+                try {
+                  const v = await getVeiculo(veiculoId);
+                  setFormData({
+                    ...formData,
+                    veiculoId,
+                    quilometragemNoAto: (v?.quilometragem ?? '').toString()
+                  });
+                } catch (err) {
+                  setFormData({ ...formData, veiculoId, quilometragemNoAto: '' });
+                }
+              } else {
+                setFormData({ ...formData, veiculoId: '', quilometragemNoAto: '' });
+              }
+            }}
             renderInput={(params) => (
               <TextField 
                 {...params} 
@@ -342,6 +362,7 @@ const MaintenanceSAP = () => {
             margin="normal"
             value={formData.descricao}
             onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
+            disabled={!formData.veiculoId}
           />
 
           <TextField
@@ -354,6 +375,7 @@ const MaintenanceSAP = () => {
             InputProps={{ 
               startAdornment: <InputAdornment position="start">R$</InputAdornment> 
             }}
+            disabled={!formData.veiculoId}
           />
 
           <TextField
@@ -362,35 +384,9 @@ const MaintenanceSAP = () => {
             fullWidth
             margin="normal"
             value={formData.quilometragemNoAto}
-            onChange={(e) => setFormData({ ...formData, quilometragemNoAto: e.target.value })}
-          />
-
-          <TextField
-            label="Centro de Custo"
-            fullWidth
-            margin="normal"
-            value={formData.centroCusto}
-            onChange={(e) => setFormData({ ...formData, centroCusto: e.target.value })}
-          />
-
-          <TextField
-            label="Agendar Para *"
-            type="date"
-            fullWidth
-            margin="normal"
-            InputLabelProps={{ shrink: true }}
-            value={formData.agendadoPara}
-            onChange={(e) => setFormData({ ...formData, agendadoPara: e.target.value })}
-          />
-
-          <TextField
-            label="Observações"
-            multiline
-            rows={3}
-            fullWidth
-            margin="normal"
-            value={formData.observacoes}
-            onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
+            InputProps={{ readOnly: true }}
+            disabled
+            helperText="Obtido automaticamente do cadastro do veículo"
           />
 
           <Alert severity="info" sx={{ mb: 2 }}>

@@ -64,9 +64,10 @@ interface Manutencao {
 type ManutencaoFormData = {
   veiculoId: string;
   tipo: string;
+  prioridade: string;
+  quilometragemNoAto?: number;
   descricao: string;
   custo?: number;
-  agendadoPara: string;
 };
 
 type ManutencaoErrors = Partial<Record<keyof ManutencaoFormData, string>>;
@@ -95,8 +96,8 @@ function Manutencoes() {
   const [formData, setFormData] = useState<ManutencaoFormData>({ 
     veiculoId: '', 
     tipo: '', 
-    descricao: '', 
-    agendadoPara: '' 
+    prioridade: 'Media',
+    descricao: ''
   });
   const [editingRequest, setEditingRequest] = useState<Manutencao | null>(null);
   const [errors, setErrors] = useState<ManutencaoErrors>({});
@@ -187,7 +188,7 @@ function Manutencoes() {
               veiculoId: veiculoId,
               descricao: descricao || '',
               tipo: tipoManutencao || 'Corretiva',
-              agendadoPara: dataSugerida || '',
+              prioridade: 'Media',
               custo: undefined
             });
           } catch (error) {
@@ -196,7 +197,7 @@ function Manutencoes() {
               veiculoId: '',
               descricao: descricao || '',
               tipo: tipoManutencao || 'Corretiva',
-              agendadoPara: dataSugerida || '',
+              prioridade: 'Media',
               custo: undefined
             });
           }
@@ -285,14 +286,14 @@ function Manutencoes() {
     setFormData(request ? {
       veiculoId: request.veiculoId,
       tipo: request.tipo,
+      prioridade: 'Media',
       descricao: request.descricao,
-      custo: request.custo,
-      agendadoPara: request.agendadoPara
+      custo: request.custo
     } : { 
       veiculoId: '', 
       tipo: '', 
-      descricao: '', 
-      agendadoPara: '' 
+      prioridade: 'Media',
+      descricao: ''
     });
     setErrors({});
     setChecklistImages({});  // Limpar imagens do checklist
@@ -302,7 +303,7 @@ function Manutencoes() {
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setEditingRequest(null);
-    setFormData({ veiculoId: '', tipo: '', descricao: '', agendadoPara: '' });
+    setFormData({ veiculoId: '', tipo: '', prioridade: 'Media', descricao: '' });
     setErrors({});
     setChecklistImages({});
   };
@@ -312,8 +313,8 @@ function Manutencoes() {
     
     if (!formData.veiculoId) newErrors.veiculoId = 'Veículo é obrigatório';
     if (!formData.tipo) newErrors.tipo = 'Tipo de manutenção é obrigatório';
+    if (!formData.prioridade) newErrors.prioridade = 'Prioridade é obrigatória';
     if (!formData.descricao) newErrors.descricao = 'Descrição é obrigatória';
-    if (!formData.agendadoPara) newErrors.agendadoPara = 'Data agendada é obrigatória';
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -399,7 +400,6 @@ function Manutencoes() {
               <TableCell>Tipo</TableCell>
               <TableCell>Descrição</TableCell>
               <TableCell>Status</TableCell>
-              <TableCell>Data Agendada</TableCell>
               <TableCell>Custo</TableCell>
               <TableCell align="right">Ações</TableCell>
             </TableRow>
@@ -424,7 +424,6 @@ function Manutencoes() {
                     <MenuItem value="Cancelada">Cancelada</MenuItem>
                   </Select>
                 </TableCell>
-                <TableCell>{new Date(manutencao.agendadoPara).toLocaleDateString()}</TableCell>
                 <TableCell>{manutencao.custo ? `R$ ${manutencao.custo.toFixed(2)}` : '-'}</TableCell>
                 <TableCell align="right">
                   <Tooltip title="Editar">
@@ -505,20 +504,6 @@ function Manutencoes() {
               required
               multiline
               rows={3}
-            />
-
-            {/* Campo Data Agendada */}
-            <TextField
-              label="Data Agendada *"
-              type="date"
-              value={formData.agendadoPara}
-              onChange={e => setFormData({ ...formData, agendadoPara: e.target.value })}
-              error={!!errors.agendadoPara}
-              helperText={errors.agendadoPara}
-              fullWidth
-              margin="normal"
-              required
-              InputLabelProps={{ shrink: true }}
             />
 
             {/* Campo Custo */}
