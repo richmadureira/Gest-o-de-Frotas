@@ -44,6 +44,24 @@ public class ManutencaoConfiguration : IEntityTypeConfiguration<Manutencao>
             .HasConversion<string>()
             .HasMaxLength(20);
 
+        builder.Property(m => m.Prioridade)
+            .HasConversion<string>()
+            .HasMaxLength(10);
+
+        builder.Property(m => m.CentroCusto)
+            .HasMaxLength(50)
+            .IsRequired(false);
+
+        builder.Property(m => m.Observacoes)
+            .HasMaxLength(1000)
+            .IsRequired(false);
+
+        builder.Property(m => m.QuilometragemNoAto)
+            .IsRequired(false);
+
+        builder.Property(m => m.SolicitanteId)
+            .IsRequired(false);
+
         // Relacionamentos
         builder.HasOne(m => m.Veiculo)
             .WithMany(v => v.Manutencoes)
@@ -55,5 +73,6 @@ public class ManutencaoConfiguration : IEntityTypeConfiguration<Manutencao>
         builder.HasIndex(m => m.AgendadoPara);
         builder.HasIndex(m => m.Status);
         builder.HasIndex(m => m.Tipo);
+        builder.HasIndex(m => m.Prioridade);
     }
 }

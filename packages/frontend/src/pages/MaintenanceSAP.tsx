@@ -32,7 +32,11 @@ const MaintenanceSAP = () => {
   const [formData, setFormData] = useState({
     veiculoId: '',
     tipo: '',
+    prioridade: 'Media',
+    quilometragemNoAto: '',
     descricao: '',
+    observacoes: '',
+    centroCusto: '',
     custo: '',
     agendadoPara: ''
   });
@@ -83,7 +87,11 @@ const MaintenanceSAP = () => {
     setFormData({
       veiculoId: '',
       tipo: '',
+      prioridade: 'Media',
+      quilometragemNoAto: '',
       descricao: '',
+      observacoes: '',
+      centroCusto: '',
       custo: '',
       agendadoPara: ''
     });
@@ -96,7 +104,7 @@ const MaintenanceSAP = () => {
 
   const handleSalvarManutencao = async () => {
     // Validações
-    if (!formData.veiculoId || !formData.tipo || !formData.descricao || !formData.agendadoPara) {
+    if (!formData.veiculoId || !formData.tipo || !formData.prioridade || !formData.descricao || !formData.agendadoPara || formData.quilometragemNoAto === '') {
       setErro('Por favor, preencha todos os campos obrigatórios.');
       return;
     }
@@ -105,16 +113,25 @@ const MaintenanceSAP = () => {
       setSalvando(true);
       setErro('');
 
-      await createManutencao({
+      // Preparar payload com novo campo
+      const payload = {
         veiculoId: formData.veiculoId,
         tipo: formData.tipo,
+        prioridade: formData.prioridade,
+        quilometragemNoAto: formData.quilometragemNoAto ? parseInt(formData.quilometragemNoAto, 10) : undefined,
         descricao: formData.descricao,
+        observacoes: formData.observacoes || undefined,
+        centroCusto: formData.centroCusto || undefined,
         custo: formData.custo ? parseFloat(formData.custo) : undefined,
         agendadoPara: formData.agendadoPara
-      });
+      };
+      
+      await createManutencao(payload);
 
       await carregarManutencoes();
       handleCloseDialog();
+
+      alert('Manutenção SAP criada com sucesso! Status: Solicitada');
     } catch (error: any) {
       console.error('Erro ao salvar manutenção:', error);
       setErro(error.response?.data?.message || 'Erro ao salvar manutenção');
@@ -303,6 +320,20 @@ const MaintenanceSAP = () => {
             </Select>
           </FormControl>
 
+          <FormControl fullWidth margin="normal">
+            <InputLabel>Prioridade *</InputLabel>
+            <Select
+              value={formData.prioridade}
+              label="Prioridade *"
+              onChange={(e) => setFormData({ ...formData, prioridade: e.target.value })}
+            >
+              <MenuItem value="Baixa">Baixa</MenuItem>
+              <MenuItem value="Media">Média</MenuItem>
+              <MenuItem value="Alta">Alta</MenuItem>
+              <MenuItem value="Urgente">Urgente</MenuItem>
+            </Select>
+          </FormControl>
+
           <TextField
             label="Descrição *"
             multiline
@@ -326,6 +357,23 @@ const MaintenanceSAP = () => {
           />
 
           <TextField
+            label="Quilometragem Atual *"
+            type="number"
+            fullWidth
+            margin="normal"
+            value={formData.quilometragemNoAto}
+            onChange={(e) => setFormData({ ...formData, quilometragemNoAto: e.target.value })}
+          />
+
+          <TextField
+            label="Centro de Custo"
+            fullWidth
+            margin="normal"
+            value={formData.centroCusto}
+            onChange={(e) => setFormData({ ...formData, centroCusto: e.target.value })}
+          />
+
+          <TextField
             label="Agendar Para *"
             type="date"
             fullWidth
@@ -334,6 +382,20 @@ const MaintenanceSAP = () => {
             value={formData.agendadoPara}
             onChange={(e) => setFormData({ ...formData, agendadoPara: e.target.value })}
           />
+
+          <TextField
+            label="Observações"
+            multiline
+            rows={3}
+            fullWidth
+            margin="normal"
+            value={formData.observacoes}
+            onChange={(e) => setFormData({ ...formData, observacoes: e.target.value })}
+          />
+
+          <Alert severity="info" sx={{ mb: 2 }}>
+            Esta solicitação será enviada ao SAP (Status inicial: Solicitada).
+          </Alert>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} disabled={salvando}>

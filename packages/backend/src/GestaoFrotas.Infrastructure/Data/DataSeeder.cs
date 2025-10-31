@@ -21,42 +21,42 @@ public static class DataSeeder
         if (await context.Usuarios.AnyAsync()) return;
 
         var usuarios = new List<Usuario>
-        {
-            // Admin
-            new Usuario
-            {
-                Email = "admin@translog.com",
-            SenhaHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
-                Nome = "Administrador Sistema",
-            Papel = PapelUsuario.Administrador,
-            Cpf = "12345678901",
-            Telefone = "(11) 98765-4321",
-            Ativo = true
-            },
+		{
+			// Admin
+			new Usuario
+			{
+				Email = "admin@translog.com",
+			    SenhaHash = BCrypt.Net.BCrypt.HashPassword("admin123"),
+				Nome = "Administrador Sistema",
+			    Papel = PapelUsuario.Administrador,
+			    Cpf = "12345678901",
+			    Telefone = "(11) 98765-4321",
+			    Ativo = true
+			},
 
-            // Gestores
-            new Usuario
-        {
-                Email = "gestor1@translog.com",
-            SenhaHash = BCrypt.Net.BCrypt.HashPassword("gestor123"),
-                Nome = "Maria Silva Santos",
-            Papel = PapelUsuario.Gestor,
-            Cpf = "98765432109",
-            Telefone = "(11) 97654-3210",
-            Ativo = true
-            },
-            new Usuario
-            {
-                Email = "gestor2@translog.com",
-                SenhaHash = BCrypt.Net.BCrypt.HashPassword("gestor123"),
-                Nome = "João Carlos Oliveira",
-                Papel = PapelUsuario.Gestor,
-            Cpf = "45678912345",
-            Telefone = "(11) 96543-2109",
-            Ativo = true
-            },
+			// Gestores
+			new Usuario
+		    {
+				Email = "gestor1@translog.com",
+			    SenhaHash = BCrypt.Net.BCrypt.HashPassword("gestor123"),
+				Nome = "Maria Silva Santos",
+			    Papel = PapelUsuario.Gestor,
+			    Cpf = "98765432109",
+			    Telefone = "(11) 97654-3210",
+			    Ativo = true
+			},
+			new Usuario
+			{
+				Email = "gestor2@translog.com",
+				SenhaHash = BCrypt.Net.BCrypt.HashPassword("gestor123"),
+				Nome = "João Carlos Oliveira",
+				Papel = PapelUsuario.Gestor,
+			Cpf = "45678912345",
+			Telefone = "(11) 96543-2109",
+			Ativo = true
+			},
 
-            // Condutores com CNH válida
+			// Condutores com CNH válida
             new Usuario
             {
                 Email = "carlos.silva@translog.com",
@@ -148,6 +148,53 @@ public static class DataSeeder
                 Matricula = "COND006",
                 TurnoTrabalho = Turno.Noite,
                 Ativo = true
+            },
+            
+            // Condutores adicionais para expandir dados
+            new Usuario
+            {
+                Email = "rafael.sousa@translog.com",
+                SenhaHash = BCrypt.Net.BCrypt.HashPassword("condutor123"),
+                Nome = "Rafael Sousa",
+                Papel = PapelUsuario.Condutor,
+                Cpf = "77788899900",
+                Telefone = "(11) 97777-7777",
+                CnhNumero = "77788899900",
+                CnhCategoria = CategoriaCNH.D,
+                CnhValidade = DateTime.UtcNow.AddDays(150),
+                Matricula = "COND007",
+                TurnoTrabalho = Turno.Manha,
+                Ativo = true
+            },
+            new Usuario
+            {
+                Email = "juliana.costa@translog.com",
+                SenhaHash = BCrypt.Net.BCrypt.HashPassword("condutor123"),
+                Nome = "Juliana Costa",
+                Papel = PapelUsuario.Condutor,
+                Cpf = "88899900011",
+                Telefone = "(11) 98888-8888",
+                CnhNumero = "88899900011",
+                CnhCategoria = CategoriaCNH.E,
+                CnhValidade = DateTime.UtcNow.AddDays(220),
+                Matricula = "COND008",
+                TurnoTrabalho = Turno.Tarde,
+                Ativo = true
+            },
+            new Usuario
+            {
+                Email = "roberto.ferreira@translog.com",
+                SenhaHash = BCrypt.Net.BCrypt.HashPassword("condutor123"),
+                Nome = "Roberto Ferreira",
+                Papel = PapelUsuario.Condutor,
+                Cpf = "99900011122",
+                Telefone = "(11) 99999-9999",
+                CnhNumero = "99900011122",
+                CnhCategoria = CategoriaCNH.C,
+                CnhValidade = DateTime.UtcNow.AddDays(-5), // Vencida há 5 dias
+                Matricula = "COND009",
+                TurnoTrabalho = Turno.Noite,
+                Ativo = true
             }
         };
 
@@ -163,13 +210,13 @@ public static class DataSeeder
         {
             // Vans - Disponíveis (modelos comerciais comuns)
             new Veiculo
-            {
-                Placa = "ABC-1234",
+        {
+            Placa = "ABC-1234",
                 Modelo = "Ducato Cargo",
                 Marca = "Fiat",
-                Ano = 2022,
-                Tipo = TipoVeiculo.Van,
-                Status = StatusVeiculo.Disponivel,
+            Ano = 2022,
+            Tipo = TipoVeiculo.Van,
+            Status = StatusVeiculo.Disponivel,
                 Quilometragem = 45000,
                 UltimaManutencao = DateTime.UtcNow.AddDays(-15),
                 ProximaManutencao = DateTime.UtcNow.AddDays(45)
@@ -178,10 +225,10 @@ public static class DataSeeder
             {
                 Placa = "XYZ-5678",
                 Modelo = "Master Furgão",
-                Marca = "Renault",
-                Ano = 2021,
-                Tipo = TipoVeiculo.Van,
-                Status = StatusVeiculo.Disponivel,
+            Marca = "Renault",
+            Ano = 2021,
+            Tipo = TipoVeiculo.Van,
+            Status = StatusVeiculo.Disponivel,
                 Quilometragem = 68000,
                 UltimaManutencao = DateTime.UtcNow.AddDays(-30),
                 ProximaManutencao = DateTime.UtcNow.AddDays(30)
@@ -228,10 +275,10 @@ public static class DataSeeder
             {
                 Placa = "MNO-1111",
                 Modelo = "Accelo 1016",
-                Marca = "Mercedes-Benz",
-                Ano = 2020,
-                Tipo = TipoVeiculo.Caminhao,
-                Status = StatusVeiculo.Disponivel,
+            Marca = "Mercedes-Benz",
+            Ano = 2020,
+            Tipo = TipoVeiculo.Caminhao,
+            Status = StatusVeiculo.Disponivel,
                 Quilometragem = 85000,
                 UltimaManutencao = DateTime.UtcNow.AddDays(-25),
                 ProximaManutencao = DateTime.UtcNow.AddDays(35)
@@ -431,13 +478,103 @@ public static class DataSeeder
                 Luzes = luzes,
                 Freios = freios,
                 Limpeza = limpeza,
-                Observacoes = status == StatusChecklist.Rejeitado ? 
-                    GerarObservacoesProblemas(pneus, luzes, freios, limpeza) : 
+                Observacoes = status == StatusChecklist.Rejeitado ?
+                    GerarObservacoesProblemas(pneus, luzes, freios, limpeza) :
                     (random.Next(3) == 0 ? "Veículo em perfeito estado" : null),
                 Enviado = status == StatusChecklist.Aprovado || random.Next(2) == 0
             };
 
             checklists.Add(checklist);
+        }
+
+        // Checklists adicionais focados nos últimos 7 dias para popular o dashboard
+        var hoje = DateTime.UtcNow.Date;
+
+        // Checklists de HOJE (5-8 checklists)
+        for (int i = 0; i < 8; i++)
+        {
+            var usuario = usuarios[i % usuarios.Count];
+            var veiculo = veiculos[i % veiculos.Count];
+            var horaChecklist = hoje.AddHours(6 + i); // 06:00 até 13:00
+
+            StatusChecklist statusHoje;
+            if (i < 3) statusHoje = StatusChecklist.Aprovado; // 3 aprovados
+            else if (i < 6) statusHoje = StatusChecklist.Pendente; // 3 pendentes
+            else statusHoje = StatusChecklist.Rejeitado; // 2 rejeitados
+
+            bool pneusHoje = statusHoje != StatusChecklist.Rejeitado || i % 2 == 0;
+            bool luzesHoje = statusHoje != StatusChecklist.Rejeitado || i % 3 != 0;
+            bool freiosHoje = statusHoje != StatusChecklist.Rejeitado || i % 3 != 1;
+            bool limpezaHoje = statusHoje != StatusChecklist.Rejeitado || i % 4 != 0;
+
+            checklists.Add(new Checklist
+            {
+                VeiculoId = veiculo.Id,
+                MotoristaId = usuario.Id,
+                Data = horaChecklist,
+                Status = statusHoje,
+                PlacaVeiculo = veiculo.Placa,
+                KmVeiculo = (veiculo.Quilometragem ?? 50000) + random.Next(50, 150),
+                Pneus = pneusHoje,
+                Luzes = luzesHoje,
+                Freios = freiosHoje,
+                Limpeza = limpezaHoje,
+                Observacoes = statusHoje == StatusChecklist.Rejeitado ?
+                    GerarObservacoesProblemas(pneusHoje, luzesHoje, freiosHoje, limpezaHoje) : null,
+                Enviado = true
+            });
+        }
+
+        // Checklists dos últimos 6 dias (2-3 por dia)
+        for (int dia = 1; dia <= 6; dia++)
+        {
+            var dataAtras = hoje.AddDays(-dia);
+            var checklistsPorDia = 2 + random.Next(2); // 2 ou 3 checklists por dia
+
+            for (int j = 0; j < checklistsPorDia; j++)
+            {
+                var usuario = usuarios[random.Next(usuarios.Count)];
+                var veiculo = veiculos[random.Next(veiculos.Count)];
+                var horaChecklist = dataAtras.AddHours(7 + j * 3); // Espaçados ao longo do dia
+
+                var statusRandom = random.Next(100);
+                StatusChecklist statusDia;
+                if (statusRandom < 75) statusDia = StatusChecklist.Aprovado; // 75% aprovados
+                else if (statusRandom < 90) statusDia = StatusChecklist.Pendente; // 15% pendentes
+                else statusDia = StatusChecklist.Rejeitado; // 10% rejeitados
+
+                bool pneusDia = statusDia == StatusChecklist.Aprovado || random.Next(2) == 0;
+                bool luzesDia = statusDia == StatusChecklist.Aprovado || random.Next(2) == 0;
+                bool freiosDia = statusDia == StatusChecklist.Aprovado || random.Next(2) == 0;
+                bool limpezaDia = statusDia == StatusChecklist.Aprovado || random.Next(2) == 0;
+
+                // Se rejeitado, garantir pelo menos um problema
+                if (statusDia == StatusChecklist.Rejeitado)
+                {
+                    var problemaIndex = random.Next(4);
+                    if (problemaIndex == 0) pneusDia = false;
+                    else if (problemaIndex == 1) luzesDia = false;
+                    else if (problemaIndex == 2) freiosDia = false;
+                    else limpezaDia = false;
+                }
+
+                checklists.Add(new Checklist
+                {
+                    VeiculoId = veiculo.Id,
+                    MotoristaId = usuario.Id,
+                    Data = horaChecklist,
+                    Status = statusDia,
+                    PlacaVeiculo = veiculo.Placa,
+                    KmVeiculo = (veiculo.Quilometragem ?? 50000) + random.Next(100, 300),
+                    Pneus = pneusDia,
+                    Luzes = luzesDia,
+                    Freios = freiosDia,
+                    Limpeza = limpezaDia,
+                    Observacoes = statusDia == StatusChecklist.Rejeitado ?
+                        GerarObservacoesProblemas(pneusDia, luzesDia, freiosDia, limpezaDia) : null,
+                    Enviado = statusDia == StatusChecklist.Aprovado || random.Next(3) > 0
+                });
+            }
         }
 
         context.Checklists.AddRange(checklists);
@@ -735,10 +872,115 @@ public static class DataSeeder
                 FornecedorSAP = "Auto Elétrica SP",
                 Progresso = 85,
                 AgendadoPara = DateTime.UtcNow.AddDays(12)
+            },
+            
+            // Manutenções SAP adicionais para expandir dados
+            new Manutencao
+            {
+                VeiculoId = veiculos[13 % veiculos.Count].Id,
+                Tipo = TipoManutencao.Preventiva,
+                Descricao = "Revisão dos 60.000 km",
+                Custo = 1150.00m,
+                Status = StatusManutencao.Agendada,
+                StatusSAP = StatusManutencaoSAP.Solicitada,
+                Progresso = 10,
+                AgendadoPara = DateTime.UtcNow.AddDays(1)
+            },
+            new Manutencao
+            {
+                VeiculoId = veiculos[14 % veiculos.Count].Id,
+                Tipo = TipoManutencao.Corretiva,
+                Descricao = "Substituição de embreagem",
+                Custo = 1900.00m,
+                Status = StatusManutencao.Agendada,
+                StatusSAP = StatusManutencaoSAP.Aprovada,
+                Progresso = 25,
+                AgendadoPara = DateTime.UtcNow.AddDays(2)
+            },
+            new Manutencao
+            {
+                VeiculoId = veiculos[0].Id,
+                Tipo = TipoManutencao.Preventiva,
+                Descricao = "Troca de amortecedores",
+                Custo = 820.00m,
+                Status = StatusManutencao.Agendada,
+                StatusSAP = StatusManutencaoSAP.EnviadaSAP,
+                Progresso = 40,
+                AgendadoPara = DateTime.UtcNow
+            },
+            new Manutencao
+            {
+                VeiculoId = veiculos[1].Id,
+                Tipo = TipoManutencao.Corretiva,
+                Descricao = "Reparo no radiador",
+                Custo = 680.00m,
+                Status = StatusManutencao.Agendada,
+                StatusSAP = StatusManutencaoSAP.ProcessandoSAP,
+                Progresso = 55,
+                AgendadoPara = DateTime.UtcNow
+            },
+            new Manutencao
+            {
+                VeiculoId = veiculos[2].Id,
+                Tipo = TipoManutencao.Preventiva,
+                Descricao = "Manutenção do sistema de injeção",
+                Custo = 450.00m,
+                Status = StatusManutencao.Agendada,
+                StatusSAP = StatusManutencaoSAP.OrdemCriada,
+                NumeroOrdemSAP = $"OS-{DateTime.UtcNow.Year}-006",
+                FornecedorSAP = "Centro Automotivo",
+                Progresso = 70,
+                AgendadoPara = DateTime.UtcNow.AddDays(-1)
             }
         };
 
         manutencoes.AddRange(manutencoesSAP);
+
+        // Manutenções normais adicionais para expandir dados
+        var manutencoesNormaisAdicionais = new[]
+        {
+            new Manutencao
+            {
+                VeiculoId = veiculos[3].Id,
+                Tipo = TipoManutencao.Preventiva,
+                Descricao = "Limpeza de bicos injetores",
+                Custo = 180.00m,
+                Status = StatusManutencao.Concluida,
+                AgendadoPara = DateTime.UtcNow.AddDays(-4),
+                ConcluidoEm = DateTime.UtcNow.AddDays(-3)
+            },
+            new Manutencao
+            {
+                VeiculoId = veiculos[4].Id,
+                Tipo = TipoManutencao.Corretiva,
+                Descricao = "Troca de bateria",
+                Custo = 320.00m,
+                Status = StatusManutencao.Concluida,
+                AgendadoPara = DateTime.UtcNow.AddDays(-6),
+                ConcluidoEm = DateTime.UtcNow.AddDays(-5)
+            },
+            new Manutencao
+            {
+                VeiculoId = veiculos[5].Id,
+                Tipo = TipoManutencao.Preventiva,
+                Descricao = "Alinhamento e balanceamento",
+                Custo = 120.00m,
+                Status = StatusManutencao.Concluida,
+                AgendadoPara = DateTime.UtcNow.AddDays(-9),
+                ConcluidoEm = DateTime.UtcNow.AddDays(-8)
+            },
+            new Manutencao
+            {
+                VeiculoId = veiculos[6].Id,
+                Tipo = TipoManutencao.Preventiva,
+                Descricao = "Troca de lâmpadas",
+                Custo = 85.00m,
+                Status = StatusManutencao.EmAndamento,
+                AgendadoPara = DateTime.UtcNow.AddDays(-1)
+            }
+        };
+
+        manutencoes.AddRange(manutencoesNormaisAdicionais);
 
         context.Manutencoes.AddRange(manutencoes);
         await context.SaveChangesAsync();
@@ -747,7 +989,7 @@ public static class DataSeeder
     private static string? GerarObservacoesProblemas(bool pneus, bool luzes, bool freios, bool limpeza)
     {
         var problemas = new List<string>();
-        
+
         if (!pneus) problemas.Add("Pneu traseiro careca");
         if (!luzes) problemas.Add("Farol alto não funciona");
         if (!freios) problemas.Add("Freios com barulho");

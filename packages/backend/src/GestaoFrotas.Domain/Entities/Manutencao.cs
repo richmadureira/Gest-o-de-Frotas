@@ -62,6 +62,31 @@ public class Manutencao : EntidadeBase
     /// </summary>
     public int Progresso { get; set; } = 0;
 
+    /// <summary>
+    /// Prioridade atribuída à manutenção (Baixa, Média, Alta, Urgente)
+    /// </summary>
+    public PrioridadeManutencao Prioridade { get; set; } = PrioridadeManutencao.Media;
+
+    /// <summary>
+    /// Quilometragem registrada no momento da abertura da manutenção
+    /// </summary>
+    public int? QuilometragemNoAto { get; set; }
+
+    /// <summary>
+    /// Centro de custo associado (quando aplicável)
+    /// </summary>
+    public string? CentroCusto { get; set; }
+
+    /// <summary>
+    /// Observações adicionais para contexto da solicitação
+    /// </summary>
+    public string? Observacoes { get; set; }
+
+    /// <summary>
+    /// Usuário que abriu a solicitação (solicitante)
+    /// </summary>
+    public Guid? SolicitanteId { get; set; }
+
     // Navigation Properties
 
     /// <summary>
