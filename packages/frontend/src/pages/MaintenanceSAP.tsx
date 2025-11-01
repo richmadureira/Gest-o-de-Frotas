@@ -6,7 +6,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions, TextField,
   FormControl, InputLabel, Select, MenuItem, Autocomplete, InputAdornment, Alert
 } from '@mui/material';
-import { PlayArrow, Refresh, Add } from '@mui/icons-material';
+import { PlayArrow, Add } from '@mui/icons-material';
 import { getManutencoes, simularProximoStatusManutencao, createManutencao, getVeiculos, getVeiculo } from '../services/api';
 
 interface ManutencaoSAP {
@@ -176,14 +176,6 @@ const MaintenanceSAP = () => {
             onClick={handleOpenDialog}
           >
             Nova Manutenção
-          </Button>
-          <Button
-            variant="outlined"
-            startIcon={<Refresh />}
-            onClick={carregarManutencoes}
-            disabled={loading}
-          >
-            Atualizar
           </Button>
         </Box>
       </Box>

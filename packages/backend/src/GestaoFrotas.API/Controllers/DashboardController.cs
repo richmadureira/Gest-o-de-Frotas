@@ -53,9 +53,10 @@ public class DashboardController : ControllerBase
                 .CountAsync();
 
             // KPI 4: Custos do Mês (baseado em data de criação)
-            var custosMes = await _context.Manutencoes
+            var manutencoesComCusto = await _context.Manutencoes
                 .Where(m => m.CriadoEm >= inicioMes && m.Custo.HasValue)
-                .SumAsync(m => m.Custo!.Value);
+                .ToListAsync();
+            var custosMes = manutencoesComCusto.Sum(m => m.Custo ?? 0);
 
             // Alertas: CNH Vencida
             var condutoresCnhVencida = await _context.Usuarios
@@ -91,11 +92,14 @@ public class DashboardController : ControllerBase
 
             // Alertas: Checklists Pendentes (atrasados > 2h)
             var duasHorasAtras = DateTime.UtcNow.AddHours(-2);
-            var checklistsPendentesAtrasados = await _context.Checklists
+            var checklistsPendentesLista = await _context.Checklists
                 .Include(c => c.Veiculo)
                 .Include(c => c.Motorista)
                 .Where(c => c.Status == StatusChecklist.Pendente && 
                            c.Data < duasHorasAtras)
+                .ToListAsync();
+            
+            var checklistsPendentesAtrasados = checklistsPendentesLista
                 .Select(c => new
                 {
                     id = c.Id,
@@ -106,7 +110,7 @@ public class DashboardController : ControllerBase
                 })
                 .OrderByDescending(c => c.horasAtraso)
                 .Take(5)
-                .ToListAsync();
+                .ToList();
 
             // Tendências: Checklists últimos 7 dias
             var checklistsSemana = await _context.Checklists
