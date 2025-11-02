@@ -22,7 +22,11 @@ public class ManutencoesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Manutencao>>> GetManutencoes(
         [FromQuery] TipoManutencao? tipo,
-        [FromQuery] Guid? veiculoId)
+        [FromQuery] Guid? veiculoId,
+        [FromQuery] PrioridadeManutencao? prioridade,
+        [FromQuery] StatusManutencaoSAP? statusSAP,
+        [FromQuery] DateTime? dataInicio,
+        [FromQuery] DateTime? dataFim)
     {
         var query = _context.Manutencoes
             .Include(m => m.Veiculo)
@@ -36,6 +40,26 @@ public class ManutencoesController : ControllerBase
         if (veiculoId.HasValue)
         {
             query = query.Where(m => m.VeiculoId == veiculoId.Value);
+        }
+
+        if (prioridade.HasValue)
+        {
+            query = query.Where(m => m.Prioridade == prioridade.Value);
+        }
+
+        if (statusSAP.HasValue)
+        {
+            query = query.Where(m => m.StatusSAP == statusSAP.Value);
+        }
+
+        if (dataInicio.HasValue)
+        {
+            query = query.Where(m => m.CriadoEm >= dataInicio.Value);
+        }
+
+        if (dataFim.HasValue)
+        {
+            query = query.Where(m => m.CriadoEm <= dataFim.Value);
         }
 
         var manutencoes = await query

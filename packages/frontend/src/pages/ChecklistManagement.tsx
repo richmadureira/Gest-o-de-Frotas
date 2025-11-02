@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TablePagination,
-  Toolbar, TextField, Select, MenuItem, Button, InputLabel, FormControl, IconButton, Dialog, DialogTitle, DialogContent, Chip, Tooltip, Avatar, Stack, Divider, Alert, CircularProgress, Badge
+  Toolbar, TextField, Select, MenuItem, Button, InputLabel, FormControl, IconButton, Dialog, DialogTitle, DialogContent, Chip, Tooltip, Avatar, Stack, Divider, Alert, CircularProgress, Badge, Grid, Card, CardContent
 } from '@mui/material';
-import { CheckCircle, Warning, CameraAlt, Search, Check, Close, ReportProblem, Error } from '@mui/icons-material';
+import { CheckCircle, Warning, CameraAlt, Search, Check, Close, ReportProblem, Error, AssignmentTurnedIn } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthContext';
 import { getChecklists, getVeiculos, getUsuarios } from '../services/api';
@@ -235,9 +235,28 @@ const ChecklistManagement: React.FC = () => {
     setPage(0);
   };
 
+  // Calcular métricas
+  const metricas = {
+    total: checklists.length,
+    aprovadosHoje: checklists.filter(c => {
+      const hoje = new Date().toISOString().split('T')[0];
+      const dataCh = new Date(c.data).toISOString().split('T')[0];
+      return dataCh === hoje && c.status === 'Aprovado';
+    }).length,
+    pendentes: checklists.filter(c => c.status === 'Pendente').length,
+    rejeitadosUltimos7Dias: checklists.filter(c => {
+      const seteDiasAtras = new Date();
+      seteDiasAtras.setDate(seteDiasAtras.getDate() - 7);
+      return new Date(c.data) >= seteDiasAtras && c.status === 'Rejeitado';
+    }).length
+  };
+
   return (
     <Box sx={{ p: { xs: 1, md: 3 }, width: '100%', maxWidth: 1280, mx: 'auto' }}>
-      <Typography variant="h5" mb={2} fontWeight={700}>Gestão de Checklists</Typography>
+      <Typography variant="h5" mb={2} fontWeight={700}>
+        <AssignmentTurnedIn sx={{ mr: 1, verticalAlign: 'middle' }} />
+        Gestão de Checklists
+      </Typography>
       
       {/* Loading e Error */}
       {loading && (
@@ -251,6 +270,65 @@ const ChecklistManagement: React.FC = () => {
           {error}
         </Alert>
       )}
+      
+      {/* Cards de Métricas */}
+      {!loading && (
+        <Grid container spacing={3} mb={3}>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ backgroundColor: '#e3f2fd', borderLeft: '4px solid #1976d2' }}>
+              <CardContent>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Box>
+                    <Typography variant="body2" color="textSecondary">Total de Checklists</Typography>
+                    <Typography variant="h4" fontWeight="bold">{metricas.total}</Typography>
+                  </Box>
+                  <AssignmentTurnedIn sx={{ fontSize: 40, color: '#1976d2' }} />
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ backgroundColor: '#e8f5e9', borderLeft: '4px solid #4caf50' }}>
+              <CardContent>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Box>
+                    <Typography variant="body2" color="textSecondary">Aprovados Hoje</Typography>
+                    <Typography variant="h4" fontWeight="bold">{metricas.aprovadosHoje}</Typography>
+                  </Box>
+                  <CheckCircle sx={{ fontSize: 40, color: '#4caf50' }} />
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ backgroundColor: '#fff3e0', borderLeft: '4px solid #ff9800' }}>
+              <CardContent>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Box>
+                    <Typography variant="body2" color="textSecondary">Pendentes</Typography>
+                    <Typography variant="h4" fontWeight="bold">{metricas.pendentes}</Typography>
+                  </Box>
+                  <Warning sx={{ fontSize: 40, color: '#ff9800' }} />
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12} sm={6} md={3}>
+            <Card sx={{ backgroundColor: '#ffebee', borderLeft: '4px solid #f44336' }}>
+              <CardContent>
+                <Box display="flex" justifyContent="space-between" alignItems="center">
+                  <Box>
+                    <Typography variant="body2" color="textSecondary">Rejeitados (7 dias)</Typography>
+                    <Typography variant="h4" fontWeight="bold">{metricas.rejeitadosUltimos7Dias}</Typography>
+                  </Box>
+                  <Error sx={{ fontSize: 40, color: '#f44336' }} />
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        </Grid>
+      )}
+      
       {/* Filtros */}
       <Paper sx={{ p: 2, mb: 3 }}>
         <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">

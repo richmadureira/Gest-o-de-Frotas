@@ -29,8 +29,11 @@ import {
   InputLabel,
   Select,
   MenuItem,
+  Grid,
+  Card,
+  CardContent,
 } from '@mui/material';
-import { Add, Edit, Delete } from '@mui/icons-material';
+import { Add, Edit, Delete, DirectionsCar, Build, CheckCircle, Speed, FilterList } from '@mui/icons-material';
 import HomeIcon from '@mui/icons-material/Home';
 import { useNavigate } from 'react-router-dom';
 import InputMask from 'react-input-mask';
@@ -79,10 +82,23 @@ function GerenciamentoVeiculos() {
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
+  const [filtroTipo, setFiltroTipo] = useState('');
+  const [filtroStatus, setFiltroStatus] = useState('');
+  const [filtroAnoMin, setFiltroAnoMin] = useState('');
+  const [filtroAnoMax, setFiltroAnoMax] = useState('');
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Métricas
+  const [metricas, setMetricas] = useState({
+    total: 0,
+    disponiveis: 0,
+    emManutencao: 0,
+    kmTotal: 0
+  });
 
   // Carregar veículos da API
   useEffect(() => {
@@ -95,12 +111,34 @@ function GerenciamentoVeiculos() {
       setError(null);
       const data = await getVeiculos();
       setVeiculos(data);
+      
+      // Calcular métricas
+      const total = data.length;
+      const disponiveis = data.filter((v: Veiculo) => v.status === 'Disponivel').length;
+      const emManutencao = data.filter((v: Veiculo) => v.status === 'EmManutencao').length;
+      const kmTotal = data.reduce((sum: number, v: Veiculo) => sum + (v.quilometragem || 0), 0);
+      
+      setMetricas({ total, disponiveis, emManutencao, kmTotal });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao carregar veículos');
       console.error('Erro ao carregar veículos:', err);
     } finally {
       setLoading(false);
     }
+  };
+  
+  const handleFiltrar = () => {
+    // Filtros são aplicados localmente pelo filteredVeiculos
+    setPage(0);
+  };
+  
+  const handleLimparFiltros = () => {
+    setSearchQuery('');
+    setFiltroTipo('');
+    setFiltroStatus('');
+    setFiltroAnoMin('');
+    setFiltroAnoMax('');
+    setPage(0);
   };
 
   const handleOpenDialog = (veiculo: Veiculo | null = null) => {
@@ -207,38 +245,193 @@ function GerenciamentoVeiculos() {
     return str ? str.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase() : '';
   }
 
-  const filteredVeiculos = veiculos.filter(
-    (veiculo) =>
+  const filteredVeiculos = veiculos.filter((veiculo) => {
+    // Filtro de busca por texto
+    const matchesSearch = 
       normalize(veiculo.placa).includes(normalize(searchQuery)) ||
-      normalize(veiculo.modelo).includes(normalize(searchQuery))
-  );
+      normalize(veiculo.modelo).includes(normalize(searchQuery)) ||
+      normalize(veiculo.marca).includes(normalize(searchQuery));
+    
+    // Filtro de tipo
+    const matchesTipo = !filtroTipo || veiculo.tipo === filtroTipo;
+    
+    // Filtro de status
+    const matchesStatus = !filtroStatus || veiculo.status === filtroStatus;
+    
+    // Filtro de ano
+    const matchesAnoMin = !filtroAnoMin || veiculo.ano >= parseInt(filtroAnoMin);
+    const matchesAnoMax = !filtroAnoMax || veiculo.ano <= parseInt(filtroAnoMax);
+    
+    return matchesSearch && matchesTipo && matchesStatus && matchesAnoMin && matchesAnoMax;
+  });
 
 
   return (
     <Container maxWidth="lg" style={{ marginTop: '2rem' }}>
-      
-      {/* Barra de Ações */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={3} marginTop={4}>
-        <Box display="flex" alignItems="center" gap={2}>
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder="Pesquisar por placa ou modelo..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            style={{ width: '300px' }}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<Add />}
-            onClick={() => handleOpenDialog()}
-            sx={{ alignSelf: 'flex-end' }}
-          >
-            Novo Veículo
+      {/* Título e Botão de Ação */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} mt={4}>
+        <Typography variant="h4" fontWeight="bold">
+          <DirectionsCar sx={{ mr: 1, verticalAlign: 'middle' }} />
+          Gestão de Veículos
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<Add />}
+          onClick={() => handleOpenDialog()}
+        >
+          Novo Veículo
+        </Button>
+      </Box>
+
+      {/* Cards de Métricas */}
+      <Grid container spacing={3} mb={3}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ backgroundColor: '#e3f2fd', borderLeft: '4px solid #1976d2' }}>
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="textSecondary">Total de Veículos</Typography>
+                  <Typography variant="h4" fontWeight="bold">{metricas.total}</Typography>
+                </Box>
+                <DirectionsCar sx={{ fontSize: 40, color: '#1976d2' }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ backgroundColor: '#e8f5e9', borderLeft: '4px solid #4caf50' }}>
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="textSecondary">Disponíveis</Typography>
+                  <Typography variant="h4" fontWeight="bold">{metricas.disponiveis}</Typography>
+                </Box>
+                <CheckCircle sx={{ fontSize: 40, color: '#4caf50' }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ backgroundColor: '#fff3e0', borderLeft: '4px solid #ff9800' }}>
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="textSecondary">Em Manutenção</Typography>
+                  <Typography variant="h4" fontWeight="bold">{metricas.emManutencao}</Typography>
+                </Box>
+                <Build sx={{ fontSize: 40, color: '#ff9800' }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ backgroundColor: '#e1f5fe', borderLeft: '4px solid #2196f3' }}>
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="textSecondary">Km Total da Frota</Typography>
+                  <Typography variant="h4" fontWeight="bold">{(metricas.kmTotal / 1000).toFixed(0)}k</Typography>
+                </Box>
+                <Speed sx={{ fontSize: 40, color: '#2196f3' }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Paper de Filtros */}
+      <Paper sx={{ p: 2, mb: 3 }}>
+        <Box display="flex" alignItems="center" justifyContent="space-between" mb={filtrosAbertos ? 2 : 0}>
+          <Box display="flex" alignItems="center" gap={1}>
+            <FilterList />
+            <Typography variant="h6">Filtros</Typography>
+          </Box>
+          <Button size="small" onClick={() => setFiltrosAbertos(!filtrosAbertos)}>
+            {filtrosAbertos ? 'Ocultar' : 'Expandir'}
           </Button>
         </Box>
-      </Box>
+        
+        {filtrosAbertos && (
+          <>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6} md={3}>
+                <TextField
+                  label="Busca (placa/modelo/marca)"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={2}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Tipo</InputLabel>
+                  <Select
+                    value={filtroTipo}
+                    label="Tipo"
+                    onChange={(e) => setFiltroTipo(e.target.value)}
+                  >
+                    <MenuItem value="">Todos</MenuItem>
+                    <MenuItem value="Carro">Carro</MenuItem>
+                    <MenuItem value="Caminhao">Caminhão</MenuItem>
+                    <MenuItem value="Van">Van/Utilitário</MenuItem>
+                    <MenuItem value="Motocicleta">Motocicleta</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={2}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Status</InputLabel>
+                  <Select
+                    value={filtroStatus}
+                    label="Status"
+                    onChange={(e) => setFiltroStatus(e.target.value)}
+                  >
+                    <MenuItem value="">Todos</MenuItem>
+                    <MenuItem value="Disponivel">Disponível</MenuItem>
+                    <MenuItem value="EmManutencao">Em Manutenção</MenuItem>
+                    <MenuItem value="Inativo">Inativo</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={2}>
+                <TextField
+                  label="Ano Mín"
+                  type="number"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  value={filtroAnoMin}
+                  onChange={(e) => setFiltroAnoMin(e.target.value)}
+                  inputProps={{ min: 1900, max: new Date().getFullYear() + 1 }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={2}>
+                <TextField
+                  label="Ano Máx"
+                  type="number"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  value={filtroAnoMax}
+                  onChange={(e) => setFiltroAnoMax(e.target.value)}
+                  inputProps={{ min: 1900, max: new Date().getFullYear() + 1 }}
+                />
+              </Grid>
+            </Grid>
+            <Box display="flex" gap={2} mt={2}>
+              <Button variant="contained" color="primary" onClick={handleFiltrar}>
+                Filtrar
+              </Button>
+              <Button variant="outlined" onClick={handleLimparFiltros}>
+                Limpar
+              </Button>
+            </Box>
+          </>
+        )}
+      </Paper>
 
       {/* Tabela de Veículos */}
       <TableContainer component={Paper}>

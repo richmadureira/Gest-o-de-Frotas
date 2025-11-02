@@ -33,9 +33,9 @@ import {
   InputLabel
 } from '@mui/material';
 
-import { Add, Edit, Delete } from '@mui/icons-material';
+import { Add, Edit, Delete, Person, CheckCircle, Warning, GroupAdd, FilterList } from '@mui/icons-material';
 import HomeIcon from '@mui/icons-material/Home';
-import { Autocomplete } from '@mui/material';
+import { Autocomplete, Grid, Card, CardContent } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import InputMask from 'react-input-mask';
@@ -93,11 +93,23 @@ function GerenciamentoUsuarios() {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarType, setSnackbarType] = useState<'success' | 'error'>('success');
   const [searchQuery, setSearchQuery] = useState('');
+  const [filtroPapel, setFiltroPapel] = useState('');
+  const [filtroStatus, setFiltroStatus] = useState('');
+  const [filtroCNHVencida, setFiltroCNHVencida] = useState('');
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
+  
+  // Métricas
+  const [metricas, setMetricas] = useState({
+    total: 0,
+    condutoresAtivos: 0,
+    cnhVencidas: 0,
+    novosUltimoMes: 0
+  });
 
   // Carregar usuários da API
   useEffect(() => {
@@ -110,12 +122,34 @@ function GerenciamentoUsuarios() {
       setError(null);
       const data = await getUsuarios(); // Carregar todos os usuários
       setUsuarios(data);
+      
+      // Calcular métricas
+      const total = data.length;
+      const condutoresAtivos = data.filter((u: Usuario) => u.papel === 'Condutor' && u.ativo).length;
+      const cnhVencidas = data.filter((u: Usuario) => u.cnhVencida).length;
+      
+      // Novos no último mês
+      const umMesAtras = new Date();
+      umMesAtras.setMonth(umMesAtras.getMonth() - 1);
+      const novosUltimoMes = data.filter((u: Usuario) => 
+        new Date(u.criadoEm) >= umMesAtras
+      ).length;
+      
+      setMetricas({ total, condutoresAtivos, cnhVencidas, novosUltimoMes });
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao carregar usuários');
       console.error('Erro ao carregar usuários:', err);
     } finally {
       setLoading(false);
     }
+  };
+  
+  const handleLimparFiltros = () => {
+    setSearchQuery('');
+    setFiltroPapel('');
+    setFiltroStatus('');
+    setFiltroCNHVencida('');
+    setPage(0);
   };
 
   // Validação dinâmica dos campos obrigatórios
@@ -299,37 +333,173 @@ function GerenciamentoUsuarios() {
 
   const filteredUsuarios = usuarios.filter(u => {
     const query = normalize(searchQuery);
-    return (
+    const matchesSearch = 
       normalize(u.nome).includes(query) ||
       (u.email && normalize(u.email).includes(query)) ||
-      normalize(u.papel).includes(query)
-    );
+      normalize(u.papel).includes(query);
+    
+    const matchesPapel = !filtroPapel || u.papel === filtroPapel;
+    const matchesStatus = !filtroStatus || (filtroStatus === 'Ativo' ? u.ativo : !u.ativo);
+    const matchesCNH = !filtroCNHVencida || 
+      (filtroCNHVencida === 'Sim' ? u.cnhVencida === true : u.cnhVencida === false || u.cnhVencida === undefined);
+    
+    return matchesSearch && matchesPapel && matchesStatus && matchesCNH;
   });
 
   return (
     <Container maxWidth="lg" style={{ marginTop: '2rem' }}>
-      
-      {/* Barra de Ações */}
-      <Box display="flex" justifyContent="space-between" alignItems="center" marginBottom={3} marginTop={4}>
-        <Box display="flex" alignItems={'center'} gap={2}>
-          <TextField
-            variant="outlined"
-            size="small"
-            placeholder="Pesquisar usuários..."
-            value={searchQuery}
-            onChange={handleSearchChange}
-            style={{ width: '300px' }}
-          />
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<Add />}
-            onClick={() => handleOpenDialog()}
-          >
-            Novo Usuário
+      {/* Título e Botão de Ação */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} mt={4}>
+        <Typography variant="h4" fontWeight="bold">
+          <Person sx={{ mr: 1, verticalAlign: 'middle' }} />
+          Gestão de Usuários
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<Add />}
+          onClick={() => handleOpenDialog()}
+        >
+          Novo Usuário
+        </Button>
+      </Box>
+
+      {/* Cards de Métricas */}
+      <Grid container spacing={3} mb={3}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ backgroundColor: '#e3f2fd', borderLeft: '4px solid #1976d2' }}>
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="textSecondary">Total de Usuários</Typography>
+                  <Typography variant="h4" fontWeight="bold">{metricas.total}</Typography>
+                </Box>
+                <Person sx={{ fontSize: 40, color: '#1976d2' }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ backgroundColor: '#e8f5e9', borderLeft: '4px solid #4caf50' }}>
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="textSecondary">Condutores Ativos</Typography>
+                  <Typography variant="h4" fontWeight="bold">{metricas.condutoresAtivos}</Typography>
+                </Box>
+                <CheckCircle sx={{ fontSize: 40, color: '#4caf50' }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ backgroundColor: '#fff3e0', borderLeft: '4px solid #ff9800' }}>
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="textSecondary">CNH Vencidas</Typography>
+                  <Typography variant="h4" fontWeight="bold">{metricas.cnhVencidas}</Typography>
+                </Box>
+                <Warning sx={{ fontSize: 40, color: '#ff9800' }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ backgroundColor: '#e1f5fe', borderLeft: '4px solid #2196f3' }}>
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="textSecondary">Novos (Último Mês)</Typography>
+                  <Typography variant="h4" fontWeight="bold">{metricas.novosUltimoMes}</Typography>
+                </Box>
+                <GroupAdd sx={{ fontSize: 40, color: '#2196f3' }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Paper de Filtros */}
+      <Paper sx={{ p: 2, mb: 3 }}>
+        <Box display="flex" alignItems="center" justifyContent="space-between" mb={filtrosAbertos ? 2 : 0}>
+          <Box display="flex" alignItems="center" gap={1}>
+            <FilterList />
+            <Typography variant="h6">Filtros</Typography>
+          </Box>
+          <Button size="small" onClick={() => setFiltrosAbertos(!filtrosAbertos)}>
+            {filtrosAbertos ? 'Ocultar' : 'Expandir'}
           </Button>
         </Box>
-      </Box>
+        
+        {filtrosAbertos && (
+          <>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6} md={4}>
+                <TextField
+                  label="Busca (nome/email)"
+                  variant="outlined"
+                  size="small"
+                  fullWidth
+                  value={searchQuery}
+                  onChange={handleSearchChange}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Papel</InputLabel>
+                  <Select
+                    value={filtroPapel}
+                    label="Papel"
+                    onChange={(e) => setFiltroPapel(e.target.value)}
+                  >
+                    <MenuItem value="">Todos</MenuItem>
+                    <MenuItem value="Administrador">Administrador</MenuItem>
+                    <MenuItem value="Gestor">Gestor</MenuItem>
+                    <MenuItem value="Condutor">Condutor</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={2}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Status</InputLabel>
+                  <Select
+                    value={filtroStatus}
+                    label="Status"
+                    onChange={(e) => setFiltroStatus(e.target.value)}
+                  >
+                    <MenuItem value="">Todos</MenuItem>
+                    <MenuItem value="Ativo">Ativo</MenuItem>
+                    <MenuItem value="Inativo">Inativo</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>CNH Vencida</InputLabel>
+                  <Select
+                    value={filtroCNHVencida}
+                    label="CNH Vencida"
+                    onChange={(e) => setFiltroCNHVencida(e.target.value)}
+                  >
+                    <MenuItem value="">Todos</MenuItem>
+                    <MenuItem value="Sim">Sim</MenuItem>
+                    <MenuItem value="Nao">Não</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+            <Box display="flex" gap={2} mt={2}>
+              <Button variant="contained" color="primary" onClick={() => setPage(0)}>
+                Filtrar
+              </Button>
+              <Button variant="outlined" onClick={handleLimparFiltros}>
+                Limpar
+              </Button>
+            </Box>
+          </>
+        )}
+      </Paper>
 
       {/* Tabela de Condutores */}
       <TableContainer component={Paper}>

@@ -4,9 +4,10 @@ import {
   TableCell, TableContainer, TableHead, TableRow, Paper,
   Chip, LinearProgress, Grid, Card, CardContent, IconButton, Tooltip,
   Dialog, DialogTitle, DialogContent, DialogActions, TextField,
-  FormControl, InputLabel, Select, MenuItem, Autocomplete, InputAdornment, Alert
+  FormControl, InputLabel, Select, MenuItem, Autocomplete, InputAdornment, Alert,
+  TablePagination
 } from '@mui/material';
-import { PlayArrow, Add } from '@mui/icons-material';
+import { PlayArrow, Add, FilterList } from '@mui/icons-material';
 import { getManutencoes, simularProximoStatusManutencao, createManutencao, getVeiculos, getVeiculo } from '../services/api';
 
 interface ManutencaoSAP {
@@ -37,6 +38,19 @@ const MaintenanceSAP = () => {
     descricao: '',
     custo: ''
   });
+  
+  // Estados de filtros
+  const [filtroVeiculoId, setFiltroVeiculoId] = useState('');
+  const [filtroTipo, setFiltroTipo] = useState('');
+  const [filtroprioridade, setFiltroPrioridade] = useState('');
+  const [filtroStatusSAP, setFiltroStatusSAP] = useState('');
+  const [filtroDataInicio, setFiltroDataInicio] = useState('');
+  const [filtroDataFim, setFiltroDataFim] = useState('');
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
+  
+  // Estados de paginação
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
     carregarManutencoes();
@@ -157,6 +171,39 @@ const MaintenanceSAP = () => {
     return map[status] ?? 0;
   };
 
+  const handleLimparFiltros = () => {
+    setFiltroVeiculoId('');
+    setFiltroTipo('');
+    setFiltroPrioridade('');
+    setFiltroStatusSAP('');
+    setFiltroDataInicio('');
+    setFiltroDataFim('');
+    setPage(0);
+  };
+
+  // Aplicar filtros localmente
+  const filteredManutencoes = manutencoes.filter((m: any) => {
+    const matchesVeiculo = !filtroVeiculoId || m.veiculo?.placa?.includes(filtroVeiculoId);
+    const matchesTipo = !filtroTipo || m.tipo === filtroTipo;
+    const matchesPrioridade = !filtroprioridade || m.prioridade === filtroprioridade;
+    const matchesStatus = !filtroStatusSAP || m.statusSAP === filtroStatusSAP;
+    
+    // Filtros de data (assumindo que existe criadoEm)
+    let matchesDataInicio = true;
+    let matchesDataFim = true;
+    if (m.criadoEm) {
+      const dataCriacao = new Date(m.criadoEm).toISOString().split('T')[0];
+      if (filtroDataInicio) {
+        matchesDataInicio = dataCriacao >= filtroDataInicio;
+      }
+      if (filtroDataFim) {
+        matchesDataFim = dataCriacao <= filtroDataFim;
+      }
+    }
+    
+    return matchesVeiculo && matchesTipo && matchesPrioridade && matchesStatus && matchesDataInicio && matchesDataFim;
+  });
+
   const metricas = {
     total: manutencoes.length,
     emProcesso: manutencoes.filter(m => m.statusSAP !== 'Finalizada').length,
@@ -216,6 +263,116 @@ const MaintenanceSAP = () => {
         </Grid>
       </Grid>
 
+      {/* Paper de Filtros */}
+      <Paper sx={{ p: 2, mb: 3 }}>
+        <Box display="flex" alignItems="center" justifyContent="space-between" mb={filtrosAbertos ? 2 : 0}>
+          <Box display="flex" alignItems="center" gap={1}>
+            <FilterList />
+            <Typography variant="h6">Filtros</Typography>
+          </Box>
+          <Button size="small" onClick={() => setFiltrosAbertos(!filtrosAbertos)}>
+            {filtrosAbertos ? 'Ocultar' : 'Expandir'}
+          </Button>
+        </Box>
+        
+        {filtrosAbertos && (
+          <>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6} md={3}>
+                <Autocomplete
+                  options={veiculos}
+                  getOptionLabel={(option) => `${option.placa} - ${option.modelo}`}
+                  onChange={(e, value) => setFiltroVeiculoId(value?.placa || '')}
+                  renderInput={(params) => (
+                    <TextField {...params} label="Veículo" size="small" />
+                  )}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={2}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Tipo</InputLabel>
+                  <Select
+                    value={filtroTipo}
+                    label="Tipo"
+                    onChange={(e) => setFiltroTipo(e.target.value)}
+                  >
+                    <MenuItem value="">Todos</MenuItem>
+                    <MenuItem value="Preventiva">Preventiva</MenuItem>
+                    <MenuItem value="Corretiva">Corretiva</MenuItem>
+                    <MenuItem value="Emergencia">Emergência</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={2}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Prioridade</InputLabel>
+                  <Select
+                    value={filtroprioridade}
+                    label="Prioridade"
+                    onChange={(e) => setFiltroPrioridade(e.target.value)}
+                  >
+                    <MenuItem value="">Todas</MenuItem>
+                    <MenuItem value="Baixa">Baixa</MenuItem>
+                    <MenuItem value="Media">Média</MenuItem>
+                    <MenuItem value="Alta">Alta</MenuItem>
+                    <MenuItem value="Urgente">Urgente</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={2}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Status SAP</InputLabel>
+                  <Select
+                    value={filtroStatusSAP}
+                    label="Status SAP"
+                    onChange={(e) => setFiltroStatusSAP(e.target.value)}
+                  >
+                    <MenuItem value="">Todos</MenuItem>
+                    <MenuItem value="Solicitada">Solicitada</MenuItem>
+                    <MenuItem value="Aprovada">Aprovada</MenuItem>
+                    <MenuItem value="EnviadaSAP">Enviada SAP</MenuItem>
+                    <MenuItem value="ProcessandoSAP">Processando SAP</MenuItem>
+                    <MenuItem value="OrdemCriada">Ordem Criada</MenuItem>
+                    <MenuItem value="EmExecucao">Em Execução</MenuItem>
+                    <MenuItem value="Finalizada">Finalizada</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={2}>
+                <TextField
+                  label="Data Início"
+                  type="date"
+                  size="small"
+                  fullWidth
+                  value={filtroDataInicio}
+                  onChange={(e) => setFiltroDataInicio(e.target.value)}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={2}>
+                <TextField
+                  label="Data Fim"
+                  type="date"
+                  size="small"
+                  fullWidth
+                  value={filtroDataFim}
+                  onChange={(e) => setFiltroDataFim(e.target.value)}
+                  InputLabelProps={{ shrink: true }}
+                />
+              </Grid>
+            </Grid>
+            <Box display="flex" gap={2} mt={2}>
+              <Button variant="contained" color="primary" onClick={() => setPage(0)}>
+                Filtrar
+              </Button>
+              <Button variant="outlined" onClick={handleLimparFiltros}>
+                Limpar
+              </Button>
+            </Box>
+          </>
+        )}
+      </Paper>
+
       {/* Tabela de manutenções */}
       <TableContainer component={Paper}>
         <Table>
@@ -233,7 +390,9 @@ const MaintenanceSAP = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {manutencoes.map((manutencao) => (
+            {filteredManutencoes
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((manutencao) => (
               <TableRow key={manutencao.id}>
                 <TableCell>{manutencao.veiculo.placa} - {manutencao.veiculo.modelo}</TableCell>
                 <TableCell>{manutencao.tipo}</TableCell>
@@ -277,6 +436,22 @@ const MaintenanceSAP = () => {
           </TableBody>
         </Table>
       </TableContainer>
+
+      {/* Paginação */}
+      <TablePagination
+        rowsPerPageOptions={[10, 25, 50]}
+        component="div"
+        count={filteredManutencoes.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={(event, newPage) => setPage(newPage)}
+        onRowsPerPageChange={(event) => {
+          setRowsPerPage(parseInt(event.target.value, 10));
+          setPage(0);
+        }}
+        labelRowsPerPage="Linhas por página:"
+        labelDisplayedRows={({ from, to, count }) => `${from}-${to} de ${count}`}
+      />
 
       {/* Dialog para criar nova manutenção */}
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="sm" fullWidth>

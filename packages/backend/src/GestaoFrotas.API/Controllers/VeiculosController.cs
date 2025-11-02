@@ -22,7 +22,10 @@ public class VeiculosController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Veiculo>>> GetVeiculos(
         [FromQuery] string? search,
-        [FromQuery] StatusVeiculo? status)
+        [FromQuery] StatusVeiculo? status,
+        [FromQuery] TipoVeiculo? tipo,
+        [FromQuery] int? anoMin,
+        [FromQuery] int? anoMax)
     {
         var query = _context.Veiculos.AsQueryable();
 
@@ -37,6 +40,21 @@ public class VeiculosController : ControllerBase
         if (status.HasValue)
         {
             query = query.Where(v => v.Status == status.Value);
+        }
+
+        if (tipo.HasValue)
+        {
+            query = query.Where(v => v.Tipo == tipo.Value);
+        }
+
+        if (anoMin.HasValue)
+        {
+            query = query.Where(v => v.Ano >= anoMin.Value);
+        }
+
+        if (anoMax.HasValue)
+        {
+            query = query.Where(v => v.Ano <= anoMax.Value);
         }
 
         var veiculos = await query
