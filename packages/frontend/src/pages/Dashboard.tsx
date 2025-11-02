@@ -24,7 +24,7 @@ import {
 } from '@mui/icons-material';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts';
 import { useAuth } from '../components/AuthContext';
-import { getMeuChecklistHoje, getDashboardData } from '../services/api';
+import { getMeuChecklistHoje, getDashboardData, getAlertasCNH } from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
 interface DashboardProps {
@@ -37,6 +37,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, userName }) => {
   const [loadingChecklist, setLoadingChecklist] = useState(true);
   const [dashboardData, setDashboardData] = useState<any>(null);
   const [loadingDashboard, setLoadingDashboard] = useState(true);
+  const [alertasCNH, setAlertasCNH] = useState<any>(null);
   const { userRole } = useAuth();
   const navigate = useNavigate();
 
@@ -68,6 +69,22 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, userName }) => {
         const data = await getDashboardData();
         console.log('[Dashboard] Dados recebidos:', data);
         setDashboardData(data);
+        
+        // Carregar alertas de CNH
+        try {
+          const cnhData = await getAlertasCNH();
+          
+          // Os dados já vêm em camelCase do backend
+          setAlertasCNH({
+            vencidas: cnhData.vencidas || [],
+            vencendo7Dias: cnhData.vencendo7Dias || [],
+            vencendo15Dias: cnhData.vencendo15Dias || [],
+            vencendo30Dias: cnhData.vencendo30Dias || [],
+            totalAlertas: cnhData.totalAlertas || 0,
+          });
+        } catch (err) {
+          console.error('[Dashboard] Erro ao carregar alertas CNH:', err);
+        }
       } catch (err: any) {
         console.error('[Dashboard] Erro ao carregar dashboard:', err);
         console.error('[Dashboard] Detalhes do erro:', err.response?.data);
@@ -243,27 +260,93 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, userName }) => {
                       <Typography variant="h6">Alertas Críticos</Typography>
                     </Box>
 
-                    {/* CNH Vencida */}
-                    {dashboardData?.alertas.cnhVencidas && dashboardData.alertas.cnhVencidas.length > 0 ? (
+                    {/* CNH Vencidas */}
+                    {alertasCNH?.vencidas && alertasCNH.vencidas.length > 0 && (
                       <>
                         <Typography variant="subtitle2" color="error" sx={{ mb: 1 }}>
-                          CNH Vencida ({dashboardData.alertas.cnhVencidas.length})
+                          CNH Vencida ({alertasCNH.vencidas.length})
                         </Typography>
                         <List dense>
-                          {dashboardData.alertas.cnhVencidas.map((alerta: any) => (
-                            <ListItem key={alerta.id}>
+                          {alertasCNH.vencidas.map((condutor: any) => (
+                            <ListItem key={condutor.id}>
                               <ListItemIcon>
                                 <PersonIcon color="error" fontSize="small" />
                               </ListItemIcon>
                               <ListItemText
-                                primary={alerta.nome}
-                                secondary={`Vencida há ${alerta.diasVencida} dias`}
+                                primary={condutor.nome}
+                                secondary={`Vencida há ${Math.abs(condutor.diasParaVencer)} dias - CNH: ${condutor.cnhNumero}`}
                               />
                             </ListItem>
                           ))}
                         </List>
                       </>
-                    ) : null}
+                    )}
+
+                    {/* CNH Vencendo em 7 dias */}
+                    {alertasCNH?.vencendo7Dias && alertasCNH.vencendo7Dias.length > 0 && (
+                      <>
+                        <Typography variant="subtitle2" sx={{ color: '#ff9800', mb: 1, mt: 2 }}>
+                          CNH Vencendo em até 7 dias ({alertasCNH.vencendo7Dias.length})
+                        </Typography>
+                        <List dense>
+                          {alertasCNH.vencendo7Dias.map((condutor: any) => (
+                            <ListItem key={condutor.id}>
+                              <ListItemIcon>
+                                <PersonIcon sx={{ color: '#ff9800' }} fontSize="small" />
+                              </ListItemIcon>
+                              <ListItemText
+                                primary={condutor.nome}
+                                secondary={`Vence em ${condutor.diasParaVencer} dia(s) - CNH: ${condutor.cnhNumero}`}
+                              />
+                            </ListItem>
+                          ))}
+                        </List>
+                      </>
+                    )}
+
+                    {/* CNH Vencendo em 15 dias */}
+                    {alertasCNH?.vencendo15Dias && alertasCNH.vencendo15Dias.length > 0 && (
+                      <>
+                        <Typography variant="subtitle2" sx={{ color: '#fbc02d', mb: 1, mt: 2 }}>
+                          CNH Vencendo entre 8 e 15 dias ({alertasCNH.vencendo15Dias.length})
+                        </Typography>
+                        <List dense>
+                          {alertasCNH.vencendo15Dias.map((condutor: any) => (
+                            <ListItem key={condutor.id}>
+                              <ListItemIcon>
+                                <PersonIcon sx={{ color: '#fbc02d' }} fontSize="small" />
+                              </ListItemIcon>
+                              <ListItemText
+                                primary={condutor.nome}
+                                secondary={`Vence em ${condutor.diasParaVencer} dias - CNH: ${condutor.cnhNumero}`}
+                              />
+                            </ListItem>
+                          ))}
+                        </List>
+                      </>
+                    )}
+
+                    {/* CNH Vencendo em 30 dias */}
+                    {alertasCNH?.vencendo30Dias && alertasCNH.vencendo30Dias.length > 0 && (
+                      <>
+                        <Typography variant="subtitle2" sx={{ color: '#1976d2', mb: 1, mt: 2 }}>
+                          CNH Vencendo entre 16 e 30 dias ({alertasCNH.vencendo30Dias.length})
+                        </Typography>
+                        <List dense>
+                          {alertasCNH.vencendo30Dias.map((condutor: any) => (
+                            <ListItem key={condutor.id}>
+                              <ListItemIcon>
+                                <PersonIcon sx={{ color: '#1976d2' }} fontSize="small" />
+                              </ListItemIcon>
+                              <ListItemText
+                                primary={condutor.nome}
+                                secondary={`Vence em ${condutor.diasParaVencer} dias - CNH: ${condutor.cnhNumero}`}
+                              />
+                            </ListItem>
+                          ))}
+                        </List>
+                      </>
+                    )}
 
                     {/* Manutenções Atrasadas */}
                     {dashboardData?.alertas.manutencoesAtrasadas && dashboardData.alertas.manutencoesAtrasadas.length > 0 ? (
@@ -287,7 +370,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, userName }) => {
                       </>
                     ) : null}
 
-                    {(!dashboardData?.alertas.cnhVencidas || dashboardData.alertas.cnhVencidas.length === 0) &&
+                    {/* Mensagem quando não há alertas */}
+                    {(!alertasCNH || alertasCNH.totalAlertas === 0) &&
                      (!dashboardData?.alertas.manutencoesAtrasadas || dashboardData.alertas.manutencoesAtrasadas.length === 0) && (
                       <Typography variant="body2" color="textSecondary">
                         Nenhum alerta crítico no momento

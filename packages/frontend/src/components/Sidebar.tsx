@@ -21,6 +21,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import PersonIcon from '@mui/icons-material/Person';
+import HistoryIcon from '@mui/icons-material/History';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from './AuthContext';
 import translogLogo from '../image/translog.png';
@@ -33,10 +34,11 @@ const gestorAdminMenu = [
   { text: 'Usuários', icon: <PersonIcon />, path: '/drivers' },
   { text: 'Veículos', icon: <DirectionsCarIcon />, path: '/vehicles' },
   { text: 'Manutenções', icon: <BuildIcon />, path: '/maintenance' },
+  { text: 'Logs de Auditoria', icon: <HistoryIcon />, path: '/audit-logs', adminOnly: true },
 ];
 
 const permissions = {
-  admin: ['', 'checklist', 'vehicles', 'drivers', 'maintenance'],
+  admin: ['', 'checklist', 'vehicles', 'drivers', 'maintenance', 'audit-logs'],
   gestor: ['', 'checklist', 'vehicles', 'drivers', 'maintenance'],
   condutor: ['checklist'],
 };

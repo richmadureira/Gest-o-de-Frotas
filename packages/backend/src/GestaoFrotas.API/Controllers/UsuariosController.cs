@@ -204,6 +204,40 @@ public class UsuariosController : ControllerBase
 
         return NoContent();
     }
+
+    /// <summary>
+    /// Obter alertas de CNH vencendo ou vencidas
+    /// </summary>
+    [HttpGet("alertas-cnh")]
+    [Authorize(Roles = "Administrador,Gestor")]
+    public async Task<ActionResult<object>> GetAlertasCNH()
+    {
+        var condutores = await _context.Usuarios
+            .Where(u => u.Papel == PapelUsuario.Condutor && u.Ativo && u.CnhValidade != null)
+            .Select(u => new
+            {
+                u.Id,
+                u.Nome,
+                u.Email,
+                u.CnhNumero,
+                u.CnhCategoria,
+                CnhValidade = u.CnhValidade!.Value,
+                DiasParaVencer = (u.CnhValidade!.Value.Date - DateTime.UtcNow.Date).Days,
+                CnhVencida = u.CnhValidade!.Value.Date < DateTime.UtcNow.Date
+            })
+            .ToListAsync();
+
+        var result = new
+        {
+            Vencidas = condutores.Where(c => c.CnhVencida).OrderBy(c => c.DiasParaVencer).ToList(),
+            Vencendo7Dias = condutores.Where(c => !c.CnhVencida && c.DiasParaVencer <= 7).OrderBy(c => c.DiasParaVencer).ToList(),
+            Vencendo15Dias = condutores.Where(c => !c.CnhVencida && c.DiasParaVencer > 7 && c.DiasParaVencer <= 15).OrderBy(c => c.DiasParaVencer).ToList(),
+            Vencendo30Dias = condutores.Where(c => !c.CnhVencida && c.DiasParaVencer > 15 && c.DiasParaVencer <= 30).OrderBy(c => c.DiasParaVencer).ToList(),
+            TotalAlertas = condutores.Count(c => c.CnhVencida || c.DiasParaVencer <= 30)
+        };
+
+        return Ok(result);
+    }
 }
 
 public record UpdateUsuarioRequest(

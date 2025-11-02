@@ -34,6 +34,7 @@ import { Add, Edit, Delete, Visibility, Build, Assignment, CheckCircle, Schedule
 import HomeIcon from '@mui/icons-material/Home';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { SelectChangeEvent } from '@mui/material';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { 
   getVeiculo, 
   getVeiculos, 
@@ -108,6 +109,10 @@ function Manutencoes() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [openDetails, setOpenDetails] = useState(false);
+  
+  // Estados para confirmação de exclusão
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [manutencaoToDelete, setManutencaoToDelete] = useState<Manutencao | null>(null);
   
   // Estados para imagens do checklist
   const [checklistImages, setChecklistImages] = useState<{
@@ -268,15 +273,22 @@ function Manutencoes() {
     }
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm('Tem certeza que deseja excluir esta manutenção?')) return;
+  const handleDeleteClick = (manutencao: Manutencao) => {
+    setManutencaoToDelete(manutencao);
+    setConfirmDialogOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!manutencaoToDelete) return;
     
     try {
       setLoading(true);
-      await deleteManutencao(id);
+      await deleteManutencao(manutencaoToDelete.id);
       setSnackbarMessage('Manutenção excluída com sucesso!');
       await carregarDados();
       setSnackbarOpen(true);
+      setConfirmDialogOpen(false);
+      setManutencaoToDelete(null);
     } catch (err: any) {
       console.error('Erro ao excluir:', err);
       setError(err.response?.data?.message || 'Erro ao excluir manutenção');
@@ -526,7 +538,7 @@ function Manutencoes() {
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Excluir">
-                    <IconButton color="error" onClick={() => handleDelete(manutencao.id)}>
+                    <IconButton color="error" onClick={() => handleDeleteClick(manutencao)}>
                       <Delete />
                     </IconButton>
                   </Tooltip>
@@ -758,6 +770,22 @@ function Manutencoes() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Dialog de Confirmação de Exclusão */}
+      <ConfirmDialog
+        open={confirmDialogOpen}
+        title="Confirmar Exclusão"
+        message="Tem certeza que deseja excluir esta manutenção?"
+        itemName={manutencaoToDelete ? `${manutencaoToDelete.veiculo?.placa} - ${manutencaoToDelete.tipo}` : ''}
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        onConfirm={handleDelete}
+        onCancel={() => {
+          setConfirmDialogOpen(false);
+          setManutencaoToDelete(null);
+        }}
+        severity="error"
+      />
 
       {/* Snackbar para mensagens */}
       <Snackbar

@@ -41,6 +41,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import InputMask from 'react-input-mask';
 import { getUsuarios, register, updateUsuario, deleteUsuario } from '../services/api';
 import { useAuth } from '../components/AuthContext';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 // Tipos e interfaces para TypeScript
 interface Usuario {
@@ -102,6 +103,10 @@ function GerenciamentoUsuarios() {
   const [loading, setLoading] = useState(false);
 
   const [error, setError] = useState<string | null>(null);
+  
+  // Estados para confirmação de exclusão
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [usuarioToDelete, setUsuarioToDelete] = useState<Usuario | null>(null);
   
   // Métricas
   const [metricas, setMetricas] = useState({
@@ -301,15 +306,24 @@ function GerenciamentoUsuarios() {
     }
   };
 
-  const handleDeleteUsuario = async (id: string) => {
+  const handleDeleteClick = (usuario: Usuario) => {
+    setUsuarioToDelete(usuario);
+    setConfirmDialogOpen(true);
+  };
+
+  const handleDeleteUsuario = async () => {
+    if (!usuarioToDelete) return;
+    
     try {
       setLoading(true);
       setError(null);
-      await deleteUsuario(id);
+      await deleteUsuario(usuarioToDelete.id);
       setSnackbarMessage('Usuário removido com sucesso!');
       setSnackbarType('success');
       setOpenSnackbar(true);
       await carregarUsuarios();
+      setConfirmDialogOpen(false);
+      setUsuarioToDelete(null);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao remover usuário');
       setSnackbarMessage('Erro ao remover usuário');
@@ -553,7 +567,7 @@ function GerenciamentoUsuarios() {
                     <span>
                       <IconButton 
                         color="error" 
-                        onClick={() => handleDeleteUsuario(usuario.id)}
+                        onClick={() => handleDeleteClick(usuario)}
                         disabled={userRole !== 'admin' || user?.id === usuario.id}
                       >
                         <Delete />
@@ -776,6 +790,22 @@ function GerenciamentoUsuarios() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Dialog de Confirmação de Exclusão */}
+      <ConfirmDialog
+        open={confirmDialogOpen}
+        title="Confirmar Exclusão"
+        message="Tem certeza que deseja excluir este usuário?"
+        itemName={usuarioToDelete ? `${usuarioToDelete.nome} (${usuarioToDelete.email})` : ''}
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        onConfirm={handleDeleteUsuario}
+        onCancel={() => {
+          setConfirmDialogOpen(false);
+          setUsuarioToDelete(null);
+        }}
+        severity="error"
+      />
 
       {/* Snackbar */}
       <Snackbar

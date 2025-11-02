@@ -83,6 +83,11 @@ export const updateUsuario = async (id: string, data: {
   cpf?: string;
   telefone?: string;
   ativo: boolean;
+  cnhNumero?: string;
+  cnhCategoria?: string;
+  cnhValidade?: string;
+  matricula?: string;
+  turnoTrabalho?: string;
 }) => {
   // Mapear camelCase para PascalCase para o backend
   const backendData = {
@@ -91,7 +96,12 @@ export const updateUsuario = async (id: string, data: {
     Papel: data.papel,
     Cpf: data.cpf,
     Telefone: data.telefone,
-    Ativo: data.ativo
+    Ativo: data.ativo,
+    CnhNumero: data.cnhNumero,
+    CnhCategoria: data.cnhCategoria,
+    CnhValidade: data.cnhValidade ? new Date(data.cnhValidade).toISOString() : null,
+    Matricula: data.matricula,
+    TurnoTrabalho: data.turnoTrabalho
   };
   const response = await api.put(`/usuarios/${id}`, backendData);
   return response.data;
@@ -177,6 +187,11 @@ export const updateVeiculo = async (id: string, data: {
 
 export const deleteVeiculo = async (id: string) => {
   const response = await api.delete(`/veiculos/${id}`);
+  return response.data;
+};
+
+export const getVeiculoHistorico = async (id: string) => {
+  const response = await api.get(`/veiculos/${id}/historico`);
   return response.data;
 };
 
@@ -353,3 +368,18 @@ export const getDashboardData = async () => {
   const response = await api.get('/dashboard');
   return response.data;
 };
+
+// ===== AUDIT LOGS =====
+export const getAuditLogs = async () => {
+  const response = await api.get('/auditlogs');
+  return response.data;
+};
+
+// ===== ALERTAS CNH =====
+export const getAlertasCNH = async () => {
+  const response = await api.get('/usuarios/alertas-cnh');
+  return response.data;
+};
+
+// Export default para uso direto
+export default api;

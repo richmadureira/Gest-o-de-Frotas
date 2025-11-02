@@ -19,6 +19,8 @@ import { useAuth } from './components/AuthContext';
 import LogoutIcon from '@mui/icons-material/ExitToApp';
 import ChecklistManagement from './pages/ChecklistManagement';
 import CondutorHome from './pages/CondutorHome';
+import AuditLogs from './pages/AuditLogs';
+import VehicleHistory from './pages/VehicleHistory';
 
 const drawerWidth = 240;
 
@@ -29,6 +31,7 @@ const routePermissions = {
   '/drivers': ['admin', 'gestor'],
   '/report-details': ['admin', 'gestor'],
   '/maintenance': ['admin', 'gestor'],
+  '/audit-logs': ['admin'],
 };
 
 function ProtectedRoute({ element, path }: { element: React.ReactElement, path: keyof typeof routePermissions }) {
@@ -125,11 +128,13 @@ function App() {
           <Route path="/" element={<Dashboard onLogout={handleLogout} />} />
           <Route path="/checklist" element={<ProtectedRoute path="/checklist" element={<ChecklistManagement />} />} />
           <Route path="/vehicles" element={<ProtectedRoute path="/vehicles" element={<Vehicles />} />} />
+          <Route path="/vehicles/:id/historico" element={<ProtectedRoute path="/vehicles" element={<VehicleHistory />} />} />
           <Route path="/summary" element={<ProtectedRoute path="/summary" element={<Summary />} />} />
           <Route path="/drivers" element={<ProtectedRoute path="/drivers" element={<Drivers />} />} />
           <Route path="/report-details" element={<ProtectedRoute path="/report-details" element={<ReportDetails />} />} />
         <Route path="/maintenance" element={<ProtectedRoute path="/maintenance" element={<MaintenanceSAP />} />} />
         <Route path="/maintenance/new" element={<ProtectedRoute path="/maintenance" element={<MaintenanceSAP />} />} />
+          <Route path="/audit-logs" element={<ProtectedRoute path="/audit-logs" element={<AuditLogs />} />} />
           <Route path="*" element={<Dashboard onLogout={handleLogout} />} />
         </Routes>
         <Box sx={{ position: 'fixed', bottom: 16, right: 24, zIndex: 1300 }}>

@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<Veiculo> Veiculos { get; set; }
     public DbSet<Checklist> Checklists { get; set; }
     public DbSet<Manutencao> Manutencoes { get; set; }
+    public DbSet<AuditLog> AuditLogs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

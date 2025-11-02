@@ -33,12 +33,13 @@ import {
   Card,
   CardContent,
 } from '@mui/material';
-import { Add, Edit, Delete, DirectionsCar, Build, CheckCircle, Speed, FilterList } from '@mui/icons-material';
+import { Add, Edit, Delete, DirectionsCar, Build, CheckCircle, Speed, FilterList, History } from '@mui/icons-material';
 import HomeIcon from '@mui/icons-material/Home';
 import { useNavigate } from 'react-router-dom';
 import InputMask from 'react-input-mask';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { getVeiculos, createVeiculo, updateVeiculo, deleteVeiculo } from '../services/api';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 // Tipos e interfaces para TypeScript
 interface Veiculo {
@@ -91,6 +92,10 @@ function GerenciamentoVeiculos() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  
+  // Estados para confirmação de exclusão
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [veiculoToDelete, setVeiculoToDelete] = useState<Veiculo | null>(null);
   
   // Métricas
   const [metricas, setMetricas] = useState({
@@ -220,14 +225,23 @@ function GerenciamentoVeiculos() {
     }
   };
 
-  const handleDeactivateVeiculo = async (id: string) => {
+  const handleDeleteClick = (veiculo: Veiculo) => {
+    setVeiculoToDelete(veiculo);
+    setConfirmDialogOpen(true);
+  };
+
+  const handleDeactivateVeiculo = async () => {
+    if (!veiculoToDelete) return;
+    
     try {
       setLoading(true);
       setError(null);
-      await deleteVeiculo(id);
+      await deleteVeiculo(veiculoToDelete.id);
       setSnackbarMessage('Veículo removido com sucesso!');
       setOpenSnackbar(true);
       await carregarVeiculos();
+      setConfirmDialogOpen(false);
+      setVeiculoToDelete(null);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erro ao remover veículo');
       console.error('Erro ao remover veículo:', err);
@@ -475,13 +489,18 @@ function GerenciamentoVeiculos() {
                 </TableCell>
                 <TableCell>{veiculo.quilometragem.toLocaleString()} km</TableCell>
                 <TableCell align="right">
+                  <Tooltip title="Ver Histórico">
+                    <IconButton color="info" onClick={() => navigate(`/vehicles/${veiculo.id}/historico`)}>
+                      <History />
+                    </IconButton>
+                  </Tooltip>
                   <Tooltip title="Editar">
                     <IconButton color="primary" onClick={() => handleOpenDialog(veiculo)}>
                       <Edit />
                     </IconButton>
                   </Tooltip>
                   <Tooltip title="Excluir">
-                    <IconButton color="error" onClick={() => handleDeactivateVeiculo(veiculo.id)}>
+                    <IconButton color="error" onClick={() => handleDeleteClick(veiculo)}>
                       <Delete />
                     </IconButton>
                   </Tooltip>
@@ -611,6 +630,22 @@ function GerenciamentoVeiculos() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Dialog de Confirmação de Exclusão */}
+      <ConfirmDialog
+        open={confirmDialogOpen}
+        title="Confirmar Exclusão"
+        message="Tem certeza que deseja excluir este veículo?"
+        itemName={veiculoToDelete ? `${veiculoToDelete.placa} - ${veiculoToDelete.modelo}` : ''}
+        confirmText="Excluir"
+        cancelText="Cancelar"
+        onConfirm={handleDeactivateVeiculo}
+        onCancel={() => {
+          setConfirmDialogOpen(false);
+          setVeiculoToDelete(null);
+        }}
+        severity="error"
+      />
 
       {/* Snackbar */}
       <Snackbar

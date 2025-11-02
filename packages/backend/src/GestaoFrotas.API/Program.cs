@@ -4,6 +4,9 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
 using GestaoFrotas.Infrastructure.Data;
+using GestaoFrotas.Application.Interfaces;
+using GestaoFrotas.Infrastructure.Services;
+using GestaoFrotas.API.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +22,9 @@ builder.Services.AddControllers()
 // Database
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Services
+builder.Services.AddScoped<IAuditService, AuditService>();
 
 // CORS
 builder.Services.AddCors(options =>
@@ -110,6 +116,9 @@ app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+// Middleware de auditoria (após autenticação)
+app.UseMiddleware<AuditMiddleware>();
 
 app.MapControllers();
 

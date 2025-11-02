@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\GestaoFrotas.Domain\GestaoFrotas.Domain.csproj" />
+    <ProjectReference Include="..\GestaoFrotas.Application\GestaoFrotas.Application.csproj" />
   </ItemGroup>
 
   <ItemGroup>

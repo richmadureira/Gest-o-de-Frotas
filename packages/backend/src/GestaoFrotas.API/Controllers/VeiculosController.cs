@@ -166,6 +166,166 @@ public class VeiculosController : ControllerBase
 
         return NoContent();
     }
+
+    /// <summary>
+    /// Obter histórico completo do veículo (incluindo checklists e manutenções)
+    /// </summary>
+    [HttpGet("{id}/historico")]
+    public async Task<ActionResult<object>> GetHistoricoVeiculo(string id)
+    {
+        if (!Guid.TryParse(id, out var veiculoId))
+        {
+            return BadRequest(new { message = "ID inválido" });
+        }
+
+        var veiculo = await _context.Veiculos.FindAsync(veiculoId);
+        if (veiculo == null)
+        {
+            return NotFound(new { message = "Veículo não encontrado" });
+        }
+
+        // Buscar checklists do veículo
+        var checklists = await _context.Checklists
+            .Include(c => c.Motorista)
+            .Where(c => c.VeiculoId == veiculoId)
+            .OrderByDescending(c => c.Data)
+            .Select(c => new
+            {
+                c.Id,
+                c.Data,
+                c.KmVeiculo,
+                MotoristaId = c.MotoristaId,
+                MotoristaNome = c.Motorista != null ? c.Motorista.Nome : "N/A",
+                c.Status,
+                c.Pneus,
+                c.Luzes,
+                c.Freios,
+                c.Limpeza,
+                c.Observacoes,
+                TemAvarias = !c.Pneus || !c.Luzes || !c.Freios || !c.Limpeza
+            })
+            .ToListAsync();
+
+        // Buscar manutenções do veículo
+        var manutencoes = await _context.Manutencoes
+            .Where(m => m.VeiculoId == veiculoId)
+            .OrderByDescending(m => m.CriadoEm)
+            .Select(m => new
+            {
+                m.Id,
+                m.Tipo,
+                m.Prioridade,
+                StatusSAP = m.StatusSAP,
+                m.Descricao,
+                m.QuilometragemNoAto,
+                m.Custo,
+                m.CriadoEm,
+                m.AtualizadoEm,
+                m.NumeroOrdemSAP,
+                m.FornecedorSAP
+            })
+            .ToListAsync();
+
+        // Calcular estatísticas
+        var totalChecklists = checklists.Count;
+        var totalManutencoes = manutencoes.Count;
+        var custoTotalManutencoes = manutencoes.Sum(m => m.Custo ?? 0);
+        var ultimoChecklist = checklists.FirstOrDefault();
+        var ultimaManutencao = manutencoes.FirstOrDefault();
+        
+        // Estatísticas de checklists
+        var checklistsAprovados = checklists.Count(c => c.Status == StatusChecklist.Aprovado);
+        var checklistsRejeitados = checklists.Count(c => c.Status == StatusChecklist.Rejeitado);
+        var checklistsPendentes = checklists.Count(c => c.Status == StatusChecklist.Pendente);
+        
+        // Estatísticas de manutenções (usando StatusSAP)
+        var manutencoesSolicitadas = manutencoes.Count(m => m.StatusSAP == StatusManutencaoSAP.Solicitada);
+        var manutencoesAprovadas = manutencoes.Count(m => m.StatusSAP == StatusManutencaoSAP.Aprovada);
+        var manutencoesEnviadasSAP = manutencoes.Count(m => m.StatusSAP == StatusManutencaoSAP.EnviadaSAP);
+        var manutencoesEmExecucao = manutencoes.Count(m => m.StatusSAP == StatusManutencaoSAP.EmExecucao);
+        var manutencoesFinalizadas = manutencoes.Count(m => m.StatusSAP == StatusManutencaoSAP.Finalizada);
+
+        // Evolução de quilometragem (últimos 10 checklists)
+        var evolucaoKm = checklists
+            .Take(10)
+            .OrderBy(c => c.Data)
+            .Select(c => new
+            {
+                Data = c.Data.ToString("dd/MM"),
+                Km = c.KmVeiculo
+            })
+            .ToList();
+
+        // Custos por tipo de manutenção
+        var custosPorTipo = manutencoes
+            .Where(m => m.Custo.HasValue && m.Custo > 0)
+            .GroupBy(m => m.Tipo)
+            .Select(g => new
+            {
+                Tipo = g.Key.ToString(),
+                Total = g.Sum(m => m.Custo ?? 0),
+                Quantidade = g.Count()
+            })
+            .OrderByDescending(x => x.Total)
+            .ToList();
+
+        // Custos mensais (últimos 6 meses)
+        var seiseMesesAtras = DateTime.UtcNow.AddMonths(-6);
+        var custosMensais = manutencoes
+            .Where(m => m.CriadoEm >= seiseMesesAtras && m.Custo.HasValue && m.Custo > 0)
+            .GroupBy(m => new { m.CriadoEm.Year, m.CriadoEm.Month })
+            .Select(g => new
+            {
+                Mes = $"{g.Key.Month:00}/{g.Key.Year}",
+                Total = g.Sum(m => m.Custo ?? 0),
+                Quantidade = g.Count()
+            })
+            .OrderBy(x => x.Mes)
+            .ToList();
+
+        var result = new
+        {
+            Veiculo = new
+            {
+                veiculo.Id,
+                veiculo.Placa,
+                veiculo.Modelo,
+                veiculo.Marca,
+                veiculo.Ano,
+                veiculo.Tipo,
+                veiculo.Status,
+                veiculo.Quilometragem,
+                veiculo.UltimaManutencao,
+                veiculo.ProximaManutencao
+            },
+            Checklists = checklists,
+            Manutencoes = manutencoes,
+            Estatisticas = new
+            {
+                TotalChecklists = totalChecklists,
+                ChecklistsAprovados = checklistsAprovados,
+                ChecklistsRejeitados = checklistsRejeitados,
+                ChecklistsPendentes = checklistsPendentes,
+                TotalManutencoes = totalManutencoes,
+                ManutencoesSolicitadas = manutencoesSolicitadas,
+                ManutencoesAprovadas = manutencoesAprovadas,
+                ManutencoesEnviadasSAP = manutencoesEnviadasSAP,
+                ManutencoesEmExecucao = manutencoesEmExecucao,
+                ManutencoesFinalizadas = manutencoesFinalizadas,
+                CustoTotalManutencoes = custoTotalManutencoes,
+                UltimoChecklist = ultimoChecklist,
+                UltimaManutencao = ultimaManutencao
+            },
+            Graficos = new
+            {
+                EvolucaoKm = evolucaoKm,
+                CustosPorTipo = custosPorTipo,
+                CustosMensais = custosMensais
+            }
+        };
+
+        return Ok(result);
+    }
 }
 
 public record VeiculoRequest(
