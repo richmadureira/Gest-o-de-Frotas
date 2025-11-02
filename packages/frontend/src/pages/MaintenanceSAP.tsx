@@ -7,7 +7,7 @@ import {
   FormControl, InputLabel, Select, MenuItem, Autocomplete, InputAdornment, Alert,
   TablePagination
 } from '@mui/material';
-import { PlayArrow, Add, FilterList } from '@mui/icons-material';
+import { PlayArrow, Add, FilterList, Build, Assignment, CheckCircle, HourglassEmpty, Description } from '@mui/icons-material';
 import { getManutencoes, simularProximoStatusManutencao, createManutencao, getVeiculos, getVeiculo } from '../services/api';
 
 interface ManutencaoSAP {
@@ -212,52 +212,73 @@ const MaintenanceSAP = () => {
   };
 
   return (
-    <Container maxWidth="xl">
-      <Box sx={{ mb: 3, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Typography variant="h4">Gestão de Manutenções SAP</Typography>
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<Add />}
-            onClick={handleOpenDialog}
-          >
-            Nova Manutenção
-          </Button>
-        </Box>
+    <Container maxWidth="lg" style={{ marginTop: '2rem' }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} mt={4}>
+        <Typography variant="h4" fontWeight="bold">
+          <Build sx={{ mr: 1, verticalAlign: 'middle' }} />
+          Gestão de Manutenções SAP
+        </Typography>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<Add />}
+          onClick={handleOpenDialog}
+        >
+          Nova Manutenção
+        </Button>
       </Box>
 
       {/* Cards de métricas */}
       <Grid container spacing={3} sx={{ mb: 3 }}>
-        <Grid item xs={12} md={3}>
-          <Card>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ backgroundColor: '#e3f2fd', borderLeft: '4px solid #1976d2' }}>
             <CardContent>
-              <Typography color="textSecondary">Total</Typography>
-              <Typography variant="h4">{metricas.total}</Typography>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="textSecondary">Total de Manutenções</Typography>
+                  <Typography variant="h4" fontWeight="bold">{metricas.total}</Typography>
+                </Box>
+                <Assignment sx={{ fontSize: 40, color: '#1976d2' }} />
+              </Box>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={3}>
-          <Card>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ backgroundColor: '#fff3e0', borderLeft: '4px solid #ff9800' }}>
             <CardContent>
-              <Typography color="textSecondary">Em Processo</Typography>
-              <Typography variant="h4">{metricas.emProcesso}</Typography>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="textSecondary">Em Processo</Typography>
+                  <Typography variant="h4" fontWeight="bold">{metricas.emProcesso}</Typography>
+                </Box>
+                <HourglassEmpty sx={{ fontSize: 40, color: '#ff9800' }} />
+              </Box>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={3}>
-          <Card>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ backgroundColor: '#e8f5e9', borderLeft: '4px solid #4caf50' }}>
             <CardContent>
-              <Typography color="textSecondary">Finalizadas</Typography>
-              <Typography variant="h4">{metricas.finalizadas}</Typography>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="textSecondary">Finalizadas</Typography>
+                  <Typography variant="h4" fontWeight="bold">{metricas.finalizadas}</Typography>
+                </Box>
+                <CheckCircle sx={{ fontSize: 40, color: '#4caf50' }} />
+              </Box>
             </CardContent>
           </Card>
         </Grid>
-        <Grid item xs={12} md={3}>
-          <Card>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ backgroundColor: '#e1f5fe', borderLeft: '4px solid #2196f3' }}>
             <CardContent>
-              <Typography color="textSecondary">Ordens SAP</Typography>
-              <Typography variant="h4">{metricas.ordensCriadas}</Typography>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="textSecondary">Ordens SAP</Typography>
+                  <Typography variant="h4" fontWeight="bold">{metricas.ordensCriadas}</Typography>
+                </Box>
+                <Description sx={{ fontSize: 40, color: '#2196f3' }} />
+              </Box>
             </CardContent>
           </Card>
         </Grid>

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import {
   Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TablePagination,
-  Toolbar, TextField, Select, MenuItem, Button, InputLabel, FormControl, IconButton, Dialog, DialogTitle, DialogContent, Chip, Tooltip, Avatar, Stack, Divider, Alert, CircularProgress, Badge, Grid, Card, CardContent
+  TextField, Select, MenuItem, Button, InputLabel, FormControl, IconButton, Dialog, DialogTitle, DialogContent, Tooltip, Stack, Divider, Alert, CircularProgress, Grid, Card, CardContent, Container
 } from '@mui/material';
-import { CheckCircle, Warning, CameraAlt, Search, Check, Close, ReportProblem, Error, AssignmentTurnedIn } from '@mui/icons-material';
+import { CheckCircle, Warning, CameraAlt, Search, Close, Error, AssignmentTurnedIn, FilterList } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthContext';
 import { getChecklists, getVeiculos, getUsuarios } from '../services/api';
@@ -58,7 +58,7 @@ interface ChecklistItem {
 
 const ChecklistManagement: React.FC = () => {
   const navigate = useNavigate();
-  const { userRole, user } = useAuth();
+  const { userRole } = useAuth();
   
   // Função auxiliar para construir URLs de imagens
   const construirUrlImagem = (caminhoImagem: string) => {
@@ -101,6 +101,7 @@ const ChecklistManagement: React.FC = () => {
   const [period, setPeriod] = useState({ from: '', to: '' });
   const [vehicle, setVehicle] = useState('');
   const [driver, setDriver] = useState('');
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
   
   // Tabela
   const [orderBy, setOrderBy] = useState('data');
@@ -252,11 +253,13 @@ const ChecklistManagement: React.FC = () => {
   };
 
   return (
-    <Box sx={{ p: { xs: 1, md: 3 }, width: '100%', maxWidth: 1280, mx: 'auto' }}>
-      <Typography variant="h5" mb={2} fontWeight={700}>
-        <AssignmentTurnedIn sx={{ mr: 1, verticalAlign: 'middle' }} />
-        Gestão de Checklists
-      </Typography>
+    <Container maxWidth="lg" style={{ marginTop: '2rem' }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} mt={4}>
+        <Typography variant="h4" fontWeight="bold">
+          <AssignmentTurnedIn sx={{ mr: 1, verticalAlign: 'middle' }} />
+          Gestão de Checklists
+        </Typography>
+      </Box>
       
       {/* Loading e Error */}
       {loading && (
@@ -331,57 +334,91 @@ const ChecklistManagement: React.FC = () => {
       
       {/* Filtros */}
       <Paper sx={{ p: 2, mb: 3 }}>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="center">
-          <TextField
-            label="De"
-            type="date"
-            size="small"
-            InputLabelProps={{ shrink: true }}
-            value={period.from}
-            onChange={e => setPeriod({ ...period, from: e.target.value })}
-          />
-          <TextField
-            label="Até"
-            type="date"
-            size="small"
-            InputLabelProps={{ shrink: true }}
-            value={period.to}
-            onChange={e => setPeriod({ ...period, to: e.target.value })}
-          />
-          <FormControl size="small" sx={{ minWidth: 180 }}>
-            <InputLabel>Veículo</InputLabel>
-            <Select
-              label="Veículo"
-              value={vehicle}
-              onChange={e => setVehicle(e.target.value)}
-            >
-              <MenuItem value="">Todos</MenuItem>
-              {veiculos.map(v => (
-                <MenuItem key={v.id} value={v.id}>
-                  {v.placa} - {v.modelo}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <FormControl size="small" sx={{ minWidth: 180 }}>
-            <InputLabel>Condutor</InputLabel>
-            <Select
-              label="Condutor"
-              value={driver}
-              onChange={e => setDriver(e.target.value)}
-            >
-              <MenuItem value="">Todos</MenuItem>
-              {usuarios.map(u => (
-                <MenuItem key={u.id} value={u.id}>
-                  {u.nome}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-          <Button variant="contained" color="primary" startIcon={<Search />} onClick={handleFiltrar}>
-            Filtrar
+        <Box display="flex" alignItems="center" justifyContent="space-between" mb={filtrosAbertos ? 2 : 0}>
+          <Box display="flex" alignItems="center" gap={1}>
+            <FilterList />
+            <Typography variant="h6">Filtros</Typography>
+          </Box>
+          <Button size="small" onClick={() => setFiltrosAbertos(!filtrosAbertos)}>
+            {filtrosAbertos ? 'Ocultar' : 'Expandir'}
           </Button>
-        </Stack>
+        </Box>
+        
+        {filtrosAbertos && (
+          <>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6} md={3}>
+                <TextField
+                  label="De"
+                  type="date"
+                  size="small"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={period.from}
+                  onChange={e => setPeriod({ ...period, from: e.target.value })}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <TextField
+                  label="Até"
+                  type="date"
+                  size="small"
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  value={period.to}
+                  onChange={e => setPeriod({ ...period, to: e.target.value })}
+                />
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl size="small" fullWidth>
+                  <InputLabel>Veículo</InputLabel>
+                  <Select
+                    label="Veículo"
+                    value={vehicle}
+                    onChange={e => setVehicle(e.target.value)}
+                  >
+                    <MenuItem value="">Todos</MenuItem>
+                    {veiculos.map(v => (
+                      <MenuItem key={v.id} value={v.id}>
+                        {v.placa} - {v.modelo}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl size="small" fullWidth>
+                  <InputLabel>Condutor</InputLabel>
+                  <Select
+                    label="Condutor"
+                    value={driver}
+                    onChange={e => setDriver(e.target.value)}
+                  >
+                    <MenuItem value="">Todos</MenuItem>
+                    {usuarios.map(u => (
+                      <MenuItem key={u.id} value={u.id}>
+                        {u.nome}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+            <Box display="flex" gap={2} mt={2}>
+              <Button variant="contained" color="primary" startIcon={<Search />} onClick={handleFiltrar}>
+                Filtrar
+              </Button>
+              <Button variant="outlined" onClick={() => {
+                setPeriod({ from: '', to: '' });
+                setVehicle('');
+                setDriver('');
+                setPage(0);
+              }}>
+                Limpar
+              </Button>
+            </Box>
+          </>
+        )}
       </Paper>
       {/* Tabela */}
       <Paper>
@@ -817,7 +854,7 @@ const ChecklistManagement: React.FC = () => {
           )}
         </DialogContent>
       </Dialog>
-    </Box>
+    </Container>
   );
 };
 

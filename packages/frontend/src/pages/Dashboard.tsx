@@ -134,91 +134,99 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, userName }) => {
             <Grid container spacing={3} sx={{ mb: 4 }}>
               {/* Card 1: Frota Ativa */}
               <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ height: '100%' }}>
+                <Card sx={{ backgroundColor: '#e3f2fd', borderLeft: '4px solid #1976d2', height: '100%' }}>
                   <CardContent>
-                    <Box display="flex" alignItems="center" mb={1}>
-                      <DirectionsCarIcon color="primary" sx={{ mr: 1 }} />
-                      <Typography variant="subtitle2" color="textSecondary">
-                        Frota Ativa
-                      </Typography>
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <Box>
+                        <Typography variant="body2" color="textSecondary">
+                          Frota Ativa
+                        </Typography>
+                        <Typography variant="h4" fontWeight="bold">
+                          {dashboardData?.kpis.frota.disponiveis || 0}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          de {dashboardData?.kpis.frota.total || 0} veículos
+                        </Typography>
+                        <Typography variant="caption" color="success.main" fontWeight="bold">
+                          {dashboardData?.kpis.frota.taxaDisponibilidade || 0}% disponível
+                        </Typography>
+                      </Box>
+                      <DirectionsCarIcon sx={{ fontSize: 40, color: '#1976d2' }} />
                     </Box>
-                    <Typography variant="h4" fontWeight="bold">
-                      {dashboardData?.kpis.frota.disponiveis || 0}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      de {dashboardData?.kpis.frota.total || 0} veículos
-                    </Typography>
-                    <Typography variant="caption" color="success.main" fontWeight="bold">
-                      {dashboardData?.kpis.frota.taxaDisponibilidade || 0}% disponível
-                    </Typography>
                   </CardContent>
                 </Card>
               </Grid>
 
               {/* Card 2: Checklists Hoje */}
               <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ height: '100%' }}>
+                <Card sx={{ backgroundColor: '#e8f5e9', borderLeft: '4px solid #4caf50', height: '100%' }}>
                   <CardContent>
-                    <Box display="flex" alignItems="center" mb={1}>
-                      <AssignmentTurnedInIcon color="primary" sx={{ mr: 1 }} />
-                      <Typography variant="subtitle2" color="textSecondary">
-                        Checklists Hoje
-                      </Typography>
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <Box>
+                        <Typography variant="body2" color="textSecondary">
+                          Checklists Hoje
+                        </Typography>
+                        <Typography variant="h4" fontWeight="bold">
+                          {dashboardData?.kpis.checklists.concluidos || 0}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          de {dashboardData?.kpis.checklists.total || 0} concluídos
+                        </Typography>
+                        <Typography variant="caption" color="primary.main" fontWeight="bold">
+                          {dashboardData?.kpis.checklists.taxaConclusao || 0}% taxa
+                        </Typography>
+                      </Box>
+                      <AssignmentTurnedInIcon sx={{ fontSize: 40, color: '#4caf50' }} />
                     </Box>
-                    <Typography variant="h4" fontWeight="bold">
-                      {dashboardData?.kpis.checklists.concluidos || 0}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      de {dashboardData?.kpis.checklists.total || 0} concluídos
-                    </Typography>
-                    <Typography variant="caption" color="primary.main" fontWeight="bold">
-                      {dashboardData?.kpis.checklists.taxaConclusao || 0}% taxa
-                    </Typography>
                   </CardContent>
                 </Card>
               </Grid>
 
               {/* Card 3: Manutenções */}
               <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ height: '100%' }}>
+                <Card sx={{ backgroundColor: '#fff3e0', borderLeft: '4px solid #ff9800', height: '100%' }}>
                   <CardContent>
-                    <Box display="flex" alignItems="center" mb={1}>
-                      <BuildIcon color="warning" sx={{ mr: 1 }} />
-                      <Typography variant="subtitle2" color="textSecondary">
-                        Manutenções
-                      </Typography>
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <Box>
+                        <Typography variant="body2" color="textSecondary">
+                          Manutenções
+                        </Typography>
+                        <Typography variant="h4" fontWeight="bold">
+                          {dashboardData?.kpis.manutencoes.ativas || 0}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          ativas
+                        </Typography>
+                        {(dashboardData?.kpis.manutencoes.atrasadas || 0) > 0 && (
+                          <Typography variant="caption" color="error.main" fontWeight="bold">
+                            {dashboardData?.kpis.manutencoes.atrasadas} atrasadas
+                          </Typography>
+                        )}
+                      </Box>
+                      <BuildIcon sx={{ fontSize: 40, color: '#ff9800' }} />
                     </Box>
-                    <Typography variant="h4" fontWeight="bold">
-                      {dashboardData?.kpis.manutencoes.ativas || 0}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      ativas
-                    </Typography>
-                    {(dashboardData?.kpis.manutencoes.atrasadas || 0) > 0 && (
-                      <Typography variant="caption" color="error.main" fontWeight="bold">
-                        {dashboardData?.kpis.manutencoes.atrasadas} atrasadas
-                      </Typography>
-                    )}
                   </CardContent>
                 </Card>
               </Grid>
 
               {/* Card 4: Custos Mês */}
               <Grid item xs={12} sm={6} md={3}>
-                <Card sx={{ height: '100%' }}>
+                <Card sx={{ backgroundColor: '#e1f5fe', borderLeft: '4px solid #2196f3', height: '100%' }}>
                   <CardContent>
-                    <Box display="flex" alignItems="center" mb={1}>
-                      <AttachMoneyIcon color="success" sx={{ mr: 1 }} />
-                      <Typography variant="subtitle2" color="textSecondary">
-                        Custos Mês
-                      </Typography>
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <Box>
+                        <Typography variant="body2" color="textSecondary">
+                          Custos Mês
+                        </Typography>
+                        <Typography variant="h4" fontWeight="bold">
+                          R$ {(dashboardData?.kpis.custos.mesAtual || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary">
+                          manutenções
+                        </Typography>
+                      </Box>
+                      <AttachMoneyIcon sx={{ fontSize: 40, color: '#2196f3' }} />
                     </Box>
-                    <Typography variant="h4" fontWeight="bold">
-                      R$ {(dashboardData?.kpis.custos.mesAtual || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                    </Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      manutenções
-                    </Typography>
                   </CardContent>
                 </Card>
               </Grid>

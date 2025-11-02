@@ -26,8 +26,11 @@ import {
   Alert,
   CircularProgress,
   Stack,
+  Grid,
+  Card,
+  CardContent,
 } from '@mui/material';
-import { Add, Edit, Delete, Visibility } from '@mui/icons-material';
+import { Add, Edit, Delete, Visibility, Build, Assignment, CheckCircle, Schedule, FilterList } from '@mui/icons-material';
 import HomeIcon from '@mui/icons-material/Home';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { SelectChangeEvent } from '@mui/material';
@@ -90,6 +93,7 @@ function Manutencoes() {
     dataInicio: '',
     dataFim: ''
   });
+  const [filtrosAbertos, setFiltrosAbertos] = useState(false);
   
   // Estados para modal e formulário
   const [openDialog, setOpenDialog] = useState(false);
@@ -320,62 +324,152 @@ function Manutencoes() {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Calcular métricas
+  const metricas = {
+    total: manutencoes.length,
+    agendadas: manutencoes.filter(m => m.status === 'Agendada').length,
+    emAndamento: manutencoes.filter(m => m.status === 'EmAndamento').length,
+    concluidas: manutencoes.filter(m => m.status === 'Concluida').length
+  };
+
   return (
-    <Container maxWidth="xl">
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-        <HomeIcon sx={{ mr: 1 }} />
-        <Typography variant="h4" component="h1">
+    <Container maxWidth="lg" style={{ marginTop: '2rem' }}>
+      {/* Título e Botão de Ação */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3} mt={4}>
+        <Typography variant="h4" fontWeight="bold">
+          <Build sx={{ mr: 1, verticalAlign: 'middle' }} />
           Gestão de Manutenções
         </Typography>
-      </Box>
-
-      {/* Filtros */}
-      <Paper sx={{ p: 2, mb: 3 }}>
-        <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
-          <FormControl sx={{ minWidth: 150 }}>
-            <InputLabel>Status</InputLabel>
-            <Select
-              value={filtros.status}
-              onChange={e => setFiltros({ ...filtros, status: e.target.value })}
-              label="Status"
-            >
-              <MenuItem value="">Todos</MenuItem>
-              <MenuItem value="Agendada">Agendada</MenuItem>
-              <MenuItem value="EmAndamento">Em Andamento</MenuItem>
-              <MenuItem value="Concluida">Concluída</MenuItem>
-              <MenuItem value="Cancelada">Cancelada</MenuItem>
-            </Select>
-          </FormControl>
-          
-          <FormControl sx={{ minWidth: 150 }}>
-            <InputLabel>Tipo</InputLabel>
-            <Select
-              value={filtros.tipo}
-              onChange={e => setFiltros({ ...filtros, tipo: e.target.value })}
-              label="Tipo"
-            >
-              <MenuItem value="">Todos</MenuItem>
-              <MenuItem value="Preventiva">Preventiva</MenuItem>
-              <MenuItem value="Corretiva">Corretiva</MenuItem>
-            </Select>
-          </FormControl>
-          
-          <Button variant="contained" onClick={carregarDados}>
-            Filtrar
-          </Button>
-        </Stack>
-      </Paper>
-
-      {/* Botão Nova Solicitação */}
-      <Box sx={{ mb: 3 }}>
         <Button
           variant="contained"
+          color="primary"
           startIcon={<Add />}
           onClick={() => handleOpenDialog()}
         >
           Nova Solicitação
         </Button>
       </Box>
+
+      {/* Cards de Métricas */}
+      <Grid container spacing={3} mb={3}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ backgroundColor: '#e3f2fd', borderLeft: '4px solid #1976d2' }}>
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="textSecondary">Total de Manutenções</Typography>
+                  <Typography variant="h4" fontWeight="bold">{metricas.total}</Typography>
+                </Box>
+                <Assignment sx={{ fontSize: 40, color: '#1976d2' }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ backgroundColor: '#fff3e0', borderLeft: '4px solid #ff9800' }}>
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="textSecondary">Agendadas</Typography>
+                  <Typography variant="h4" fontWeight="bold">{metricas.agendadas}</Typography>
+                </Box>
+                <Schedule sx={{ fontSize: 40, color: '#ff9800' }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ backgroundColor: '#e1f5fe', borderLeft: '4px solid #2196f3' }}>
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="textSecondary">Em Andamento</Typography>
+                  <Typography variant="h4" fontWeight="bold">{metricas.emAndamento}</Typography>
+                </Box>
+                <Build sx={{ fontSize: 40, color: '#2196f3' }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card sx={{ backgroundColor: '#e8f5e9', borderLeft: '4px solid #4caf50' }}>
+            <CardContent>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box>
+                  <Typography variant="body2" color="textSecondary">Concluídas</Typography>
+                  <Typography variant="h4" fontWeight="bold">{metricas.concluidas}</Typography>
+                </Box>
+                <CheckCircle sx={{ fontSize: 40, color: '#4caf50' }} />
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Filtros Expansíveis */}
+      <Paper sx={{ p: 2, mb: 3 }}>
+        <Box display="flex" alignItems="center" justifyContent="space-between" mb={filtrosAbertos ? 2 : 0}>
+          <Box display="flex" alignItems="center" gap={1}>
+            <FilterList />
+            <Typography variant="h6">Filtros</Typography>
+          </Box>
+          <Button size="small" onClick={() => setFiltrosAbertos(!filtrosAbertos)}>
+            {filtrosAbertos ? 'Ocultar' : 'Expandir'}
+          </Button>
+        </Box>
+        
+        {filtrosAbertos && (
+          <>
+            <Grid container spacing={2}>
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Status</InputLabel>
+                  <Select
+                    value={filtros.status}
+                    onChange={e => setFiltros({ ...filtros, status: e.target.value })}
+                    label="Status"
+                  >
+                    <MenuItem value="">Todos</MenuItem>
+                    <MenuItem value="Agendada">Agendada</MenuItem>
+                    <MenuItem value="EmAndamento">Em Andamento</MenuItem>
+                    <MenuItem value="Concluida">Concluída</MenuItem>
+                    <MenuItem value="Cancelada">Cancelada</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+              
+              <Grid item xs={12} sm={6} md={3}>
+                <FormControl fullWidth size="small">
+                  <InputLabel>Tipo</InputLabel>
+                  <Select
+                    value={filtros.tipo}
+                    onChange={e => setFiltros({ ...filtros, tipo: e.target.value })}
+                    label="Tipo"
+                  >
+                    <MenuItem value="">Todos</MenuItem>
+                    <MenuItem value="Preventiva">Preventiva</MenuItem>
+                    <MenuItem value="Corretiva">Corretiva</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
+            </Grid>
+            <Box display="flex" gap={2} mt={2}>
+              <Button variant="contained" color="primary" onClick={carregarDados}>
+                Filtrar
+              </Button>
+              <Button variant="outlined" onClick={() => setFiltros({
+                status: '',
+                tipo: '',
+                veiculoId: '',
+                dataInicio: '',
+                dataFim: ''
+              })}>
+                Limpar
+              </Button>
+            </Box>
+          </>
+        )}
+      </Paper>
 
       {/* Alert de erro */}
       {error && (
