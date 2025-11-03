@@ -348,31 +348,8 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, userName }) => {
                       </>
                     )}
 
-                    {/* Manutenções Atrasadas */}
-                    {dashboardData?.alertas.manutencoesAtrasadas && dashboardData.alertas.manutencoesAtrasadas.length > 0 ? (
-                      <>
-                        <Typography variant="subtitle2" color="warning.main" sx={{ mb: 1, mt: dashboardData?.alertas.cnhVencidas?.length > 0 ? 2 : 0 }}>
-                          Manutenções Atrasadas ({dashboardData.alertas.manutencoesAtrasadas.length})
-                        </Typography>
-                        <List dense>
-                          {dashboardData.alertas.manutencoesAtrasadas.map((alerta: any) => (
-                            <ListItem key={alerta.id}>
-                              <ListItemIcon>
-                                <BuildIcon color="warning" fontSize="small" />
-                              </ListItemIcon>
-                              <ListItemText
-                                primary={`${alerta.placa} - ${alerta.modelo}`}
-                                secondary={`${alerta.diasAtraso} dias atrasada`}
-                              />
-                            </ListItem>
-                          ))}
-                        </List>
-                      </>
-                    ) : null}
-
                     {/* Mensagem quando não há alertas */}
-                    {(!alertasCNH || alertasCNH.totalAlertas === 0) &&
-                     (!dashboardData?.alertas.manutencoesAtrasadas || dashboardData.alertas.manutencoesAtrasadas.length === 0) && (
+                    {(!alertasCNH || alertasCNH.totalAlertas === 0) && (
                       <Typography variant="body2" color="textSecondary">
                         Nenhum alerta crítico no momento
                       </Typography>
@@ -403,7 +380,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, userName }) => {
                               </ListItemIcon>
                               <ListItemText
                                 primary={alerta.motorista}
-                                secondary={`${alerta.veiculo} - ${alerta.horasAtraso}h atraso`}
                               />
                             </ListItem>
                           ))}

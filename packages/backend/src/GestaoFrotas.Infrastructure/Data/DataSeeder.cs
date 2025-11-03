@@ -7,7 +7,8 @@ namespace GestaoFrotas.Infrastructure.Data;
 
 /// <summary>
 /// DataSeeder refatorado com exemplos estratégicos que demonstram todas as funcionalidades do sistema
-/// Total: 8 usuários, 6 veículos, 12 checklists, 8 manutenções
+/// Total: 4 usuários, 6 veículos, 9 checklists, 8 manutenções
+/// Foco: Testar funcionalidade "Ações Pendentes" com 2 condutores (1 sem checklist hoje)
 /// </summary>
 public static class DataSeeder
 {
@@ -27,7 +28,7 @@ public static class DataSeeder
         var hoje = DateTime.UtcNow;
 
         // ============================================
-        // USUÁRIOS (8 totais)
+        // USUÁRIOS (4 totais)
         // ============================================
         
         var usuarios = new List<Usuario>
@@ -47,7 +48,7 @@ public static class DataSeeder
             },
 
             // ----------------------------------------
-            // 2. GESTORES (2)
+            // 2. GESTOR (1)
             // ----------------------------------------
             new Usuario
             {
@@ -59,22 +60,12 @@ public static class DataSeeder
                 Telefone = "(11) 97654-3210",
                 Ativo = true
             },
-            new Usuario
-            {
-                Email = "gestor2@translog.com",
-                SenhaHash = BCrypt.Net.BCrypt.HashPassword("gestor123"),
-                Nome = "João Carlos Oliveira",
-                Papel = PapelUsuario.Gestor,
-                Cpf = "45678912345",
-                Telefone = "(11) 96543-2109",
-                Ativo = true
-            },
 
             // ----------------------------------------
-            // 3. CONDUTORES (5) - Demonstrar Alertas CNH
+            // 3. CONDUTORES (2) - Demonstrar Alertas CNH e Ações Pendentes
             // ----------------------------------------
             
-            // CNH VENCIDA - Alerta Crítico Vermelho
+            // CNH VENCIDA - Alerta Crítico Vermelho - SEM CHECKLIST HOJE (Ações Pendentes)
             new Usuario
             {
                 Email = "carlos.silva@translog.com",
@@ -91,7 +82,7 @@ public static class DataSeeder
                 Ativo = true
             },
 
-            // CNH VENCENDO EM 5 DIAS - Alerta Laranja Urgente
+            // CNH VENCENDO EM 5 DIAS - Alerta Laranja Urgente - COM CHECKLIST HOJE
             new Usuario
             {
                 Email = "ana.costa@translog.com",
@@ -104,57 +95,6 @@ public static class DataSeeder
                 CnhCategoria = CategoriaCNH.C,
                 CnhValidade = hoje.AddDays(5), // Vence em 5 dias
                 Matricula = "COND002",
-                TurnoTrabalho = Turno.Tarde,
-                Ativo = true
-            },
-
-            // CNH VENCENDO EM 12 DIAS - Alerta Amarelo
-            new Usuario
-            {
-                Email = "pedro.almeida@translog.com",
-                SenhaHash = BCrypt.Net.BCrypt.HashPassword("condutor123"),
-                Nome = "Pedro Almeida",
-                Papel = PapelUsuario.Condutor,
-                Cpf = "33344455566",
-                Telefone = "(11) 93333-3333",
-                CnhNumero = "33344455566",
-                CnhCategoria = CategoriaCNH.D,
-                CnhValidade = hoje.AddDays(12), // Vence em 12 dias
-                Matricula = "COND003",
-                TurnoTrabalho = Turno.Noite,
-                Ativo = true
-            },
-
-            // CNH VENCENDO EM 25 DIAS - Alerta Azul
-            new Usuario
-            {
-                Email = "julia.santos@translog.com",
-                SenhaHash = BCrypt.Net.BCrypt.HashPassword("condutor123"),
-                Nome = "Júlia Santos",
-                Papel = PapelUsuario.Condutor,
-                Cpf = "44455566677",
-                Telefone = "(11) 94444-4444",
-                CnhNumero = "44455566677",
-                CnhCategoria = CategoriaCNH.E,
-                CnhValidade = hoje.AddDays(25), // Vence em 25 dias
-                Matricula = "COND004",
-                TurnoTrabalho = Turno.Manha,
-                Ativo = true
-            },
-
-            // CNH VÁLIDA POR 6 MESES - Sem Alerta
-            new Usuario
-            {
-                Email = "ricardo.lima@translog.com",
-                SenhaHash = BCrypt.Net.BCrypt.HashPassword("condutor123"),
-                Nome = "Ricardo Lima",
-                Papel = PapelUsuario.Condutor,
-                Cpf = "55566677788",
-                Telefone = "(11) 95555-5555",
-                CnhNumero = "55566677788",
-                CnhCategoria = CategoriaCNH.C,
-                CnhValidade = hoje.AddDays(180), // Válida por 6 meses
-                Matricula = "COND005",
                 TurnoTrabalho = Turno.Tarde,
                 Ativo = true
             }
@@ -282,39 +222,23 @@ public static class DataSeeder
         var hoje = DateTime.UtcNow.Date;
 
         // ============================================
-        // CHECKLISTS (10 totais - 2 de hoje + 8 histórico)
-        // Demonstra: 3 condutores sem checklist hoje (Carlos, Ana, Pedro)
+        // CHECKLISTS (9 totais - 1 de hoje + 8 histórico)
+        // Demonstra: 1 condutor sem checklist hoje (Carlos Silva - Ações Pendentes)
         // ============================================
 
         var checklists = new List<Checklist>();
 
         // ----------------------------------------
-        // CHECKLISTS DE HOJE (2 de 5 condutores - demonstra 3 pendentes)
+        // CHECKLISTS DE HOJE (1 de 2 condutores - demonstra 1 pendente)
         // ----------------------------------------
-        // Apenas Ricardo e Júlia enviaram checklist hoje
-        // Carlos, Ana e Pedro NÃO enviaram (aparecem em "Ações Pendentes")
+        // Apenas Ana Costa enviou checklist hoje
+        // Carlos Silva NÃO enviou (aparece em "Ações Pendentes")
 
-        // 1. Checklist SEM AVARIAS - Tudo OK
-        checklists.Add(new Checklist
-        {
-            VeiculoId = veiculos[0].Id, // ABC-1234
-            MotoristaId = usuarios[4].Id, // Ricardo (CNH válida)
-            Data = hoje.AddHours(7),
-            PlacaVeiculo = veiculos[0].Placa,
-            KmVeiculo = 75120,
-            Pneus = true,
-            Luzes = true,
-            Freios = true,
-            Limpeza = true,
-            Observacoes = "Veículo em perfeito estado. Tudo verificado e aprovado.",
-            Enviado = true
-        });
-
-        // 2. Checklist COM MÚLTIPLAS AVARIAS - Pneus + Luzes + Freios
+        // 1. Checklist COM MÚLTIPLAS AVARIAS - Pneus + Luzes + Freios (Ana Costa)
         checklists.Add(new Checklist
         {
             VeiculoId = veiculos[2].Id, // GHI-9012
-            MotoristaId = usuarios[3].Id, // Júlia (CNH vence em 25 dias)
+            MotoristaId = usuarios[1].Id, // Ana Costa (CNH vence em 5 dias)
             Data = hoje.AddHours(6),
             PlacaVeiculo = veiculos[2].Placa,
             KmVeiculo = 28230,
@@ -331,13 +255,14 @@ public static class DataSeeder
 
         // ----------------------------------------
         // CHECKLISTS DOS ÚLTIMOS 7 DIAS (8)
+        // Distribuídos entre Carlos Silva e Ana Costa
         // ----------------------------------------
 
-        // Dia -1
+        // Dia -1 (2 checklists)
         checklists.Add(new Checklist
         {
             VeiculoId = veiculos[0].Id,
-            MotoristaId = usuarios[4].Id,
+            MotoristaId = usuarios[1].Id, // Ana Costa
             Data = hoje.AddDays(-1).AddHours(7),
             PlacaVeiculo = veiculos[0].Placa,
             KmVeiculo = 75050,
@@ -351,8 +276,8 @@ public static class DataSeeder
 
         checklists.Add(new Checklist
         {
-            VeiculoId = veiculos[5].Id, // Carro PQR-2468
-            MotoristaId = usuarios[0].Id, // Carlos (CNH vencida)
+            VeiculoId = veiculos[5].Id, // Motocicleta PQR-2468
+            MotoristaId = usuarios[0].Id, // Carlos Silva
             Data = hoje.AddDays(-1).AddHours(14),
             PlacaVeiculo = veiculos[5].Placa,
             KmVeiculo = 35120,
@@ -367,7 +292,7 @@ public static class DataSeeder
         checklists.Add(new Checklist
         {
             VeiculoId = veiculos[2].Id,
-            MotoristaId = usuarios[3].Id,
+            MotoristaId = usuarios[1].Id, // Ana Costa
             Data = hoje.AddDays(-2).AddHours(8),
             PlacaVeiculo = veiculos[2].Placa,
             KmVeiculo = 28080,
@@ -382,7 +307,7 @@ public static class DataSeeder
         checklists.Add(new Checklist
         {
             VeiculoId = veiculos[4].Id,
-            MotoristaId = usuarios[1].Id,
+            MotoristaId = usuarios[0].Id, // Carlos Silva
             Data = hoje.AddDays(-3).AddHours(7),
             PlacaVeiculo = veiculos[4].Placa,
             KmVeiculo = 42020,
@@ -399,7 +324,7 @@ public static class DataSeeder
         checklists.Add(new Checklist
         {
             VeiculoId = veiculos[0].Id,
-            MotoristaId = usuarios[2].Id,
+            MotoristaId = usuarios[1].Id, // Ana Costa
             Data = hoje.AddDays(-4).AddHours(9),
             PlacaVeiculo = veiculos[0].Placa,
             KmVeiculo = 74980,
@@ -414,7 +339,7 @@ public static class DataSeeder
         checklists.Add(new Checklist
         {
             VeiculoId = veiculos[5].Id,
-            MotoristaId = usuarios[4].Id,
+            MotoristaId = usuarios[0].Id, // Carlos Silva
             Data = hoje.AddDays(-5).AddHours(13),
             PlacaVeiculo = veiculos[5].Placa,
             KmVeiculo = 35050,
@@ -429,7 +354,7 @@ public static class DataSeeder
         checklists.Add(new Checklist
         {
             VeiculoId = veiculos[2].Id,
-            MotoristaId = usuarios[1].Id,
+            MotoristaId = usuarios[1].Id, // Ana Costa
             Data = hoje.AddDays(-6).AddHours(7),
             PlacaVeiculo = veiculos[2].Placa,
             KmVeiculo = 28015,
@@ -444,7 +369,7 @@ public static class DataSeeder
         checklists.Add(new Checklist
         {
             VeiculoId = veiculos[4].Id,
-            MotoristaId = usuarios[3].Id,
+            MotoristaId = usuarios[0].Id, // Carlos Silva
             Data = hoje.AddDays(-7).AddHours(8),
             PlacaVeiculo = veiculos[4].Placa,
             KmVeiculo = 41955,

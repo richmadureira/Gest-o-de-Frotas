@@ -42,6 +42,11 @@ public class Usuario : EntidadeBase
     /// </summary>
     public bool Ativo { get; set; } = true;
 
+    /// <summary>
+    /// Indica se é o primeiro login do usuário (precisa trocar senha)
+    /// </summary>
+    public bool PrimeiroLogin { get; set; } = true;
+
     // Campos específicos para condutores
     /// <summary>
     /// Número da CNH do condutor
