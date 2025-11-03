@@ -50,11 +50,6 @@ public class ChecklistConfiguration : IEntityTypeConfiguration<Checklist>
             .IsRequired()
             .HasDefaultValue(false);
 
-        // Conversões de enum para string
-        builder.Property(c => c.Status)
-            .HasConversion<string>()
-            .HasMaxLength(20);
-
         // Valores padrão
         builder.Property(c => c.Data)
             .HasDefaultValueSql("GETUTCDATE()");
@@ -74,6 +69,5 @@ public class ChecklistConfiguration : IEntityTypeConfiguration<Checklist>
         builder.HasIndex(c => c.VeiculoId);
         builder.HasIndex(c => c.MotoristaId);
         builder.HasIndex(c => c.Data);
-        builder.HasIndex(c => c.Status);
     }
 }

@@ -11,16 +11,6 @@ public enum TipoVeiculo
     Carro = 1,
 
     /// <summary>
-    /// Caminhão
-    /// </summary>
-    Caminhao = 2,
-
-    /// <summary>
-    /// Van/Utilitário
-    /// </summary>
-    Van = 3,
-
-    /// <summary>
     /// Motocicleta
     /// </summary>
     Motocicleta = 4

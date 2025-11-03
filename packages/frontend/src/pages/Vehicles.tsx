@@ -243,8 +243,12 @@ function GerenciamentoVeiculos() {
       setConfirmDialogOpen(false);
       setVeiculoToDelete(null);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Erro ao remover veículo');
+      const errorMessage = err.response?.data?.message || 'Erro ao remover veículo';
+      setError(errorMessage);
+      setSnackbarMessage(errorMessage);
+      setOpenSnackbar(true);
       console.error('Erro ao remover veículo:', err);
+      // Não fecha o dialog para que o usuário veja o erro
     } finally {
       setLoading(false);
     }
@@ -389,8 +393,6 @@ function GerenciamentoVeiculos() {
                   >
                     <MenuItem value="">Todos</MenuItem>
                     <MenuItem value="Carro">Carro</MenuItem>
-                    <MenuItem value="Caminhao">Caminhão</MenuItem>
-                    <MenuItem value="Van">Van/Utilitário</MenuItem>
                     <MenuItem value="Motocicleta">Motocicleta</MenuItem>
                   </Select>
                 </FormControl>
@@ -586,9 +588,20 @@ function GerenciamentoVeiculos() {
                 error={!!errors.tipo}
               >
                 <MenuItem value="Carro">Carro</MenuItem>
-                <MenuItem value="Caminhao">Caminhão</MenuItem>
-                <MenuItem value="Van">Van/Utilitário</MenuItem>
                 <MenuItem value="Motocicleta">Motocicleta</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl fullWidth margin="normal" required>
+              <InputLabel id="status-label">Status *</InputLabel>
+              <Select
+                labelId="status-label"
+                value={formData.status}
+                label="Status *"
+                onChange={e => setFormData({ ...formData, status: e.target.value })}
+              >
+                <MenuItem value="Disponivel">Disponível</MenuItem>
+                <MenuItem value="EmManutencao">Em Manutenção</MenuItem>
+                <MenuItem value="Inativo">Inativo</MenuItem>
               </Select>
             </FormControl>
             <TextField
@@ -650,13 +663,17 @@ function GerenciamentoVeiculos() {
       {/* Snackbar */}
       <Snackbar
         open={openSnackbar}
-        autoHideDuration={4000}
+        autoHideDuration={6000}
         onClose={() => setOpenSnackbar(false)}
         anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       >
-        <Box>
-          <Typography>{snackbarMessage}</Typography>
-        </Box>
+        <Alert 
+          onClose={() => setOpenSnackbar(false)} 
+          severity={error ? "error" : "success"}
+          sx={{ width: '100%' }}
+        >
+          {snackbarMessage}
+        </Alert>
       </Snackbar>
     </Container>
   );

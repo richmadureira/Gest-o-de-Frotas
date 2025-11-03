@@ -38,10 +38,9 @@ public class DashboardController : ControllerBase
                 .Where(c => c.Data >= hoje && c.Data < hoje.AddDays(1))
                 .ToListAsync();
             
-            var checklistsPendentes = checklistsHoje.Count(c => c.Status == StatusChecklist.Pendente);
-            var checklistsConcluidos = checklistsHoje.Count(c => c.Status == StatusChecklist.Aprovado);
             var totalChecklistsHoje = checklistsHoje.Count;
-            var taxaConclusao = totalChecklistsHoje > 0 ? (checklistsConcluidos * 100) / totalChecklistsHoje : 0;
+            var checklistsEnviados = checklistsHoje.Count(c => c.Enviado);
+            var taxaConclusao = totalChecklistsHoje > 0 ? (checklistsEnviados * 100) / totalChecklistsHoje : 0;
 
             // KPI 3: Manutenções (baseado em StatusSAP)
             var manutencoesAtivas = await _context.Manutencoes
@@ -90,26 +89,27 @@ public class DashboardController : ControllerBase
                 .Take(5)
                 .ToListAsync();
 
-            // Alertas: Checklists Pendentes (atrasados > 2h)
-            var duasHorasAtras = DateTime.UtcNow.AddHours(-2);
-            var checklistsPendentesLista = await _context.Checklists
-                .Include(c => c.Veiculo)
-                .Include(c => c.Motorista)
-                .Where(c => c.Status == StatusChecklist.Pendente && 
-                           c.Data < duasHorasAtras)
+            // Alertas: Checklists Pendentes (condutores que não enviaram checklist hoje)
+            var condutoresAtivos = await _context.Usuarios
+                .Where(u => u.Papel == PapelUsuario.Condutor && u.Ativo)
+                .Select(u => new { u.Id, u.Nome })
                 .ToListAsync();
-            
-            var checklistsPendentesAtrasados = checklistsPendentesLista
+
+            var condutoresComChecklist = await _context.Checklists
+                .Where(c => c.Data >= hoje && c.Data < hoje.AddDays(1) && c.Enviado)
+                .Select(c => c.MotoristaId)
+                .Distinct()
+                .ToListAsync();
+
+            var checklistsPendentes = condutoresAtivos
+                .Where(c => !condutoresComChecklist.Contains(c.Id))
                 .Select(c => new
                 {
                     id = c.Id,
-                    motorista = c.Motorista.Nome,
-                    veiculo = c.Veiculo.Placa + " - " + c.Veiculo.Modelo,
-                    data = c.Data,
-                    horasAtraso = Math.Round((DateTime.UtcNow - c.Data).TotalHours, 1)
+                    motorista = c.Nome,
+                    veiculo = "Aguardando checklist",
+                    horasAtraso = DateTime.UtcNow.Hour // Horas desde meia-noite
                 })
-                .OrderByDescending(c => c.horasAtraso)
-                .Take(5)
                 .ToList();
 
             // Tendências: Checklists últimos 7 dias
@@ -119,9 +119,8 @@ public class DashboardController : ControllerBase
                 .Select(g => new
                 {
                     data = g.Key,
-                    aprovados = g.Count(c => c.Status == StatusChecklist.Aprovado),
-                    rejeitados = g.Count(c => c.Status == StatusChecklist.Rejeitado),
-                    pendentes = g.Count(c => c.Status == StatusChecklist.Pendente)
+                    total = g.Count(),
+                    enviados = g.Count(c => c.Enviado)
                 })
                 .OrderBy(g => g.data)
                 .ToListAsync();
@@ -137,10 +136,8 @@ public class DashboardController : ControllerBase
                 {
                     dia = dia.ToString("dd/MM"),
                     diaSemana = dia.ToString("ddd"),
-                    aprovados = dados?.aprovados ?? 0,
-                    rejeitados = dados?.rejeitados ?? 0,
-                    pendentes = dados?.pendentes ?? 0,
-                    total = (dados?.aprovados ?? 0) + (dados?.rejeitados ?? 0) + (dados?.pendentes ?? 0)
+                    total = dados?.total ?? 0,
+                    enviados = dados?.enviados ?? 0
                 });
             }
 
@@ -158,9 +155,8 @@ public class DashboardController : ControllerBase
                     },
                     checklists = new
                     {
-                        pendentes = checklistsPendentes,
-                        concluidos = checklistsConcluidos,
                         total = totalChecklistsHoje,
+                        enviados = checklistsEnviados,
                         taxaConclusao
                     },
                     manutencoes = new
@@ -177,7 +173,7 @@ public class DashboardController : ControllerBase
                 {
                     cnhVencidas = condutoresCnhVencida,
                     manutencoesAtrasadas = veiculosManutencaoAtrasada,
-                    checklistsPendentes = checklistsPendentesAtrasados
+                    checklistsPendentes = checklistsPendentes
                 },
                 tendencias = new
                 {

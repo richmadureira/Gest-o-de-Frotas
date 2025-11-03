@@ -3,7 +3,7 @@ import {
   Box, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TableSortLabel, TablePagination,
   TextField, Select, MenuItem, Button, InputLabel, FormControl, IconButton, Dialog, DialogTitle, DialogContent, Tooltip, Stack, Divider, Alert, CircularProgress, Grid, Card, CardContent, Container
 } from '@mui/material';
-import { CheckCircle, Warning, CameraAlt, Search, Close, Error, AssignmentTurnedIn, FilterList } from '@mui/icons-material';
+import { Warning, CameraAlt, Search, Close, AssignmentTurnedIn, FilterList, CheckCircle } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/AuthContext';
 import { getChecklists, getVeiculos, getUsuarios } from '../services/api';
@@ -41,7 +41,6 @@ interface ChecklistItem {
   motoristaId: string;
   placaVeiculo: string;
   kmVeiculo: number;
-  status: string;
   pneus: boolean;
   luzes: boolean;
   freios: boolean;
@@ -101,6 +100,7 @@ const ChecklistManagement: React.FC = () => {
   const [period, setPeriod] = useState({ from: '', to: '' });
   const [vehicle, setVehicle] = useState('');
   const [driver, setDriver] = useState('');
+  const [apenasComAvarias, setApenasComAvarias] = useState(false);
   const [filtrosAbertos, setFiltrosAbertos] = useState(false);
   
   // Tabela
@@ -195,6 +195,12 @@ const ChecklistManagement: React.FC = () => {
 
   // Filtros e ordenação
   let filteredRows = checklists;
+  
+  // Aplicar filtro de "apenas com avarias"
+  if (apenasComAvarias) {
+    filteredRows = filteredRows.filter(c => !c.pneus || !c.luzes || !c.freios || !c.limpeza);
+  }
+  
   filteredRows = filteredRows.sort((a, b) => {
     if (orderBy === 'data') {
       return order === 'asc' ? new Date(a.data).getTime() - new Date(b.data).getTime() : new Date(b.data).getTime() - new Date(a.data).getTime();
@@ -239,17 +245,7 @@ const ChecklistManagement: React.FC = () => {
   // Calcular métricas
   const metricas = {
     total: checklists.length,
-    aprovadosHoje: checklists.filter(c => {
-      const hoje = new Date().toISOString().split('T')[0];
-      const dataCh = new Date(c.data).toISOString().split('T')[0];
-      return dataCh === hoje && c.status === 'Aprovado';
-    }).length,
-    pendentes: checklists.filter(c => c.status === 'Pendente').length,
-    rejeitadosUltimos7Dias: checklists.filter(c => {
-      const seteDiasAtras = new Date();
-      seteDiasAtras.setDate(seteDiasAtras.getDate() - 7);
-      return new Date(c.data) >= seteDiasAtras && c.status === 'Rejeitado';
-    }).length
+    comAvarias: checklists.filter(c => !c.pneus || !c.luzes || !c.freios || !c.limpeza).length
   };
 
   return (
@@ -277,7 +273,7 @@ const ChecklistManagement: React.FC = () => {
       {/* Cards de Métricas */}
       {!loading && (
         <Grid container spacing={3} mb={3}>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={6}>
             <Card sx={{ backgroundColor: '#e3f2fd', borderLeft: '4px solid #1976d2' }}>
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
@@ -290,41 +286,15 @@ const ChecklistManagement: React.FC = () => {
               </CardContent>
             </Card>
           </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ backgroundColor: '#e8f5e9', borderLeft: '4px solid #4caf50' }}>
-              <CardContent>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Box>
-                    <Typography variant="body2" color="textSecondary">Aprovados Hoje</Typography>
-                    <Typography variant="h4" fontWeight="bold">{metricas.aprovadosHoje}</Typography>
-                  </Box>
-                  <CheckCircle sx={{ fontSize: 40, color: '#4caf50' }} />
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
-            <Card sx={{ backgroundColor: '#fff3e0', borderLeft: '4px solid #ff9800' }}>
-              <CardContent>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                  <Box>
-                    <Typography variant="body2" color="textSecondary">Pendentes</Typography>
-                    <Typography variant="h4" fontWeight="bold">{metricas.pendentes}</Typography>
-                  </Box>
-                  <Warning sx={{ fontSize: 40, color: '#ff9800' }} />
-                </Box>
-              </CardContent>
-            </Card>
-          </Grid>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid item xs={12} sm={6} md={6}>
             <Card sx={{ backgroundColor: '#ffebee', borderLeft: '4px solid #f44336' }}>
               <CardContent>
                 <Box display="flex" justifyContent="space-between" alignItems="center">
                   <Box>
-                    <Typography variant="body2" color="textSecondary">Rejeitados (7 dias)</Typography>
-                    <Typography variant="h4" fontWeight="bold">{metricas.rejeitadosUltimos7Dias}</Typography>
+                    <Typography variant="body2" color="textSecondary">Checklists com Avarias</Typography>
+                    <Typography variant="h4" fontWeight="bold">{metricas.comAvarias}</Typography>
                   </Box>
-                  <Error sx={{ fontSize: 40, color: '#f44336' }} />
+                  <Warning sx={{ fontSize: 40, color: '#f44336' }} />
                 </Box>
               </CardContent>
             </Card>
@@ -347,7 +317,7 @@ const ChecklistManagement: React.FC = () => {
         {filtrosAbertos && (
           <>
             <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={2.4}>
                 <TextField
                   label="De"
                   type="date"
@@ -358,7 +328,7 @@ const ChecklistManagement: React.FC = () => {
                   onChange={e => setPeriod({ ...period, from: e.target.value })}
                 />
               </Grid>
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={2.4}>
                 <TextField
                   label="Até"
                   type="date"
@@ -369,7 +339,7 @@ const ChecklistManagement: React.FC = () => {
                   onChange={e => setPeriod({ ...period, to: e.target.value })}
                 />
               </Grid>
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={2.4}>
                 <FormControl size="small" fullWidth>
                   <InputLabel>Veículo</InputLabel>
                   <Select
@@ -386,7 +356,7 @@ const ChecklistManagement: React.FC = () => {
                   </Select>
                 </FormControl>
               </Grid>
-              <Grid item xs={12} sm={6} md={3}>
+              <Grid item xs={12} sm={6} md={2.4}>
                 <FormControl size="small" fullWidth>
                   <InputLabel>Condutor</InputLabel>
                   <Select
@@ -403,6 +373,19 @@ const ChecklistManagement: React.FC = () => {
                   </Select>
                 </FormControl>
               </Grid>
+              <Grid item xs={12} sm={6} md={2.4}>
+                <FormControl size="small" fullWidth>
+                  <InputLabel>Avarias</InputLabel>
+                  <Select
+                    label="Avarias"
+                    value={apenasComAvarias ? 'sim' : 'todos'}
+                    onChange={e => setApenasComAvarias(e.target.value === 'sim')}
+                  >
+                    <MenuItem value="todos">Todos</MenuItem>
+                    <MenuItem value="sim">Apenas com Avarias</MenuItem>
+                  </Select>
+                </FormControl>
+              </Grid>
             </Grid>
             <Box display="flex" gap={2} mt={2}>
               <Button variant="contained" color="primary" startIcon={<Search />} onClick={handleFiltrar}>
@@ -412,6 +395,7 @@ const ChecklistManagement: React.FC = () => {
                 setPeriod({ from: '', to: '' });
                 setVehicle('');
                 setDriver('');
+                setApenasComAvarias(false);
                 setPage(0);
               }}>
                 Limpar

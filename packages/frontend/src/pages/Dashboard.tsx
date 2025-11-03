@@ -427,31 +427,6 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, userName }) => {
                 </Card>
               </Grid>
             </Grid>
-
-            {/* Seção Inferior - Gráfico de Tendências */}
-            <Grid container spacing={3}>
-              <Grid item xs={12}>
-                <Card>
-                  <CardContent>
-                    <Typography variant="h6" sx={{ mb: 3 }}>
-                      Tendência de Checklists (Últimos 7 Dias)
-                    </Typography>
-                    <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={dashboardData?.tendencias.checklistsSemana || []}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey="dia" />
-                        <YAxis />
-                        <RechartsTooltip />
-                        <Legend />
-                        <Bar dataKey="aprovados" fill="#4caf50" name="Aprovados" stackId="a" />
-                        <Bar dataKey="rejeitados" fill="#f44336" name="Rejeitados" stackId="a" />
-                        <Bar dataKey="pendentes" fill="#ff9800" name="Pendentes" stackId="a" />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
           </Box>
         )}
       </Box>

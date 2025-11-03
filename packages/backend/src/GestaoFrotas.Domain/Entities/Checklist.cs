@@ -22,11 +22,6 @@ public class Checklist : EntidadeBase
     /// </summary>
     public DateTime Data { get; set; } = DateTime.UtcNow;
 
-    /// <summary>
-    /// Status de aprovação do checklist
-    /// </summary>
-    public StatusChecklist Status { get; set; } = StatusChecklist.Pendente;
-
     // Dados do veículo no momento do checklist
     
     /// <summary>

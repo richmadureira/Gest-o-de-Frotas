@@ -22,7 +22,6 @@ import {
   IconButton,
   Tooltip,
   TablePagination,
-  Divider,
 } from '@mui/material';
 import {
   ArrowBack,
@@ -34,7 +33,6 @@ import {
   Cancel,
   HourglassEmpty,
 } from '@mui/icons-material';
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, Legend } from 'recharts';
 import { getVeiculoHistorico } from '../services/api';
 import { format } from 'date-fns';
 
@@ -268,125 +266,12 @@ const VehicleHistory: React.FC = () => {
       {/* Tabs */}
       <Paper sx={{ mb: 3 }}>
         <Tabs value={tabValue} onChange={handleTabChange} indicatorColor="primary" textColor="primary">
-          <Tab label="Visão Geral" icon={<BarChartIcon />} iconPosition="start" />
           <Tab label={`Checklists (${checklists.length})`} icon={<Assignment />} iconPosition="start" />
           <Tab label={`Manutenções (${manutencoes.length})`} icon={<Build />} iconPosition="start" />
         </Tabs>
 
-        {/* Tab 1: Visão Geral com gráficos */}
+        {/* Tab 1: Checklists */}
         <TabPanel value={tabValue} index={0}>
-          <Grid container spacing={3}>
-            {/* Gráfico: Evolução de Quilometragem */}
-            {graficos.evolucaoKm && graficos.evolucaoKm.length > 0 && (
-              <Grid item xs={12} md={6}>
-                <Paper sx={{ p: 2 }}>
-                  <Typography variant="h6" gutterBottom>Evolução de Quilometragem</Typography>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <LineChart data={graficos.evolucaoKm}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="data" />
-                      <YAxis />
-                      <RechartsTooltip />
-                      <Legend />
-                      <Line type="monotone" dataKey="km" stroke="#2196f3" name="Quilometragem (km)" strokeWidth={2} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </Paper>
-              </Grid>
-            )}
-
-            {/* Gráfico: Custos por Tipo de Manutenção */}
-            {graficos.custosPorTipo && graficos.custosPorTipo.length > 0 && (
-              <Grid item xs={12} md={6}>
-                <Paper sx={{ p: 2 }}>
-                  <Typography variant="h6" gutterBottom>Custos por Tipo de Manutenção</Typography>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <PieChart>
-                      <Pie
-                        data={graficos.custosPorTipo}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        label={(entry) => `${entry.tipo}: R$ ${entry.total.toFixed(2)}`}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="total"
-                      >
-                        {graficos.custosPorTipo.map((entry: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <RechartsTooltip />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </Paper>
-              </Grid>
-            )}
-
-            {/* Gráfico: Custos Mensais */}
-            {graficos.custosMensais && graficos.custosMensais.length > 0 && (
-              <Grid item xs={12}>
-                <Paper sx={{ p: 2 }}>
-                  <Typography variant="h6" gutterBottom>Custos Mensais de Manutenção</Typography>
-                  <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={graficos.custosMensais}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="mes" />
-                      <YAxis />
-                      <RechartsTooltip />
-                      <Legend />
-                      <Bar dataKey="total" fill="#4caf50" name="Custo Total (R$)" />
-                      <Bar dataKey="quantidade" fill="#2196f3" name="Quantidade" />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </Paper>
-              </Grid>
-            )}
-
-            {/* Estatísticas detalhadas */}
-            <Grid item xs={12}>
-              <Paper sx={{ p: 2 }}>
-                <Typography variant="h6" gutterBottom>Estatísticas Detalhadas</Typography>
-                <Divider sx={{ mb: 2 }} />
-                <Grid container spacing={2}>
-                  <Grid item xs={12} md={6}>
-                    <Typography variant="subtitle1" fontWeight="bold" gutterBottom>Checklists</Typography>
-                    <Box display="flex" justifyContent="space-between" mb={1}>
-                      <Typography variant="body2">Aprovados:</Typography>
-                      <Chip label={estatisticas.checklistsAprovados} color="success" size="small" />
-                    </Box>
-                    <Box display="flex" justifyContent="space-between" mb={1}>
-                      <Typography variant="body2">Rejeitados:</Typography>
-                      <Chip label={estatisticas.checklistsRejeitados} color="error" size="small" />
-                    </Box>
-                    <Box display="flex" justifyContent="space-between">
-                      <Typography variant="body2">Pendentes:</Typography>
-                      <Chip label={estatisticas.checklistsPendentes} color="warning" size="small" />
-                    </Box>
-                  </Grid>
-                  <Grid item xs={12} md={6}>
-                    <Typography variant="subtitle1" fontWeight="bold" gutterBottom>Manutenções</Typography>
-                    <Box display="flex" justifyContent="space-between" mb={1}>
-                      <Typography variant="body2">Solicitadas:</Typography>
-                      <Chip label={estatisticas.manutencoesSolicitadas || 0} size="small" />
-                    </Box>
-                    <Box display="flex" justifyContent="space-between" mb={1}>
-                      <Typography variant="body2">Em Execução:</Typography>
-                      <Chip label={estatisticas.manutencoesEmExecucao || 0} color="warning" size="small" />
-                    </Box>
-                    <Box display="flex" justifyContent="space-between">
-                      <Typography variant="body2">Finalizadas:</Typography>
-                      <Chip label={estatisticas.manutencoesFinalizadas || 0} color="success" size="small" />
-                    </Box>
-                  </Grid>
-                </Grid>
-              </Paper>
-            </Grid>
-          </Grid>
-        </TabPanel>
-
-        {/* Tab 2: Checklists */}
-        <TabPanel value={tabValue} index={1}>
           <TableContainer>
             <Table>
               <TableHead>
@@ -446,8 +331,8 @@ const VehicleHistory: React.FC = () => {
           />
         </TabPanel>
 
-        {/* Tab 3: Manutenções */}
-        <TabPanel value={tabValue} index={2}>
+        {/* Tab 2: Manutenções */}
+        <TabPanel value={tabValue} index={1}>
           <TableContainer>
             <Table>
               <TableHead>

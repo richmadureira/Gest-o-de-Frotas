@@ -196,12 +196,12 @@ public class VeiculosController : ControllerBase
                 c.KmVeiculo,
                 MotoristaId = c.MotoristaId,
                 MotoristaNome = c.Motorista != null ? c.Motorista.Nome : "N/A",
-                c.Status,
                 c.Pneus,
                 c.Luzes,
                 c.Freios,
                 c.Limpeza,
                 c.Observacoes,
+                c.Enviado,
                 TemAvarias = !c.Pneus || !c.Luzes || !c.Freios || !c.Limpeza
             })
             .ToListAsync();
@@ -234,9 +234,7 @@ public class VeiculosController : ControllerBase
         var ultimaManutencao = manutencoes.FirstOrDefault();
         
         // Estatísticas de checklists
-        var checklistsAprovados = checklists.Count(c => c.Status == StatusChecklist.Aprovado);
-        var checklistsRejeitados = checklists.Count(c => c.Status == StatusChecklist.Rejeitado);
-        var checklistsPendentes = checklists.Count(c => c.Status == StatusChecklist.Pendente);
+        var checklistsEnviados = checklists.Count(c => c.Enviado);
         
         // Estatísticas de manutenções (usando StatusSAP)
         var manutencoesSolicitadas = manutencoes.Count(m => m.StatusSAP == StatusManutencaoSAP.Solicitada);
@@ -303,9 +301,7 @@ public class VeiculosController : ControllerBase
             Estatisticas = new
             {
                 TotalChecklists = totalChecklists,
-                ChecklistsAprovados = checklistsAprovados,
-                ChecklistsRejeitados = checklistsRejeitados,
-                ChecklistsPendentes = checklistsPendentes,
+                ChecklistsEnviados = checklistsEnviados,
                 TotalManutencoes = totalManutencoes,
                 ManutencoesSolicitadas = manutencoesSolicitadas,
                 ManutencoesAprovadas = manutencoesAprovadas,

@@ -42,9 +42,6 @@ public class ChecklistsController : ControllerBase
             if (dataFim.HasValue)
                 query = query.Where(c => c.Data <= dataFim.Value);
                 
-            if (!string.IsNullOrEmpty(status))
-                query = query.Where(c => c.Status.ToString() == status);
-                
             if (veiculoId.HasValue)
                 query = query.Where(c => c.VeiculoId == veiculoId.Value);
                 
@@ -61,7 +58,6 @@ public class ChecklistsController : ControllerBase
                     c.MotoristaId,
                     c.PlacaVeiculo,
                     c.KmVeiculo,
-                    c.Status,
                     c.Pneus,
                     c.Luzes,
                     c.Freios,
@@ -111,13 +107,13 @@ public class ChecklistsController : ControllerBase
                 .Where(c => c.Data >= hoje && c.Data < amanha)
                 .ToListAsync();
                 
-            var pendentes = checklistsHoje.Count(c => c.Status == StatusChecklist.Pendente);
-            var concluidos = checklistsHoje.Count(c => c.Status == StatusChecklist.Aprovado);
+            var totalHoje = checklistsHoje.Count;
+            var enviados = checklistsHoje.Count(c => c.Enviado);
             
-            // Avarias não resolvidas (checklists rejeitados recentes)
+            // Avarias não resolvidas (checklists com avarias detectadas nos últimos 7 dias)
             var avariasNaoResolvidas = await _context.Checklists
                 .Include(c => c.Veiculo)
-                .Where(c => c.Status == StatusChecklist.Rejeitado && 
+                .Where(c => (!c.Pneus || !c.Luzes || !c.Freios || !c.Limpeza) && 
                            c.Data >= DateTime.UtcNow.AddDays(-7))
                 .Select(c => new
                 {
@@ -131,7 +127,7 @@ public class ChecklistsController : ControllerBase
             
             return Ok(new
             {
-                checklistsHoje = new { pendentes, concluidos },
+                checklistsHoje = new { total = totalHoje, enviados },
                 avariasNaoResolvidas
             });
         }
@@ -204,8 +200,7 @@ public class ChecklistsController : ControllerBase
             ImagemFreios = request.ImagemFreios,
             ImagemOutrasAvarias = request.ImagemOutrasAvarias,
             Observacoes = request.Observacoes,
-            Enviado = true, // Marca como enviado ao criar
-            Status = StatusChecklist.Pendente
+            Enviado = true // Marca como enviado ao criar
         };
 
         _context.Checklists.Add(checklist);
@@ -238,23 +233,6 @@ public class ChecklistsController : ControllerBase
         }
         
         return Ok(new { enviado = true, checklist });
-    }
-
-    [Authorize(Roles = "Administrador,Gestor")]
-    [HttpPut("{id}/status")]
-    public async Task<ActionResult> UpdateChecklistStatus(Guid id, [FromBody] UpdateStatusRequest request)
-    {
-        var checklist = await _context.Checklists.FindAsync(id);
-
-        if (checklist == null)
-        {
-            return NotFound(new { message = "Checklist não encontrado" });
-        }
-
-        checklist.Status = request.Status;
-        await _context.SaveChangesAsync();
-
-        return Ok(checklist);
     }
 
     [HttpPut("{id}")]
@@ -411,5 +389,3 @@ public record ChecklistRequest(
     string? ImagemOutrasAvarias,
     string? Observacoes
 );
-
-public record UpdateStatusRequest(StatusChecklist Status);
