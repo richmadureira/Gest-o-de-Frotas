@@ -9,6 +9,8 @@ interface User {
   name: string;
   role: string;
   primeiroLogin?: boolean;
+  cnhVencida?: boolean;
+  cnhVenceEm?: number | null;
 }
 
 interface AuthContextType {

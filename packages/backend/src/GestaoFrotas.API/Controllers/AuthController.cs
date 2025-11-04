@@ -41,15 +41,18 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "Email ou senha inválidos" });
         }
 
-        // Verificar CNH vencida para condutores
-        if (usuario.Papel == PapelUsuario.Condutor && 
-            usuario.CnhValidade.HasValue && 
-            usuario.CnhValidade.Value.Date < DateTime.UtcNow.Date)
+        // Verificar CNH vencida para condutores (não bloqueia login, apenas avisa)
+        var cnhVencida = false;
+        var cnhVenceEm = (int?)null;
+        
+        if (usuario.Papel == PapelUsuario.Condutor && usuario.CnhValidade.HasValue)
         {
-            return Unauthorized(new { message = "CNH vencida. Entre em contato com o gestor." });
+            var diasParaVencimento = (usuario.CnhValidade.Value.Date - DateTime.UtcNow.Date).Days;
+            cnhVencida = diasParaVencimento < 0;
+            cnhVenceEm = diasParaVencimento;
         }
 
-        Console.WriteLine($"[AuthController] Login: {usuario.Email}, PrimeiroLogin: {usuario.PrimeiroLogin}");
+        Console.WriteLine($"[AuthController] Login: {usuario.Email}, PrimeiroLogin: {usuario.PrimeiroLogin}, CNH Vencida: {cnhVencida}");
 
         var token = GenerateJwtToken(usuario);
 
@@ -62,7 +65,9 @@ public class AuthController : ControllerBase
                 email = usuario.Email,
                 name = usuario.Nome,
                 role = usuario.Papel.ToString(),
-                primeiroLogin = usuario.PrimeiroLogin
+                primeiroLogin = usuario.PrimeiroLogin,
+                cnhVencida = cnhVencida,
+                cnhVenceEm = cnhVenceEm
             }
         });
     }
@@ -133,6 +138,17 @@ public class AuthController : ControllerBase
 
         Console.WriteLine($"[AuthController] Usuário criado: {usuario.Email}, PrimeiroLogin: {usuario.PrimeiroLogin}");
 
+        // Verificar CNH para o retorno
+        var cnhVencida = false;
+        var cnhVenceEm = (int?)null;
+        
+        if (usuario.Papel == PapelUsuario.Condutor && usuario.CnhValidade.HasValue)
+        {
+            var diasParaVencimento = (usuario.CnhValidade.Value.Date - DateTime.UtcNow.Date).Days;
+            cnhVencida = diasParaVencimento < 0;
+            cnhVenceEm = diasParaVencimento;
+        }
+
         var token = GenerateJwtToken(usuario);
 
         return Ok(new
@@ -144,7 +160,9 @@ public class AuthController : ControllerBase
                 email = usuario.Email,
                 name = usuario.Nome,
                 role = usuario.Papel.ToString(),
-                primeiroLogin = usuario.PrimeiroLogin
+                primeiroLogin = usuario.PrimeiroLogin,
+                cnhVencida = cnhVencida,
+                cnhVenceEm = cnhVenceEm
             }
         });
     }
@@ -183,6 +201,17 @@ public class AuthController : ControllerBase
         usuario.PrimeiroLogin = false;
         await _context.SaveChangesAsync();
 
+        // Verificar CNH para o retorno
+        var cnhVencida = false;
+        var cnhVenceEm = (int?)null;
+        
+        if (usuario.Papel == PapelUsuario.Condutor && usuario.CnhValidade.HasValue)
+        {
+            var diasParaVencimento = (usuario.CnhValidade.Value.Date - DateTime.UtcNow.Date).Days;
+            cnhVencida = diasParaVencimento < 0;
+            cnhVenceEm = diasParaVencimento;
+        }
+
         // Gerar novo token
         var token = GenerateJwtToken(usuario);
 
@@ -195,7 +224,9 @@ public class AuthController : ControllerBase
                 email = usuario.Email,
                 name = usuario.Nome,
                 role = usuario.Papel.ToString(),
-                primeiroLogin = usuario.PrimeiroLogin
+                primeiroLogin = usuario.PrimeiroLogin,
+                cnhVencida = cnhVencida,
+                cnhVenceEm = cnhVenceEm
             },
             message = "Senha alterada com sucesso"
         });

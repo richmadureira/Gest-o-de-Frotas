@@ -22,6 +22,7 @@ import CondutorHome from './pages/CondutorHome';
 import AuditLogs from './pages/AuditLogs';
 import VehicleHistory from './pages/VehicleHistory';
 import ChangePasswordDialog from './components/ChangePasswordDialog';
+import CnhAlert from './components/CnhAlert';
 
 const drawerWidth = 240;
 
@@ -45,7 +46,7 @@ function ProtectedRoute({ element, path }: { element: React.ReactElement, path: 
 }
 
 function App() {
-  const { isAuthenticated, logout, userRole, primeiroLogin } = useAuth();
+  const { isAuthenticated, logout, userRole, primeiroLogin, user } = useAuth();
   const [mobileOpen, setMobileOpen] = React.useState(false);
   const [showChangePasswordDialog, setShowChangePasswordDialog] = React.useState(false);
   const muiTheme = useTheme();
@@ -85,7 +86,11 @@ function App() {
           </IconButton>
         </Toolbar>
       </AppBar>
-      <Box component="main" sx={{ flexGrow: 1, mt: 8, p: 0 }}>
+      {/* Alerta de CNH para condutores */}
+      {user?.cnhVencida !== undefined && (
+        <CnhAlert cnhVencida={user.cnhVencida} cnhVenceEm={user.cnhVenceEm} />
+      )}
+      <Box component="main" sx={{ flexGrow: 1, mt: user?.cnhVencida || (user?.cnhVenceEm !== null && user?.cnhVenceEm !== undefined && user?.cnhVenceEm <= 30) ? 16 : 8, p: 0 }}>
         <Routes>
           <Route path="/" element={<CondutorHome />} />
           <Route path="/checklist" element={<Checklist />} />
@@ -127,6 +132,10 @@ function App() {
           </IconButton>
         </Toolbar>
       </AppBar>
+      {/* Alerta de CNH para admin/gestor que são condutores */}
+      {user?.cnhVencida !== undefined && (
+        <CnhAlert cnhVencida={user.cnhVencida} cnhVenceEm={user.cnhVenceEm} />
+      )}
       <Sidebar mobileOpen={mobileOpen} onDrawerToggle={handleDrawerToggle} />
       <Box
         component="main"
@@ -135,7 +144,7 @@ function App() {
           p: 3,
           width: { md: `calc(100% - ${drawerWidth}px)` },
           ml: { md: `${drawerWidth}px` },
-          mt: 8,
+          mt: user?.cnhVencida || (user?.cnhVenceEm !== null && user?.cnhVenceEm !== undefined && user?.cnhVenceEm <= 30) ? 16 : 8,
         }}
       >
         <Routes>
