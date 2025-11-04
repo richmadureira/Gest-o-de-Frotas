@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -48,6 +49,8 @@ public class AuthController : ControllerBase
             return Unauthorized(new { message = "CNH vencida. Entre em contato com o gestor." });
         }
 
+        Console.WriteLine($"[AuthController] Login: {usuario.Email}, PrimeiroLogin: {usuario.PrimeiroLogin}");
+
         var token = GenerateJwtToken(usuario);
 
         return Ok(new
@@ -58,7 +61,8 @@ public class AuthController : ControllerBase
                 id = usuario.Id,
                 email = usuario.Email,
                 name = usuario.Nome,
-                role = usuario.Papel.ToString()
+                role = usuario.Papel.ToString(),
+                primeiroLogin = usuario.PrimeiroLogin
             }
         });
     }
@@ -120,11 +124,14 @@ public class AuthController : ControllerBase
             CnhValidade = request.CnhValidade,
             Matricula = request.Matricula,
             TurnoTrabalho = request.TurnoTrabalho,
-            Ativo = true
+            Ativo = true,
+            PrimeiroLogin = true // Novo usuário precisa trocar senha no primeiro login
         };
 
         _context.Usuarios.Add(usuario);
         await _context.SaveChangesAsync();
+
+        Console.WriteLine($"[AuthController] Usuário criado: {usuario.Email}, PrimeiroLogin: {usuario.PrimeiroLogin}");
 
         var token = GenerateJwtToken(usuario);
 
@@ -136,8 +143,61 @@ public class AuthController : ControllerBase
                 id = usuario.Id,
                 email = usuario.Email,
                 name = usuario.Nome,
-                role = usuario.Papel.ToString()
+                role = usuario.Papel.ToString(),
+                primeiroLogin = usuario.PrimeiroLogin
             }
+        });
+    }
+
+    [Authorize]
+    [HttpPost("change-password")]
+    public async Task<ActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        // Obter o ID do usuário autenticado do token
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdClaim) || !Guid.TryParse(userIdClaim, out var userId))
+        {
+            return Unauthorized(new { message = "Usuário não autenticado" });
+        }
+
+        var usuario = await _context.Usuarios.FindAsync(userId);
+        if (usuario == null)
+        {
+            return NotFound(new { message = "Usuário não encontrado" });
+        }
+
+        // Verificar senha atual
+        if (!BCrypt.Net.BCrypt.Verify(request.SenhaAtual, usuario.SenhaHash))
+        {
+            return BadRequest(new { message = "Senha atual incorreta" });
+        }
+
+        // Validar que a nova senha é diferente da atual
+        if (BCrypt.Net.BCrypt.Verify(request.NovaSenha, usuario.SenhaHash))
+        {
+            return BadRequest(new { message = "A nova senha deve ser diferente da senha atual" });
+        }
+
+        // Atualizar senha e marcar que não é mais o primeiro login
+        usuario.SenhaHash = BCrypt.Net.BCrypt.HashPassword(request.NovaSenha);
+        usuario.PrimeiroLogin = false;
+        await _context.SaveChangesAsync();
+
+        // Gerar novo token
+        var token = GenerateJwtToken(usuario);
+
+        return Ok(new
+        {
+            token,
+            user = new
+            {
+                id = usuario.Id,
+                email = usuario.Email,
+                name = usuario.Nome,
+                role = usuario.Papel.ToString(),
+                primeiroLogin = usuario.PrimeiroLogin
+            },
+            message = "Senha alterada com sucesso"
         });
     }
 
@@ -188,3 +248,5 @@ public record RegisterRequest(
     string? Matricula,
     Turno? TurnoTrabalho
 );
+
+public record ChangePasswordRequest(string SenhaAtual, string NovaSenha);

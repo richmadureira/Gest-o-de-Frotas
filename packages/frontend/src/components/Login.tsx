@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   TextField,
   Button,
@@ -11,7 +11,7 @@ import {
   Link,
   Alert
 } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import logo from "../image/logo.png";
 import { useAuth } from './AuthContext';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
@@ -22,7 +22,8 @@ const validateEmail = (email: string) => {
 };
 
 const Login: React.FC = () => {
-  const { login, loading, error } = useAuth();
+  const { login, loading, error, isAuthenticated, primeiroLogin, userRole } = useAuth();
+  const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -31,6 +32,25 @@ const Login: React.FC = () => {
   const isEmailValid = validateEmail(email);
   const isPasswordValid = password.length > 0;
   const isFormValid = isEmailValid && isPasswordValid;
+
+  // Redirecionar após login bem-sucedido (somente se não for primeiro login)
+  useEffect(() => {
+    console.log('[Login] useEffect - isAuthenticated:', isAuthenticated, 'primeiroLogin:', primeiroLogin, 'userRole:', userRole);
+    
+    // Se não está autenticado ou é primeiro login, não redireciona
+    // O dialog será gerenciado pelo App.tsx
+    if (!isAuthenticated || primeiroLogin || !userRole) {
+      return;
+    }
+    
+    // Redirecionar baseado no role (somente se NÃO for primeiro login)
+    console.log('[Login] Redirecionando usuário...');
+    if (userRole === 'admin' || userRole === 'gestor') {
+      navigate('/dashboard');
+    } else if (userRole === 'condutor') {
+      navigate('/condutor');
+    }
+  }, [isAuthenticated, primeiroLogin, userRole, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,6 +63,8 @@ const Login: React.FC = () => {
 
     try {
       await login(email, password);
+      // Dialog de primeiro login será gerenciado pelo App.tsx
+      console.log('[Login] Login realizado com sucesso');
     } catch (err) {
       // O erro já é tratado no AuthContext
       console.error('Erro no login:', err);

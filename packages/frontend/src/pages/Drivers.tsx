@@ -33,15 +33,16 @@ import {
   InputLabel
 } from '@mui/material';
 
-import { Add, Edit, Delete, Person, CheckCircle, Warning, GroupAdd, FilterList } from '@mui/icons-material';
+import { Add, Edit, Delete, Person, CheckCircle, Warning, GroupAdd, FilterList, Key } from '@mui/icons-material';
 import HomeIcon from '@mui/icons-material/Home';
-import { Autocomplete, Grid, Card, CardContent } from '@mui/material';
+import { Autocomplete, Grid, Card, CardContent, InputAdornment } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import InputMask from 'react-input-mask';
-import { getUsuarios, register, updateUsuario, deleteUsuario } from '../services/api';
+import { getUsuarios, register, updateUsuario, deleteUsuario, adminChangePassword } from '../services/api';
 import { useAuth } from '../components/AuthContext';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 // Tipos e interfaces para TypeScript
 interface Usuario {
@@ -107,6 +108,15 @@ function GerenciamentoUsuarios() {
   // Estados para confirmação de exclusão
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [usuarioToDelete, setUsuarioToDelete] = useState<Usuario | null>(null);
+  
+  // Estados para alteração de senha
+  const [changePasswordDialogOpen, setChangePasswordDialogOpen] = useState(false);
+  const [usuarioToChangePassword, setUsuarioToChangePassword] = useState<Usuario | null>(null);
+  const [novaSenha, setNovaSenha] = useState('');
+  const [confirmarNovaSenha, setConfirmarNovaSenha] = useState('');
+  const [showNovaSenha, setShowNovaSenha] = useState(false);
+  const [showConfirmarSenha, setShowConfirmarSenha] = useState(false);
+  const [senhaError, setSenhaError] = useState('');
   
   // Métricas
   const [metricas, setMetricas] = useState({
@@ -335,6 +345,63 @@ function GerenciamentoUsuarios() {
     }
   };
 
+  // Funções para alteração de senha
+  const handleChangePasswordClick = (usuario: Usuario) => {
+    setUsuarioToChangePassword(usuario);
+    setNovaSenha('');
+    setConfirmarNovaSenha('');
+    setSenhaError('');
+    setShowNovaSenha(false);
+    setShowConfirmarSenha(false);
+    setChangePasswordDialogOpen(true);
+  };
+
+  const handleCloseChangePasswordDialog = () => {
+    setChangePasswordDialogOpen(false);
+    setUsuarioToChangePassword(null);
+    setNovaSenha('');
+    setConfirmarNovaSenha('');
+    setSenhaError('');
+    setShowNovaSenha(false);
+    setShowConfirmarSenha(false);
+  };
+
+  const handleChangePassword = async () => {
+    if (!usuarioToChangePassword) return;
+
+    setSenhaError('');
+
+    // Validações
+    if (!novaSenha || !confirmarNovaSenha) {
+      setSenhaError('Todos os campos são obrigatórios');
+      return;
+    }
+
+    if (novaSenha.length < 6) {
+      setSenhaError('A senha deve ter no mínimo 6 caracteres');
+      return;
+    }
+
+    if (novaSenha !== confirmarNovaSenha) {
+      setSenhaError('As senhas não coincidem');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await adminChangePassword(usuarioToChangePassword.id, novaSenha);
+      setSnackbarMessage('Senha alterada com sucesso!');
+      setSnackbarType('success');
+      setOpenSnackbar(true);
+      handleCloseChangePasswordDialog();
+    } catch (err: any) {
+      setSenhaError(err.response?.data?.message || 'Erro ao alterar senha');
+      console.error('Erro ao alterar senha:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
@@ -556,6 +623,21 @@ function GerenciamentoUsuarios() {
                         disabled={userRole === 'gestor' && (usuario.papel === 'Administrador' || usuario.papel === 'Gestor') || user?.id === usuario.id}
                       >
                         <Edit />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                  <Tooltip title={
+                    userRole !== 'admin' ? 'Apenas Administradores podem alterar senhas' :
+                    user?.id === usuario.id ? 'Use o menu de perfil para alterar sua própria senha' :
+                    'Alterar Senha'
+                  }>
+                    <span>
+                      <IconButton 
+                        color="warning" 
+                        onClick={() => handleChangePasswordClick(usuario)}
+                        disabled={userRole !== 'admin' || user?.id === usuario.id}
+                      >
+                        <Key />
                       </IconButton>
                     </span>
                   </Tooltip>
@@ -806,6 +888,78 @@ function GerenciamentoUsuarios() {
         }}
         severity="error"
       />
+
+      {/* Dialog de Alteração de Senha */}
+      <Dialog open={changePasswordDialogOpen} onClose={handleCloseChangePasswordDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>
+          Alterar Senha - {usuarioToChangePassword?.nome}
+        </DialogTitle>
+        <DialogContent>
+          {senhaError && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {senhaError}
+            </Alert>
+          )}
+          <Box component="form" sx={{ mt: 1 }}>
+            <TextField
+              label="Nova Senha"
+              type={showNovaSenha ? 'text' : 'password'}
+              fullWidth
+              margin="normal"
+              value={novaSenha}
+              onChange={(e) => setNovaSenha(e.target.value)}
+              required
+              helperText="Mínimo de 6 caracteres"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowNovaSenha(!showNovaSenha)}
+                      edge="end"
+                    >
+                      {showNovaSenha ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+
+            <TextField
+              label="Confirmar Nova Senha"
+              type={showConfirmarSenha ? 'text' : 'password'}
+              fullWidth
+              margin="normal"
+              value={confirmarNovaSenha}
+              onChange={(e) => setConfirmarNovaSenha(e.target.value)}
+              required
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={() => setShowConfirmarSenha(!showConfirmarSenha)}
+                      edge="end"
+                    >
+                      {showConfirmarSenha ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseChangePasswordDialog} disabled={loading}>
+            Cancelar
+          </Button>
+          <Button 
+            onClick={handleChangePassword} 
+            variant="contained" 
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Alterar Senha'}
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Snackbar */}
       <Snackbar

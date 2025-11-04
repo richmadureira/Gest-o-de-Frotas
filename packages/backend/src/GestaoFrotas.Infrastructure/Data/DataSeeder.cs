@@ -44,7 +44,8 @@ public static class DataSeeder
                 Papel = PapelUsuario.Administrador,
                 Cpf = "12345678901",
                 Telefone = "(11) 98765-4321",
-                Ativo = true
+                Ativo = true,
+                PrimeiroLogin = false
             },
 
             // ----------------------------------------
@@ -58,7 +59,8 @@ public static class DataSeeder
                 Papel = PapelUsuario.Gestor,
                 Cpf = "98765432109",
                 Telefone = "(11) 97654-3210",
-                Ativo = true
+                Ativo = true,
+                PrimeiroLogin = false
             },
 
             // ----------------------------------------
@@ -79,7 +81,8 @@ public static class DataSeeder
                 CnhValidade = hoje.AddDays(-10), // Vencida há 10 dias
                 Matricula = "COND001",
                 TurnoTrabalho = Turno.Manha,
-                Ativo = true
+                Ativo = true,
+                PrimeiroLogin = false
             },
 
             // CNH VENCENDO EM 5 DIAS - Alerta Laranja Urgente - COM CHECKLIST HOJE
@@ -96,7 +99,8 @@ public static class DataSeeder
                 CnhValidade = hoje.AddDays(5), // Vence em 5 dias
                 Matricula = "COND002",
                 TurnoTrabalho = Turno.Tarde,
-                Ativo = true
+                Ativo = true,
+                PrimeiroLogin = false
             }
         };
 

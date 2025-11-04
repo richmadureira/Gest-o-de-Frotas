@@ -21,6 +21,7 @@ import ChecklistManagement from './pages/ChecklistManagement';
 import CondutorHome from './pages/CondutorHome';
 import AuditLogs from './pages/AuditLogs';
 import VehicleHistory from './pages/VehicleHistory';
+import ChangePasswordDialog from './components/ChangePasswordDialog';
 
 const drawerWidth = 240;
 
@@ -44,10 +45,23 @@ function ProtectedRoute({ element, path }: { element: React.ReactElement, path: 
 }
 
 function App() {
-  const { isAuthenticated, logout, userRole } = useAuth();
+  const { isAuthenticated, logout, userRole, primeiroLogin } = useAuth();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [showChangePasswordDialog, setShowChangePasswordDialog] = React.useState(false);
   const muiTheme = useTheme();
   const isDesktop = useMediaQuery(muiTheme.breakpoints.up('md'));
+
+  // Verificar se precisa mostrar dialog de troca de senha
+  React.useEffect(() => {
+    console.log('[App] useEffect - isAuthenticated:', isAuthenticated, 'primeiroLogin:', primeiroLogin);
+    
+    if (isAuthenticated && primeiroLogin) {
+      console.log('[App] Primeiro login detectado! Abrindo dialog...');
+      setShowChangePasswordDialog(true);
+    } else {
+      setShowChangePasswordDialog(false);
+    }
+  }, [isAuthenticated, primeiroLogin]);
 
   const handleLogout = () => {
     logout();
@@ -146,6 +160,11 @@ function App() {
     </Box>
   );
 
+  const handlePasswordChangeComplete = () => {
+    console.log('[App] Senha alterada com sucesso, fechando dialog');
+    setShowChangePasswordDialog(false);
+  };
+
   return (
     <ThemeProvider theme={theme}>
       <Router>
@@ -158,6 +177,13 @@ function App() {
           </Routes>
         )}
       </Router>
+      
+      {/* Dialog de troca de senha no primeiro login - renderizado globalmente */}
+      <ChangePasswordDialog
+        open={showChangePasswordDialog}
+        onClose={handlePasswordChangeComplete}
+        obrigatorio={true}
+      />
     </ThemeProvider>
   );
 }

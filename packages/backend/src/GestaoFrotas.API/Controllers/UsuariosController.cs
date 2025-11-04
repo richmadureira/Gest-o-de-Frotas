@@ -206,6 +206,35 @@ public class UsuariosController : ControllerBase
     }
 
     /// <summary>
+    /// Alterar senha de um usuário (apenas Admin)
+    /// </summary>
+    [Authorize(Roles = "Administrador")]
+    [HttpPut("{id}/change-password")]
+    public async Task<ActionResult> AdminChangePassword(Guid id, [FromBody] AdminChangePasswordRequest request)
+    {
+        var usuario = await _context.Usuarios.FindAsync(id);
+
+        if (usuario == null)
+        {
+            return NotFound(new { message = "Usuário não encontrado" });
+        }
+
+        // Admin não pode alterar a própria senha por este endpoint
+        var adminIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+        if (!string.IsNullOrEmpty(adminIdClaim) && Guid.TryParse(adminIdClaim, out var adminId) && adminId == id)
+        {
+            return BadRequest(new { message = "Use o endpoint de troca de senha pessoal para alterar sua própria senha" });
+        }
+
+        // Atualizar senha e marcar que não é mais o primeiro login
+        usuario.SenhaHash = BCrypt.Net.BCrypt.HashPassword(request.NovaSenha);
+        usuario.PrimeiroLogin = false;
+        await _context.SaveChangesAsync();
+
+        return Ok(new { message = "Senha alterada com sucesso" });
+    }
+
+    /// <summary>
     /// Obter alertas de CNH vencendo ou vencidas
     /// </summary>
     [HttpGet("alertas-cnh")]
@@ -253,3 +282,5 @@ public record UpdateUsuarioRequest(
     string? Matricula,
     Turno? TurnoTrabalho
 );
+
+public record AdminChangePasswordRequest(string NovaSenha);

@@ -381,5 +381,21 @@ export const getAlertasCNH = async () => {
   return response.data;
 };
 
+// ===== TROCA DE SENHA =====
+export const changePassword = async (senhaAtual: string, novaSenha: string) => {
+  const response = await api.post('/auth/change-password', {
+    senhaAtual,
+    novaSenha
+  });
+  return response.data;
+};
+
+export const adminChangePassword = async (usuarioId: string, novaSenha: string) => {
+  const response = await api.put(`/usuarios/${usuarioId}/change-password`, {
+    novaSenha
+  });
+  return response.data;
+};
+
 // Export default para uso direto
 export default api;
