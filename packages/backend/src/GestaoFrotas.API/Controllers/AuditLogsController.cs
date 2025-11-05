@@ -50,7 +50,11 @@ namespace GestaoFrotas.API.Controllers
                 query = query.Where(a => a.DataHora >= dataInicio.Value);
 
             if (dataFim.HasValue)
-                query = query.Where(a => a.DataHora <= dataFim.Value);
+            {
+                // Adicionar 1 dia para incluir todo o dia selecionado
+                var dataFimAjustada = dataFim.Value.Date.AddDays(1);
+                query = query.Where(a => a.DataHora < dataFimAjustada);
+            }
 
             // Contar total
             var total = await query.CountAsync();

@@ -24,8 +24,6 @@ import {
   CircularProgress,
   Switch,
   FormControlLabel,
-  AppBar,
-  Toolbar,
   Alert,
   MenuItem,
   Select,
@@ -34,10 +32,8 @@ import {
 } from '@mui/material';
 
 import { Add, Edit, Delete, Person, CheckCircle, Warning, GroupAdd, FilterList, Key } from '@mui/icons-material';
-import HomeIcon from '@mui/icons-material/Home';
-import { Autocomplete, Grid, Card, CardContent, InputAdornment } from '@mui/material';
+import { Grid, Card, CardContent, InputAdornment } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import InputMask from 'react-input-mask';
 import { getUsuarios, register, updateUsuario, deleteUsuario, adminChangePassword } from '../services/api';
 import { useAuth } from '../components/AuthContext';
@@ -280,23 +276,36 @@ function GerenciamentoUsuarios() {
       setError(null);
       
       if (editingUsuario) {
-        await updateUsuario(editingUsuario.id, formData);
+        // Criar objeto com campos limpos (sem formatação)
+        const updateData: any = { ...formData };
+        if (updateData.cpf) updateData.cpf = updateData.cpf.replace(/\D/g, '');
+        if (updateData.telefone) updateData.telefone = updateData.telefone.replace(/\D/g, '');
+        if (updateData.cnhNumero) updateData.cnhNumero = updateData.cnhNumero.replace(/\D/g, '');
+        
+        await updateUsuario(editingUsuario.id, updateData);
         setSnackbarMessage('Usuário atualizado com sucesso!');
       } else {
         // Para criar um novo usuário, precisamos mapear corretamente os dados
-        const userData = {
+        const userData: any = {
           email: formData.email,
           password: '123456', // Senha padrão - em produção, isso deveria ser definido pelo usuário
           nome: formData.nome,
           papel: formData.papel, // Backend vai mapear a string para o enum
-          cpf: formData.cpf,
-          telefone: formData.telefone,
-          cnhNumero: formData.cnhNumero,
-          cnhCategoria: formData.cnhCategoria,
-          cnhValidade: formData.cnhValidade ? new Date(formData.cnhValidade).toISOString() : null,
-          matricula: formData.matricula,
-          turnoTrabalho: formData.turnoTrabalho
         };
+        
+        // Adicionar campos opcionais apenas se tiverem valor (remover formatação)
+        if (formData.cpf) userData.cpf = formData.cpf.replace(/\D/g, ''); // Remove pontos e hífen
+        if (formData.telefone) userData.telefone = formData.telefone.replace(/\D/g, ''); // Remove parênteses, espaços e hífen
+        
+        // Só enviar campos CNH se for condutor
+        if (formData.papel === 'Condutor') {
+          if (formData.cnhNumero) userData.cnhNumero = formData.cnhNumero.replace(/\D/g, ''); // Remove formatação
+          if (formData.cnhCategoria) userData.cnhCategoria = formData.cnhCategoria;
+          if (formData.cnhValidade) userData.cnhValidade = new Date(formData.cnhValidade).toISOString();
+          if (formData.matricula) userData.matricula = formData.matricula;
+          if (formData.turnoTrabalho) userData.turnoTrabalho = formData.turnoTrabalho;
+        }
+        
         await register(userData);
         setSnackbarMessage('Usuário criado com sucesso!');
       }
@@ -750,31 +759,55 @@ function GerenciamentoUsuarios() {
                   Informações do Condutor
                 </Typography>
                 
-                <TextField
-                  label="CPF"
-                  fullWidth
-                  margin="normal"
+                <InputMask
+                  mask="999.999.999-99"
                   value={formData.cpf || ''}
                   onChange={e => setFormData({ ...formData, cpf: e.target.value })}
-                />
+                >
+                  {(inputProps: any) => (
+                    <TextField
+                      {...inputProps}
+                      label="CPF"
+                      fullWidth
+                      margin="normal"
+                      placeholder="000.000.000-00"
+                    />
+                  )}
+                </InputMask>
                 
-                <TextField
-                  label="Telefone"
-                  fullWidth
-                  margin="normal"
+                <InputMask
+                  mask="(99) 99999-9999"
                   value={formData.telefone || ''}
                   onChange={e => setFormData({ ...formData, telefone: e.target.value })}
-                />
+                >
+                  {(inputProps: any) => (
+                    <TextField
+                      {...inputProps}
+                      label="Telefone"
+                      fullWidth
+                      margin="normal"
+                      placeholder="(00) 00000-0000"
+                    />
+                  )}
+                </InputMask>
                 
-                <TextField
-                  label="Número da CNH *"
-                  fullWidth
-                  margin="normal"
+                <InputMask
+                  mask="99999999999"
                   value={formData.cnhNumero || ''}
                   onChange={e => setFormData({ ...formData, cnhNumero: e.target.value })}
-                  error={!!errors.cnhNumero}
-                  helperText={errors.cnhNumero}
-                />
+                >
+                  {(inputProps: any) => (
+                    <TextField
+                      {...inputProps}
+                      label="Número da CNH *"
+                      fullWidth
+                      margin="normal"
+                      placeholder="00000000000"
+                      error={!!errors.cnhNumero}
+                      helperText={errors.cnhNumero}
+                    />
+                  )}
+                </InputMask>
                 
                 <FormControl fullWidth margin="normal" error={!!errors.cnhCategoria}>
                   <InputLabel>Categoria CNH *</InputLabel>
@@ -831,21 +864,37 @@ function GerenciamentoUsuarios() {
             {/* 5. CAMPOS PARA OUTROS PERFIS (OPCIONAL) */}
             {(formData.papel === 'Gestor' || formData.papel === 'Administrador') && (
               <>
-                <TextField
-                  label="CPF"
-                  fullWidth
-                  margin="normal"
+                <InputMask
+                  mask="999.999.999-99"
                   value={formData.cpf || ''}
                   onChange={e => setFormData({ ...formData, cpf: e.target.value })}
-                />
+                >
+                  {(inputProps: any) => (
+                    <TextField
+                      {...inputProps}
+                      label="CPF"
+                      fullWidth
+                      margin="normal"
+                      placeholder="000.000.000-00"
+                    />
+                  )}
+                </InputMask>
                 
-                <TextField
-                  label="Telefone"
-                  fullWidth
-                  margin="normal"
+                <InputMask
+                  mask="(99) 99999-9999"
                   value={formData.telefone || ''}
                   onChange={e => setFormData({ ...formData, telefone: e.target.value })}
-                />
+                >
+                  {(inputProps: any) => (
+                    <TextField
+                      {...inputProps}
+                      label="Telefone"
+                      fullWidth
+                      margin="normal"
+                      placeholder="(00) 00000-0000"
+                    />
+                  )}
+                </InputMask>
               </>
             )}
             

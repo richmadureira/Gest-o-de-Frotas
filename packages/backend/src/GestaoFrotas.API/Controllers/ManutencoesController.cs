@@ -59,7 +59,9 @@ public class ManutencoesController : ControllerBase
 
         if (dataFim.HasValue)
         {
-            query = query.Where(m => m.CriadoEm <= dataFim.Value);
+            // Adicionar 1 dia para incluir todo o dia selecionado
+            var dataFimAjustada = dataFim.Value.Date.AddDays(1);
+            query = query.Where(m => m.CriadoEm < dataFimAjustada);
         }
 
         var manutencoes = await query

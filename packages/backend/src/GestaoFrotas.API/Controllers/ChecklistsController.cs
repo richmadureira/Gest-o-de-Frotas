@@ -40,7 +40,11 @@ public class ChecklistsController : ControllerBase
                 query = query.Where(c => c.Data >= dataInicio.Value);
                 
             if (dataFim.HasValue)
-                query = query.Where(c => c.Data <= dataFim.Value);
+            {
+                // Adicionar 1 dia para incluir todo o dia selecionado
+                var dataFimAjustada = dataFim.Value.Date.AddDays(1);
+                query = query.Where(c => c.Data < dataFimAjustada);
+            }
                 
             if (veiculoId.HasValue)
                 query = query.Where(c => c.VeiculoId == veiculoId.Value);

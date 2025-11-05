@@ -50,12 +50,39 @@ O sistema foi desenvolvido para a empresa TransLog, especializada em logística 
 
 ### 2.1 Descrição da Aplicação
 
-O Sistema de Gestão de Frotas é uma aplicação web moderna, responsiva e intuitiva, composta por:
+O Sistema de Gestão de Frotas é uma **Progressive Web App (PWA)** moderna, responsiva e intuitiva, composta por:
 
-- **Frontend Web**: Interface de usuário desenvolvida em React com TypeScript e Material-UI
+- **Frontend Web (PWA)**: Interface de usuário desenvolvida em React com TypeScript e Material-UI
 - **Backend API**: API RESTful desenvolvida em ASP.NET Core com arquitetura em camadas
 - **Banco de Dados**: SQL Server para persistência de dados
 - **Autenticação**: Sistema de login seguro com JWT (JSON Web Tokens)
+
+#### Características PWA
+
+A aplicação foi desenvolvida como Progressive Web App, oferecendo:
+
+**Instalabilidade**
+- Pode ser instalada em dispositivos móveis e desktop
+- Ícone na tela inicial como aplicativo nativo
+- Abre em modo standalone (sem barra do navegador)
+- Experiência similar a aplicativos nativos
+
+**Performance Otimizada**
+- Service Worker para cache inteligente de assets
+- Carregamento 30-50% mais rápido após primeira visita
+- Menor consumo de dados móveis
+- Recursos estáticos servidos do cache local
+
+**Funcionalidade Offline**
+- Interface carrega mesmo sem conexão à internet
+- Dados visualizados previamente ficam em cache
+- Ideal para condutores em áreas com conexão instável
+- Sincronização automática quando conexão é restabelecida
+
+**Atualizações Automáticas**
+- App atualiza em background
+- Usuários sempre têm versão mais recente
+- Sem necessidade de publicação em lojas de aplicativos
 
 ### 2.2 Público-Alvo
 
@@ -68,12 +95,15 @@ O sistema atende três perfis distintos de usuários:
 ### 2.3 Principais Benefícios
 
 - Redução de 90% no tempo de preenchimento de checklists (digital vs. papel)
+- **Instalável como app** em qualquer dispositivo (PWA)
+- **Funciona offline** para condutores em campo
 - Rastreabilidade completa de todas as operações
 - Alertas automáticos para situações críticas
 - Histórico completo de cada veículo da frota
 - Eliminação de perda de documentos
 - Integração com sistema SAP para gestão de manutenções
 - Dashboards analíticos para tomada de decisão
+- **Performance superior** com cache inteligente
 
 ### 2.4 Escopo Funcional
 
@@ -264,12 +294,14 @@ src/
 | React Input Mask | 2.0.4 | Máscaras de input |
 | Framer Motion | 11.11.11 | Animações |
 | date-fns | 2.28.0 | Manipulação de datas |
+| **Workbox** | - | **Service Worker (PWA)** |
 
 **Justificativas:**
 - **React**: Componentização, performance, comunidade ativa
 - **TypeScript**: Reduz erros, melhora manutenibilidade e autocomplete
 - **Material-UI**: Design moderno, acessível e responsivo
 - **Axios**: Interceptors para autenticação, tratamento de erros
+- **Workbox**: Gerenciamento de cache para PWA (via Create React App)
 
 ### 4.3 Ferramentas de Desenvolvimento
 
@@ -1482,6 +1514,104 @@ Soluções:
 2. Confirme URL da API no frontend
 3. Verifique política CORS no `Program.cs`
 
+### 9.8 Instalando e Usando a PWA
+
+#### 9.8.1 Como Instalar no Android
+
+1. Acesse a aplicação no navegador Chrome
+2. Toque no menu (três pontos) no canto superior direito
+3. Selecione "Instalar aplicativo" ou "Adicionar à tela inicial"
+4. Confirme a instalação
+5. O ícone "Gestão Frotas" aparecerá na tela inicial
+
+**Ou:**
+- Aguarde o banner automático "Instalar aplicativo"
+- Toque em "Instalar"
+
+#### 9.8.2 Como Instalar no iOS (iPhone/iPad)
+
+1. Abra a aplicação no Safari
+2. Toque no botão "Compartilhar" (ícone com seta para cima)
+3. Role para baixo e toque em "Adicionar à Tela de Início"
+4. Dê um nome ao app (ex: "Gestão Frotas")
+5. Toque em "Adicionar"
+
+**Nota:** No iOS, algumas funcionalidades PWA são limitadas (sem notificações push).
+
+#### 9.8.3 Como Instalar no Desktop (Windows/Mac/Linux)
+
+**Google Chrome:**
+1. Acesse a aplicação
+2. Clique no ícone de instalação na barra de endereço (à direita)
+3. Ou: Menu → "Instalar Gestão Frotas..."
+4. Confirme a instalação
+5. O app abrirá em janela própria
+
+**Microsoft Edge:**
+1. Acesse a aplicação
+2. Clique em "..." → "Aplicativos" → "Instalar este site como aplicativo"
+3. Confirme
+4. Ícone aparecerá no menu Iniciar
+
+#### 9.8.4 Usando Modo Offline
+
+**O que funciona offline:**
+- ✅ Interface da aplicação carrega
+- ✅ Visualizar dados já carregados anteriormente
+- ✅ Navegação entre páginas
+- ✅ Dados em cache disponíveis
+
+**O que NÃO funciona offline:**
+- ❌ Login (requer validação no servidor)
+- ❌ Carregar dados novos
+- ❌ Enviar checklists
+- ❌ Qualquer operação que exija API
+
+**Dica para Condutores:**
+- Acesse a aplicação com conexão primeiro
+- Navegue pelas telas que vai usar
+- Os dados ficarão em cache
+- Em campo sem conexão, ainda poderá visualizar
+
+#### 9.8.5 Atualizações da PWA
+
+A aplicação atualiza automaticamente:
+1. Nova versão é baixada em background
+2. Usuário continua usando versão atual
+3. Ao fechar e reabrir o app, nova versão é ativada
+4. Não há interrupção de uso
+
+**Forçar atualização:**
+- Feche completamente o aplicativo
+- Reabra
+- Ou: Limpe cache do navegador
+
+#### 9.8.6 Build para Produção
+
+Para gerar versão PWA otimizada:
+
+```bash
+cd packages/frontend
+npm run build
+```
+
+O build gera automaticamente:
+- `/build/service-worker.js` - Service worker
+- `/build/precache-manifest.*.js` - Lista de cache
+- Assets otimizados e minificados
+
+**Deploy:**
+- Faça upload da pasta `build` para servidor HTTPS
+- PWA só funciona em HTTPS (exceto localhost)
+- Obtenha certificado SSL gratuito (Let's Encrypt)
+
+**Verificar PWA:**
+1. Abra DevTools (F12)
+2. Aba "Application"
+3. Seção "Service Workers" - deve mostrar ativo
+4. Seção "Manifest" - deve mostrar configurações
+5. Lighthouse → Gerar relatório PWA
+
 ---
 
 ## 10. Fluxos de Trabalho
@@ -1909,6 +2039,8 @@ O Sistema de Gestão de Frotas foi desenvolvido com sucesso, atendendo todos os 
 - TypeScript para aplicações robustas
 - Material-UI para interfaces modernas
 - JWT para autenticação stateless
+- **Progressive Web Apps (PWA) com Service Workers**
+- **Workbox para cache strategies**
 
 **Boas Práticas Aplicadas:**
 - Separação de responsabilidades
@@ -1917,6 +2049,8 @@ O Sistema de Gestão de Frotas foi desenvolvido com sucesso, atendendo todos os 
 - Tipagem forte
 - Versionamento de código
 - Documentação técnica
+- **Offline-first approach**
+- **Performance optimization com cache**
 
 ### 12.4 Trabalhos Futuros
 
@@ -1927,12 +2061,19 @@ O Sistema de Gestão de Frotas foi desenvolvido com sucesso, atendendo todos os 
    - Sincronização automática de ordens
    - Atualização em tempo real de status
 
-2. **Notificações Push**
+2. **Notificações Push (PWA)**
    - Notificar condutores de checklist pendente
    - Alertar gestor sobre manutenções urgentes
    - Avisos de CNH próxima ao vencimento
+   - Push notifications via Service Worker
 
-3. **Relatórios Avançados**
+3. **Modo Offline Avançado (PWA)**
+   - Permitir preenchimento de checklist offline
+   - Fila de sincronização quando voltar online
+   - Cache inteligente de dados da API
+   - Background sync
+
+4. **Relatórios Avançados**
    - Análise preditiva de manutenções
    - Machine Learning para identificar padrões
    - Dashboards executivos

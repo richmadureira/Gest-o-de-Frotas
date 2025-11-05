@@ -20,9 +20,6 @@ import {
   Box,
   Tooltip,
   TablePagination,
-  Switch,
-  AppBar,
-  Toolbar,
   CircularProgress,
   Alert,
   FormControl,
@@ -34,12 +31,10 @@ import {
   CardContent,
 } from '@mui/material';
 import { Add, Edit, Delete, DirectionsCar, Build, CheckCircle, Speed, FilterList, History } from '@mui/icons-material';
-import HomeIcon from '@mui/icons-material/Home';
 import { useNavigate } from 'react-router-dom';
-import InputMask from 'react-input-mask';
-import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { getVeiculos, createVeiculo, updateVeiculo, deleteVeiculo } from '../services/api';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { useAuth } from '../components/AuthContext';
 
 // Tipos e interfaces para TypeScript
 interface Veiculo {
@@ -65,6 +60,7 @@ const PLATE_REGEX = /^([A-Z]{3}-?\d{4}|[A-Z]{3}\d[A-Z]\d{2})$/i;
 
 function GerenciamentoVeiculos() {
   const navigate = useNavigate();
+  const { userRole } = useAuth();
   const [veiculos, setVeiculos] = useState<Veiculo[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [editingVeiculo, setEditingVeiculo] = useState<Veiculo | null>(null);
@@ -205,11 +201,17 @@ function GerenciamentoVeiculos() {
       setLoading(true);
       setError(null);
       
+      // Criar objeto com placa limpa (remover hífen se existir)
+      const veiculoData = {
+        ...formData,
+        placa: formData.placa.replace(/-/g, '') // Remove hífen da placa
+      };
+      
       if (editingVeiculo) {
-        await updateVeiculo(editingVeiculo.id, formData);
+        await updateVeiculo(editingVeiculo.id, veiculoData);
         setSnackbarMessage('Veículo atualizado com sucesso!');
       } else {
-        await createVeiculo(formData);
+        await createVeiculo(veiculoData);
         setSnackbarMessage('Veículo adicionado com sucesso!');
       }
       
@@ -501,11 +503,13 @@ function GerenciamentoVeiculos() {
                       <Edit />
                     </IconButton>
                   </Tooltip>
-                  <Tooltip title="Excluir">
-                    <IconButton color="error" onClick={() => handleDeleteClick(veiculo)}>
-                      <Delete />
-                    </IconButton>
-                  </Tooltip>
+                  {userRole === 'admin' && (
+                    <Tooltip title="Excluir">
+                      <IconButton color="error" onClick={() => handleDeleteClick(veiculo)}>
+                        <Delete />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                 </TableCell>
               </TableRow>
             ))}
@@ -552,7 +556,7 @@ function GerenciamentoVeiculos() {
               value={formData.placa}
               onChange={e => setFormData({ ...formData, placa: e.target.value.toUpperCase() })}
               error={!!errors.placa}
-              helperText={errors.placa}
+              helperText={errors.placa || 'Formato: AAA-9999 ou AAA9A99'}
               fullWidth
               margin="normal"
               required
