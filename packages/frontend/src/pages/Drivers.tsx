@@ -580,11 +580,8 @@ function GerenciamentoUsuarios() {
               </Grid>
             </Grid>
             <Box display="flex" gap={2} mt={2}>
-              <Button variant="contained" color="primary" onClick={() => setPage(0)}>
-                Filtrar
-              </Button>
               <Button variant="outlined" onClick={handleLimparFiltros}>
-                Limpar
+                Limpar Filtros
               </Button>
             </Box>
           </>
@@ -738,6 +735,7 @@ function GerenciamentoUsuarios() {
               fullWidth
               margin="normal"
               required
+              inputProps={{ maxLength: 255 }}
             />
             
             {/* 3. E-MAIL */}
@@ -750,6 +748,7 @@ function GerenciamentoUsuarios() {
               fullWidth
               margin="normal"
               required
+              inputProps={{ maxLength: 255 }}
             />
             
             {/* 4. CAMPOS ESPECÍFICOS PARA CONDUTOR */}
@@ -843,6 +842,7 @@ function GerenciamentoUsuarios() {
                   margin="normal"
                   value={formData.matricula || ''}
                   onChange={e => setFormData({ ...formData, matricula: e.target.value })}
+                  inputProps={{ maxLength: 20 }}
                 />
                 
                 <FormControl fullWidth margin="normal">

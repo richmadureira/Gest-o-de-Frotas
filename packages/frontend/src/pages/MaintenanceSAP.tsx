@@ -551,6 +551,7 @@ const MaintenanceSAP = () => {
             value={formData.descricao}
             onChange={(e) => setFormData({ ...formData, descricao: e.target.value })}
             disabled={!formData.veiculoId}
+            inputProps={{ maxLength: 200 }}
           />
 
           <TextField

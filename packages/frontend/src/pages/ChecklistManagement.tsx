@@ -160,6 +160,22 @@ const ChecklistManagement: React.FC = () => {
     }
   };
 
+  // Filtrar automaticamente quando os filtros mudarem
+  useEffect(() => {
+    if (period.from || period.to || vehicle || driver) {
+      handleFiltrar();
+    }
+  }, [period.from, period.to, vehicle, driver]);
+
+  const handleLimparFiltros = () => {
+    setPeriod({ from: '', to: '' });
+    setVehicle('');
+    setDriver('');
+    setApenasComAvarias(false);
+    setPage(0);
+    carregarDados(); // Recarrega todos os dados
+  };
+
   // Implementar navegação para manutenção
   const handleCriarManutencao = (checklist: ChecklistItem) => {
     // Construir lista de itens com problema
@@ -388,17 +404,8 @@ const ChecklistManagement: React.FC = () => {
               </Grid>
             </Grid>
             <Box display="flex" gap={2} mt={2}>
-              <Button variant="contained" color="primary" startIcon={<Search />} onClick={handleFiltrar}>
-                Filtrar
-              </Button>
-              <Button variant="outlined" onClick={() => {
-                setPeriod({ from: '', to: '' });
-                setVehicle('');
-                setDriver('');
-                setApenasComAvarias(false);
-                setPage(0);
-              }}>
-                Limpar
+              <Button variant="outlined" onClick={handleLimparFiltros}>
+                Limpar Filtros
               </Button>
             </Box>
           </>

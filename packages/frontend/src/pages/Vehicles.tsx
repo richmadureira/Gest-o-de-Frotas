@@ -128,11 +128,6 @@ function GerenciamentoVeiculos() {
     }
   };
   
-  const handleFiltrar = () => {
-    // Filtros são aplicados localmente pelo filteredVeiculos
-    setPage(0);
-  };
-  
   const handleLimparFiltros = () => {
     setSearchQuery('');
     setFiltroTipo('');
@@ -440,11 +435,8 @@ function GerenciamentoVeiculos() {
               </Grid>
             </Grid>
             <Box display="flex" gap={2} mt={2}>
-              <Button variant="contained" color="primary" onClick={handleFiltrar}>
-                Filtrar
-              </Button>
               <Button variant="outlined" onClick={handleLimparFiltros}>
-                Limpar
+                Limpar Filtros
               </Button>
             </Box>
           </>
@@ -503,13 +495,19 @@ function GerenciamentoVeiculos() {
                       <Edit />
                     </IconButton>
                   </Tooltip>
-                  {userRole === 'admin' && (
-                    <Tooltip title="Excluir">
-                      <IconButton color="error" onClick={() => handleDeleteClick(veiculo)}>
+                  <Tooltip title={
+                    userRole !== 'admin' ? 'Apenas Administradores podem excluir veículos' : 'Excluir'
+                  }>
+                    <span>
+                      <IconButton 
+                        color="error" 
+                        onClick={() => handleDeleteClick(veiculo)}
+                        disabled={userRole !== 'admin'}
+                      >
                         <Delete />
                       </IconButton>
-                    </Tooltip>
-                  )}
+                    </span>
+                  </Tooltip>
                 </TableCell>
               </TableRow>
             ))}
@@ -571,6 +569,7 @@ function GerenciamentoVeiculos() {
               fullWidth
               margin="normal"
               required
+              inputProps={{ maxLength: 40 }}
             />
             <TextField
               label="Modelo *"
@@ -581,6 +580,7 @@ function GerenciamentoVeiculos() {
               fullWidth
               margin="normal"
               required
+              inputProps={{ maxLength: 40 }}
             />
             <FormControl fullWidth margin="normal" required>
               <InputLabel id="type-label">Tipo *</InputLabel>

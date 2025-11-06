@@ -148,6 +148,24 @@ function Manutencoes() {
     carregarDados();
   }, []);
 
+  // Filtrar automaticamente quando os filtros mudarem
+  useEffect(() => {
+    if (filtros.status || filtros.tipo || filtros.veiculoId || filtros.dataInicio || filtros.dataFim) {
+      carregarDados();
+    }
+  }, [filtros.status, filtros.tipo, filtros.veiculoId, filtros.dataInicio, filtros.dataFim]);
+
+  const handleLimparFiltros = () => {
+    setFiltros({
+      status: '',
+      tipo: '',
+      veiculoId: '',
+      dataInicio: '',
+      dataFim: ''
+    });
+    setTimeout(() => carregarDados(), 100); // Recarrega todos os dados
+  };
+
   // Função para construir URL da imagem
   const construirUrlImagem = (caminhoImagem: string) => {
     if (!caminhoImagem) return '';
@@ -466,17 +484,8 @@ function Manutencoes() {
               </Grid>
             </Grid>
             <Box display="flex" gap={2} mt={2}>
-              <Button variant="contained" color="primary" onClick={carregarDados}>
-                Filtrar
-              </Button>
-              <Button variant="outlined" onClick={() => setFiltros({
-                status: '',
-                tipo: '',
-                veiculoId: '',
-                dataInicio: '',
-                dataFim: ''
-              })}>
-                Limpar
+              <Button variant="outlined" onClick={handleLimparFiltros}>
+                Limpar Filtros
               </Button>
             </Box>
           </>

@@ -77,6 +77,14 @@ const AuditLogs: React.FC = () => {
     carregarStats();
   }, [page, rowsPerPage]);
 
+  // Filtrar automaticamente quando os filtros mudarem
+  useEffect(() => {
+    if (filtros.usuarioId || filtros.acao || filtros.entidade || filtros.dataInicio || filtros.dataFim) {
+      setPage(0);
+      carregarLogs();
+    }
+  }, [filtros.usuarioId, filtros.acao, filtros.entidade, filtros.dataInicio, filtros.dataFim]);
+
   const carregarLogs = async () => {
     try {
       setLoading(true);
@@ -110,11 +118,6 @@ const AuditLogs: React.FC = () => {
     } catch (err) {
       console.error('Erro ao carregar estatísticas:', err);
     }
-  };
-
-  const handleFiltrar = () => {
-    setPage(0);
-    carregarLogs();
   };
 
   const handleLimparFiltros = () => {
@@ -292,11 +295,8 @@ const AuditLogs: React.FC = () => {
               </Grid>
             </Grid>
             <Box display="flex" gap={2} mt={2}>
-              <Button variant="contained" color="primary" startIcon={<Search />} onClick={handleFiltrar}>
-                Filtrar
-              </Button>
               <Button variant="outlined" onClick={handleLimparFiltros}>
-                Limpar
+                Limpar Filtros
               </Button>
             </Box>
           </>
