@@ -113,14 +113,6 @@ function Manutencoes() {
   // Estados para confirmação de exclusão
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [manutencaoToDelete, setManutencaoToDelete] = useState<Manutencao | null>(null);
-  
-  // Estados para imagens do checklist
-  const [checklistImages, setChecklistImages] = useState<{
-    imagemPneus?: string;
-    imagemLuzes?: string;
-    imagemFreios?: string;
-    imagemOutrasAvarias?: string;
-  }>({});
 
   // Função para carregar dados da API
   const carregarDados = async () => {
@@ -199,11 +191,7 @@ function Manutencoes() {
           veiculoModelo, 
           descricao, 
           tipoManutencao, 
-          dataSugerida,
-          imagemPneus,
-          imagemLuzes,
-          imagemFreios,
-          imagemOutrasAvarias
+          dataSugerida
         } = location.state;
         
         console.log('Dados recebidos do checklist:', { veiculoId, veiculoPlaca, veiculoModelo });
@@ -230,14 +218,6 @@ function Manutencoes() {
           }
         }
         
-        // Armazenar imagens para exibição
-        setChecklistImages({
-          imagemPneus,
-          imagemLuzes,
-          imagemFreios,
-          imagemOutrasAvarias
-        });
-        
         // Abrir o dialog automaticamente
         setOpenDialog(true);
         
@@ -247,7 +227,7 @@ function Manutencoes() {
     };
     
     loadDataFromChecklist();
-  }, [location.state]);
+  }, [location]);
 
   // Funções CRUD
   const handleSave = async () => {
@@ -330,7 +310,6 @@ function Manutencoes() {
       descricao: ''
     });
     setErrors({});
-    setChecklistImages({});  // Limpar imagens do checklist
     setOpenDialog(true);
   };
 
@@ -339,7 +318,6 @@ function Manutencoes() {
     setEditingRequest(null);
     setFormData({ veiculoId: '', tipo: '', prioridade: 'Media', descricao: '' });
     setErrors({});
-    setChecklistImages({});
   };
 
   const validateForm = () => {
@@ -632,144 +610,6 @@ function Manutencoes() {
               inputProps={{ step: 0.01, min: 0 }}
             />
 
-            {/* Exibir imagens do checklist se existirem */}
-            {(checklistImages.imagemPneus || checklistImages.imagemLuzes || checklistImages.imagemFreios || checklistImages.imagemOutrasAvarias) && (
-              <Box mt={3} mb={2}>
-                <Typography variant="subtitle2" gutterBottom>
-                  <b>Imagens do Checklist:</b>
-                </Typography>
-                <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: 2 }}>
-                  {checklistImages.imagemPneus && (
-                    <Box>
-                      <Typography variant="caption" display="block" gutterBottom>
-                        Pneus
-                      </Typography>
-                      <Box
-                        component="img"
-                        src={construirUrlImagem(checklistImages.imagemPneus)}
-                        alt="Pneus"
-                        sx={{
-                          width: 120,
-                          height: 120,
-                          objectFit: 'cover',
-                          borderRadius: 2,
-                          cursor: 'pointer',
-                          border: '2px solid',
-                          borderColor: 'divider',
-                          '&:hover': {
-                            borderColor: 'primary.main',
-                            transform: 'scale(1.05)',
-                            transition: 'all 0.2s ease-in-out'
-                          }
-                        }}
-                        onClick={() => window.open(construirUrlImagem(checklistImages.imagemPneus!), '_blank')}
-                        onError={(e) => {
-                          const imgElement = e.currentTarget;
-                          imgElement.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect fill="%23ddd" width="120" height="120"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23999" font-family="sans-serif" font-size="14">Erro</text></svg>';
-                          imgElement.style.border = '2px solid red';
-                        }}
-                      />
-                    </Box>
-                  )}
-                  {checklistImages.imagemLuzes && (
-                    <Box>
-                      <Typography variant="caption" display="block" gutterBottom>
-                        Luzes
-                      </Typography>
-                      <Box
-                        component="img"
-                        src={construirUrlImagem(checklistImages.imagemLuzes)}
-                        alt="Luzes"
-                        sx={{
-                          width: 120,
-                          height: 120,
-                          objectFit: 'cover',
-                          borderRadius: 2,
-                          cursor: 'pointer',
-                          border: '2px solid',
-                          borderColor: 'divider',
-                          '&:hover': {
-                            borderColor: 'primary.main',
-                            transform: 'scale(1.05)',
-                            transition: 'all 0.2s ease-in-out'
-                          }
-                        }}
-                        onClick={() => window.open(construirUrlImagem(checklistImages.imagemLuzes!), '_blank')}
-                        onError={(e) => {
-                          const imgElement = e.currentTarget;
-                          imgElement.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect fill="%23ddd" width="120" height="120"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23999" font-family="sans-serif" font-size="14">Erro</text></svg>';
-                          imgElement.style.border = '2px solid red';
-                        }}
-                      />
-                    </Box>
-                  )}
-                  {checklistImages.imagemFreios && (
-                    <Box>
-                      <Typography variant="caption" display="block" gutterBottom>
-                        Freios
-                      </Typography>
-                      <Box
-                        component="img"
-                        src={construirUrlImagem(checklistImages.imagemFreios)}
-                        alt="Freios"
-                        sx={{
-                          width: 120,
-                          height: 120,
-                          objectFit: 'cover',
-                          borderRadius: 2,
-                          cursor: 'pointer',
-                          border: '2px solid',
-                          borderColor: 'divider',
-                          '&:hover': {
-                            borderColor: 'primary.main',
-                            transform: 'scale(1.05)',
-                            transition: 'all 0.2s ease-in-out'
-                          }
-                        }}
-                        onClick={() => window.open(construirUrlImagem(checklistImages.imagemFreios!), '_blank')}
-                        onError={(e) => {
-                          const imgElement = e.currentTarget;
-                          imgElement.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect fill="%23ddd" width="120" height="120"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23999" font-family="sans-serif" font-size="14">Erro</text></svg>';
-                          imgElement.style.border = '2px solid red';
-                        }}
-                      />
-                    </Box>
-                  )}
-                  {checklistImages.imagemOutrasAvarias && (
-                    <Box>
-                      <Typography variant="caption" display="block" gutterBottom>
-                        Outras Avarias
-                      </Typography>
-                      <Box
-                        component="img"
-                        src={construirUrlImagem(checklistImages.imagemOutrasAvarias)}
-                        alt="Outras Avarias"
-                        sx={{
-                          width: 120,
-                          height: 120,
-                          objectFit: 'cover',
-                          borderRadius: 2,
-                          cursor: 'pointer',
-                          border: '2px solid',
-                          borderColor: 'divider',
-                          '&:hover': {
-                            borderColor: 'primary.main',
-                            transform: 'scale(1.05)',
-                            transition: 'all 0.2s ease-in-out'
-                          }
-                        }}
-                        onClick={() => window.open(construirUrlImagem(checklistImages.imagemOutrasAvarias!), '_blank')}
-                        onError={(e) => {
-                          const imgElement = e.currentTarget;
-                          imgElement.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120"><rect fill="%23ddd" width="120" height="120"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" fill="%23999" font-family="sans-serif" font-size="14">Erro</text></svg>';
-                          imgElement.style.border = '2px solid red';
-                        }}
-                      />
-                    </Box>
-                  )}
-                </Box>
-              </Box>
-            )}
           </Box>
         </DialogContent>
         <DialogActions>

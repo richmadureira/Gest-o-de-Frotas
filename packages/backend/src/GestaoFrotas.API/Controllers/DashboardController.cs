@@ -34,13 +34,17 @@ public class DashboardController : ControllerBase
             var veiculosInativos = await _context.Veiculos.CountAsync(v => v.Status == StatusVeiculo.Inativo);
 
             // KPI 2: Checklists Hoje
-            var checklistsHoje = await _context.Checklists
-                .Where(c => c.Data >= hoje && c.Data < hoje.AddDays(1))
-                .ToListAsync();
+            // Total esperado = número de condutores ativos
+            var totalCondutoresAtivos = await _context.Usuarios
+                .Where(u => u.Papel == PapelUsuario.Condutor && u.Ativo)
+                .CountAsync();
             
-            var totalChecklistsHoje = checklistsHoje.Count;
-            var checklistsEnviados = checklistsHoje.Count(c => c.Enviado);
-            var taxaConclusao = totalChecklistsHoje > 0 ? (checklistsEnviados * 100) / totalChecklistsHoje : 0;
+            // Checklists enviados hoje
+            var checklistsEnviados = await _context.Checklists
+                .Where(c => c.Data >= hoje && c.Data < hoje.AddDays(1) && c.Enviado)
+                .CountAsync();
+            
+            var taxaConclusao = totalCondutoresAtivos > 0 ? (checklistsEnviados * 100) / totalCondutoresAtivos : 0;
 
             // KPI 3: Manutenções (baseado em StatusSAP)
             var manutencoesAtivas = await _context.Manutencoes
@@ -155,7 +159,7 @@ public class DashboardController : ControllerBase
                     },
                     checklists = new
                     {
-                        total = totalChecklistsHoje,
+                        total = totalCondutoresAtivos,
                         enviados = checklistsEnviados,
                         taxaConclusao
                     },

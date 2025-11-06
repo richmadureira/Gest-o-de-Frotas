@@ -184,7 +184,7 @@ const Dashboard: React.FC<DashboardProps> = ({ onLogout, userName }) => {
                           Checklists Hoje
                         </Typography>
                         <Typography variant="h4" fontWeight="bold">
-                          {dashboardData?.kpis.checklists.concluidos || 0}
+                          {dashboardData?.kpis.checklists.enviados || 0}
                         </Typography>
                         <Typography variant="body2" color="textSecondary">
                           de {dashboardData?.kpis.checklists.total || 0} concluídos

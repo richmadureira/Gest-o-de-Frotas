@@ -13,6 +13,7 @@ import Summary from './pages/Summary'; // Importa a nova página de resumo
 import Drivers from './pages/Drivers'; // Certifique-se de que a grafia corresponde ao nome real do arquivo
 import ReportDetails from './pages/ReportDetails'; // Importa a nova página de detalhes do relatório
  // Importa a nova página de configurações
+import Maintenance from './pages/Maintenance';
 import MaintenanceSAP from './pages/MaintenanceSAP'; 
 import Sidebar from './components/Sidebar';
 import { useAuth } from './components/AuthContext';
@@ -155,8 +156,8 @@ function App() {
           <Route path="/summary" element={<ProtectedRoute path="/summary" element={<Summary />} />} />
           <Route path="/drivers" element={<ProtectedRoute path="/drivers" element={<Drivers />} />} />
           <Route path="/report-details" element={<ProtectedRoute path="/report-details" element={<ReportDetails />} />} />
-        <Route path="/maintenance" element={<ProtectedRoute path="/maintenance" element={<MaintenanceSAP />} />} />
-        <Route path="/maintenance/new" element={<ProtectedRoute path="/maintenance" element={<MaintenanceSAP />} />} />
+        <Route path="/maintenance" element={<ProtectedRoute path="/maintenance" element={<Maintenance />} />} />
+        <Route path="/maintenance/new" element={<ProtectedRoute path="/maintenance" element={<Maintenance />} />} />
           <Route path="/audit-logs" element={<ProtectedRoute path="/audit-logs" element={<AuditLogs />} />} />
           <Route path="*" element={<Dashboard onLogout={handleLogout} />} />
         </Routes>

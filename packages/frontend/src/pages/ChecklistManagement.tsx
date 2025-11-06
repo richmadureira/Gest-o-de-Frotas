@@ -191,19 +191,14 @@ const ChecklistManagement: React.FC = () => {
     
     navigate('/maintenance/new', { 
       state: { 
-        fromChecklist: true,  // FLAG NOVA
+        fromChecklist: true,
         veiculoId: checklist.veiculoId,
         veiculoPlaca: veiculo?.placa,
         veiculoModelo: veiculo?.modelo,
         checklistId: checklist.id,
         descricao: `Problemas identificados no checklist: ${itensProblema.join(', ')}${checklist.observacoes ? '\n\nObservações: ' + checklist.observacoes : ''}`,
         tipoManutencao: 'Corretiva',
-        dataSugerida: new Date().toISOString().split('T')[0],
-        // Passar imagens do checklist
-        imagemPneus: checklist.imagemPneus,
-        imagemLuzes: checklist.imagemLuzes,
-        imagemFreios: checklist.imagemFreios,
-        imagemOutrasAvarias: checklist.imagemOutrasAvarias
+        dataSugerida: new Date().toISOString().split('T')[0]
       } 
     });
     setOpenModal(false);
