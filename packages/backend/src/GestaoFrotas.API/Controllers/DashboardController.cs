@@ -39,12 +39,14 @@ public class DashboardController : ControllerBase
                 .Where(u => u.Papel == PapelUsuario.Condutor && u.Ativo)
                 .CountAsync();
             
-            // Checklists enviados hoje
-            var checklistsEnviados = await _context.Checklists
+            // Condutores únicos que enviaram checklist hoje (não importa quantos checklists)
+            var condutoresQueEnviaramChecklist = await _context.Checklists
                 .Where(c => c.Data >= hoje && c.Data < hoje.AddDays(1) && c.Enviado)
+                .Select(c => c.MotoristaId)
+                .Distinct()
                 .CountAsync();
             
-            var taxaConclusao = totalCondutoresAtivos > 0 ? (checklistsEnviados * 100) / totalCondutoresAtivos : 0;
+            var taxaConclusao = totalCondutoresAtivos > 0 ? (condutoresQueEnviaramChecklist * 100) / totalCondutoresAtivos : 0;
 
             // KPI 3: Manutenções (baseado em StatusSAP)
             var manutencoesAtivas = await _context.Manutencoes
@@ -116,15 +118,14 @@ public class DashboardController : ControllerBase
                 })
                 .ToList();
 
-            // Tendências: Checklists últimos 7 dias
+            // Tendências: Condutores únicos que enviaram checklists nos últimos 7 dias
             var checklistsSemana = await _context.Checklists
-                .Where(c => c.Data >= inicioSemana)
+                .Where(c => c.Data >= inicioSemana && c.Enviado)
                 .GroupBy(c => c.Data.Date)
                 .Select(g => new
                 {
                     data = g.Key,
-                    total = g.Count(),
-                    enviados = g.Count(c => c.Enviado)
+                    condutoresUnicos = g.Select(c => c.MotoristaId).Distinct().Count()
                 })
                 .OrderBy(g => g.data)
                 .ToListAsync();
@@ -140,8 +141,8 @@ public class DashboardController : ControllerBase
                 {
                     dia = dia.ToString("dd/MM"),
                     diaSemana = dia.ToString("ddd"),
-                    total = dados?.total ?? 0,
-                    enviados = dados?.enviados ?? 0
+                    total = totalCondutoresAtivos,
+                    enviados = dados?.condutoresUnicos ?? 0
                 });
             }
 
@@ -160,7 +161,7 @@ public class DashboardController : ControllerBase
                     checklists = new
                     {
                         total = totalCondutoresAtivos,
-                        enviados = checklistsEnviados,
+                        enviados = condutoresQueEnviaramChecklist,
                         taxaConclusao
                     },
                     manutencoes = new
