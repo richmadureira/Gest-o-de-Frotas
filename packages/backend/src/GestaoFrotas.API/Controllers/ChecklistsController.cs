@@ -174,19 +174,19 @@ public class ChecklistsController : ControllerBase
             return Unauthorized();
         }
 
-        // Verificar se já existe checklist enviado hoje
+        // Verificar se já existe checklist para ESTE VEÍCULO hoje (independente do motorista)
         var hoje = DateTime.UtcNow.Date;
         var amanha = hoje.AddDays(1);
 
-        var checklistHoje = await _context.Checklists
-            .AnyAsync(c => c.MotoristaId == motoristaId 
+        var checklistVeiculoHoje = await _context.Checklists
+            .AnyAsync(c => c.VeiculoId == request.VeiculoId 
                         && c.Data >= hoje 
                         && c.Data < amanha
                         && c.Enviado);
 
-        if (checklistHoje)
+        if (checklistVeiculoHoje)
         {
-            return BadRequest(new { message = "Você já enviou um checklist hoje. Apenas um checklist por dia é permitido." });
+            return BadRequest(new { message = "Já existe um checklist para este veículo hoje." });
         }
 
         var checklist = new Checklist
@@ -222,9 +222,53 @@ public class ChecklistsController : ControllerBase
         var hoje = DateTime.UtcNow.Date;
         var amanha = hoje.AddDays(1);
         
-        var checklist = await _context.Checklists
+        var checklists = await _context.Checklists
             .Include(c => c.Veiculo)
             .Where(c => c.MotoristaId == motoristaId 
+                     && c.Data >= hoje 
+                     && c.Data < amanha
+                     && c.Enviado)
+            .OrderByDescending(c => c.Data)
+            .Select(c => new
+            {
+                c.Id,
+                c.Data,
+                c.VeiculoId,
+                c.PlacaVeiculo,
+                c.KmVeiculo,
+                c.Pneus,
+                c.Luzes,
+                c.Freios,
+                c.Limpeza,
+                c.Observacoes,
+                c.ImagemPneus,
+                c.ImagemLuzes,
+                c.ImagemFreios,
+                c.ImagemOutrasAvarias,
+                Veiculo = new
+                {
+                    c.Veiculo.Id,
+                    c.Veiculo.Placa,
+                    c.Veiculo.Modelo,
+                    c.Veiculo.Marca
+                }
+            })
+            .ToListAsync();
+        
+        return Ok(new { checklists, total = checklists.Count });
+    }
+
+    [Authorize(Roles = "Condutor")]
+    [HttpGet("meu-checklist-veiculo/{veiculoId}")]
+    public async Task<ActionResult<object>> GetMeuChecklistVeiculoHoje(Guid veiculoId)
+    {
+        var motoristaId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);
+        var hoje = DateTime.UtcNow.Date;
+        var amanha = hoje.AddDays(1);
+        
+        var checklist = await _context.Checklists
+            .Include(c => c.Veiculo)
+            .Where(c => c.VeiculoId == veiculoId 
                      && c.Data >= hoje 
                      && c.Data < amanha
                      && c.Enviado)
@@ -233,10 +277,10 @@ public class ChecklistsController : ControllerBase
         
         if (checklist == null)
         {
-            return Ok(new { enviado = false, checklist = (object?)null });
+            return Ok(new { existe = false, checklist = (object?)null });
         }
         
-        return Ok(new { enviado = true, checklist });
+        return Ok(new { existe = true, checklist });
     }
 
     [HttpPut("{id}")]

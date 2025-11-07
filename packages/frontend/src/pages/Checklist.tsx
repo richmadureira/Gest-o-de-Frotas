@@ -4,7 +4,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { motion } from 'framer-motion';
 import { useNavigate, useLocation } from 'react-router-dom';
 import FormSection from './components/FormSection';
-import { getVeiculos, createChecklist, uploadImagemChecklist, getMeuChecklistHoje } from '../services/api';
+import { getVeiculos, createChecklist, uploadImagemChecklist, getMeuChecklistVeiculoHoje } from '../services/api';
 
 type ChecklistErrors = {
   veiculo?: string;
@@ -84,23 +84,51 @@ function Checklist() {
       }
     };
 
-    const verificarChecklistHoje = async () => {
+    carregarVeiculos();
+  }, [veiculoIdPreSelecionado]);
+
+  // Verificar checklist quando veículo for selecionado
+  useEffect(() => {
+    const verificarChecklistVeiculo = async (veiculoId: string) => {
       try {
-        const resultado = await getMeuChecklistHoje();
-        if (resultado.enviado) {
+        const resultado = await getMeuChecklistVeiculoHoje(veiculoId);
+        if (resultado.existe) {
           setModoLeitura(true);
           setChecklistEnviado(resultado.checklist);
-          // Preencher campos com dados do checklist enviado
           preencherFormularioLeitura(resultado.checklist);
+        } else {
+          setModoLeitura(false);
+          setChecklistEnviado(null);
+          limparFormulario();
         }
       } catch (err) {
-        console.error('Erro ao verificar checklist:', err);
+        console.error('Erro ao verificar checklist do veículo:', err);
       }
     };
 
-    carregarVeiculos();
-    verificarChecklistHoje();
-  }, [veiculoIdPreSelecionado]);
+    if (veiculoSelecionado) {
+      verificarChecklistVeiculo(veiculoSelecionado);
+    }
+  }, [veiculoSelecionado]);
+
+  // Função para limpar formulário
+  const limparFormulario = () => {
+    setMileage('');
+    setTireCondition('');
+    setLights('');
+    setCleanliness('');
+    setBrakes('');
+    setOutrasAvarias('');
+    setTireConditionDesc('');
+    setLightsDesc('');
+    setCleanlinessDesc('');
+    setBrakesDesc('');
+    setOutrasAvariasDesc('');
+    setImagemPneusUrl(null);
+    setImagemLuzesUrl(null);
+    setImagemFreiosUrl(null);
+    setImagemOutrasAvariasUrl(null);
+  };
 
   // Função para preencher formulário em modo leitura
   const preencherFormularioLeitura = (checklist: any) => {

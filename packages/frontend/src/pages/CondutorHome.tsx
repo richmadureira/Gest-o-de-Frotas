@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Box, Typography, Button, Card, CardContent, CircularProgress, Autocomplete, TextField, Alert } from '@mui/material';
+import { Container, Box, Typography, Button, Card, CardContent, CircularProgress, Autocomplete, TextField, Alert, Chip, Grid } from '@mui/material';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useNavigate } from 'react-router-dom';
 import { getMeuChecklistHoje, getVeiculos, validarPlacaHoje } from '../services/api';
 
 function CondutorHome() {
   const navigate = useNavigate();
-  const [checklistHoje, setChecklistHoje] = useState<any>(null);
+  const [checklistsHoje, setChecklistsHoje] = useState<any[]>([]);
   const [loadingChecklist, setLoadingChecklist] = useState(true);
   const [veiculos, setVeiculos] = useState<any[]>([]);
   const [veiculoSelecionado, setVeiculoSelecionado] = useState<any>(null);
@@ -15,13 +17,13 @@ function CondutorHome() {
   const [motivoBloqueio, setMotivoBloqueio] = useState('');
 
   useEffect(() => {
-    const carregarChecklistHoje = async () => {
+    const carregarChecklistsHoje = async () => {
       try {
         setLoadingChecklist(true);
         const resultado = await getMeuChecklistHoje();
-        setChecklistHoje(resultado);
+        setChecklistsHoje(resultado.checklists || []);
       } catch (err) {
-        console.error('Erro ao carregar checklist:', err);
+        console.error('Erro ao carregar checklists:', err);
       } finally {
         setLoadingChecklist(false);
       }
@@ -39,7 +41,7 @@ function CondutorHome() {
       }
     };
 
-    carregarChecklistHoje();
+    carregarChecklistsHoje();
     carregarVeiculos();
   }, []);
 
@@ -65,106 +67,129 @@ function CondutorHome() {
     }
   };
 
-  return (
-    <Container maxWidth="sm" sx={{ mt: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: 'calc(100vh - 200px)' }}>
-      {loadingChecklist ? (
-        <CircularProgress />
-      ) : (
-        <>
-          {/* Card quando checklist não foi enviado */}
-          {!checklistHoje?.enviado && (
-            <Card sx={{ width: '100%' }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Checklist de Hoje
-                </Typography>
-                <Typography color="textSecondary" gutterBottom>
-                  Status: Pendente
-                </Typography>
-                
-                {/* Campo de seleção de veículo */}
-                <Autocomplete
-                  options={veiculos}
-                  getOptionLabel={(option) => `${option.placa} - ${option.modelo}`}
-                  value={veiculoSelecionado}
-                  onChange={(event, newValue) => handleVeiculoChange(newValue)}
-                  loading={loadingVeiculos}
-                  disabled={loadingVeiculos || validando}
-                  renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Selecione o veículo *"
-                      margin="normal"
-                      fullWidth
-                      InputProps={{
-                        ...params.InputProps,
-                        endAdornment: (
-                          <>
-                            {(loadingVeiculos || validando) ? <CircularProgress size={20} /> : null}
-                            {params.InputProps.endAdornment}
-                          </>
-                        ),
-                      }}
-                    />
-                  )}
-                  sx={{ mt: 2, mb: 2 }}
-                />
-                
-                {/* Alert de bloqueio */}
-                {bloqueado && motivoBloqueio && (
-                  <Alert severity="error" sx={{ mb: 2 }}>
-                    {motivoBloqueio}
-                  </Alert>
-                )}
-                
-                <Button
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  size="large"
-                  disabled={!veiculoSelecionado || bloqueado || validando}
-                  onClick={() => navigate('/checklist', { state: { veiculoId: veiculoSelecionado.id } })}
-                >
-                  {validando ? 'Validando...' : 'Preencher agora'}
-                </Button>
-              </CardContent>
-            </Card>
-          )}
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  };
 
-          {/* Card quando checklist já foi enviado */}
-          {checklistHoje?.enviado && checklistHoje?.checklist && (
-            <Card sx={{ width: '100%' }}>
-              <CardContent>
-                <Typography variant="h6" gutterBottom>
-                  Checklist de Hoje
-                </Typography>
-                <Typography color="success.main" gutterBottom fontWeight="bold">
-                  Status: Enviado
-                </Typography>
-                <Box sx={{ mt: 2, mb: 2 }}>
-                  <Typography variant="body2" color="textSecondary">
-                    Veículo: {checklistHoje.checklist.veiculo?.placa || checklistHoje.checklist.placaVeiculo}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    KM: {checklistHoje.checklist.kmVeiculo}
-                  </Typography>
-                  <Typography variant="body2" color="textSecondary">
-                    Enviado em: {new Date(checklistHoje.checklist.data).toLocaleString('pt-BR')}
-                  </Typography>
-                </Box>
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  fullWidth
-                  size="large"
-                  onClick={() => navigate('/checklist')}
-                >
-                  Ver checklist enviado
-                </Button>
-              </CardContent>
-            </Card>
+  return (
+    <Container maxWidth="md" sx={{ mt: 8, mb: 4 }}>
+      {loadingChecklist ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '50vh' }}>
+          <CircularProgress />
+        </Box>
+      ) : (
+        <Box>
+          {/* Card para iniciar novo checklist */}
+          <Card sx={{ mb: 3 }}>
+            <CardContent>
+              <Typography variant="h6" gutterBottom>
+                Iniciar Novo Checklist
+              </Typography>
+              
+              {/* Campo de seleção de veículo */}
+              <Autocomplete
+                options={veiculos}
+                getOptionLabel={(option) => `${option.placa} - ${option.modelo}`}
+                value={veiculoSelecionado}
+                onChange={(event, newValue) => handleVeiculoChange(newValue)}
+                loading={loadingVeiculos}
+                disabled={loadingVeiculos || validando}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Selecione o veículo *"
+                    margin="normal"
+                    fullWidth
+                    InputProps={{
+                      ...params.InputProps,
+                      endAdornment: (
+                        <>
+                          {(loadingVeiculos || validando) ? <CircularProgress size={20} /> : null}
+                          {params.InputProps.endAdornment}
+                        </>
+                      ),
+                    }}
+                  />
+                )}
+                sx={{ mt: 1, mb: 2 }}
+              />
+              
+              {/* Alert de bloqueio */}
+              {bloqueado && motivoBloqueio && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {motivoBloqueio}
+                </Alert>
+              )}
+              
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                size="large"
+                disabled={!veiculoSelecionado || bloqueado || validando}
+                onClick={() => navigate('/checklist', { state: { veiculoId: veiculoSelecionado.id } })}
+              >
+                {validando ? 'Validando...' : 'Preencher Checklist'}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Lista de checklists enviados hoje */}
+          {checklistsHoje.length > 0 && (
+            <Box>
+              <Typography variant="h6" gutterBottom sx={{ mb: 2 }}>
+                Checklists Enviados Hoje ({checklistsHoje.length})
+              </Typography>
+              <Grid container spacing={2}>
+                {checklistsHoje.map((checklist) => (
+                  <Grid item xs={12} sm={6} key={checklist.id}>
+                    <Card sx={{ height: '100%' }}>
+                      <CardContent>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                          <CheckCircleIcon color="success" sx={{ mr: 1 }} />
+                          <Typography variant="h6" component="div">
+                            {checklist.veiculo?.placa || checklist.placaVeiculo}
+                          </Typography>
+                        </Box>
+                        <Typography variant="body2" color="textSecondary" gutterBottom>
+                          {checklist.veiculo?.modelo} - {checklist.veiculo?.marca}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary" gutterBottom>
+                          KM: {checklist.kmVeiculo}
+                        </Typography>
+                        <Typography variant="body2" color="textSecondary" gutterBottom>
+                          Enviado às {formatTime(checklist.data)}
+                        </Typography>
+                        
+                        {/* Status dos itens */}
+                        <Box sx={{ mt: 2, mb: 2, display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                          {!checklist.pneus && <Chip label="Pneus" color="error" size="small" />}
+                          {!checklist.luzes && <Chip label="Luzes" color="error" size="small" />}
+                          {!checklist.freios && <Chip label="Freios" color="error" size="small" />}
+                          {!checklist.limpeza && <Chip label="Limpeza" color="error" size="small" />}
+                          {checklist.pneus && checklist.luzes && checklist.freios && checklist.limpeza && (
+                            <Chip label="Tudo OK" color="success" size="small" />
+                          )}
+                        </Box>
+                        
+                        <Button
+                          variant="outlined"
+                          color="primary"
+                          fullWidth
+                          startIcon={<VisibilityIcon />}
+                          onClick={() => navigate('/checklist', { state: { veiculoId: checklist.veiculoId, readonly: true } })}
+                        >
+                          Visualizar
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            </Box>
           )}
-        </>
+        </Box>
       )}
     </Container>
   );
