@@ -416,11 +416,9 @@ public static class DataSeeder
                 Prioridade = PrioridadeManutencao.Baixa,
                 QuilometragemNoAto = 35000,
                 SolicitanteId = condutor.Id,
-                StatusSAP = StatusManutencaoSAP.Solicitada,
+                Status = StatusManutencao.Agendada,
                 Custo = null,
                 ConcluidoEm = null,
-                NumeroOrdemSAP = null,
-                FornecedorSAP = null
             },
 
             // ----------------------------------------
@@ -434,11 +432,9 @@ public static class DataSeeder
                 Prioridade = PrioridadeManutencao.Media,
                 QuilometragemNoAto = 42085,
                 SolicitanteId = gestor.Id,
-                StatusSAP = StatusManutencaoSAP.Aprovada,
+                Status = StatusManutencao.EmAndamento,
                 Custo = null,
                 ConcluidoEm = null,
-                NumeroOrdemSAP = null,
-                FornecedorSAP = null
             },
 
             // ----------------------------------------
@@ -452,11 +448,9 @@ public static class DataSeeder
                 Prioridade = PrioridadeManutencao.Alta,
                 QuilometragemNoAto = 75000,
                 SolicitanteId = gestor.Id,
-                StatusSAP = StatusManutencaoSAP.EnviadaSAP,
+                Status = StatusManutencao.EmAndamento,
                 Custo = null,
                 ConcluidoEm = null,
-                NumeroOrdemSAP = "SAP-2024-0001",
-                FornecedorSAP = null
             },
 
             // ----------------------------------------
@@ -470,11 +464,9 @@ public static class DataSeeder
                 Prioridade = PrioridadeManutencao.Urgente,
                 QuilometragemNoAto = 145230,
                 SolicitanteId = gestor.Id,
-                StatusSAP = StatusManutencaoSAP.ProcessandoSAP,
+                Status = StatusManutencao.EmAndamento,
                 Custo = null,
                 ConcluidoEm = null,
-                NumeroOrdemSAP = "SAP-2024-0002",
-                FornecedorSAP = null
             },
 
             // ----------------------------------------
@@ -488,11 +480,9 @@ public static class DataSeeder
                 Prioridade = PrioridadeManutencao.Media,
                 QuilometragemNoAto = 28000,
                 SolicitanteId = gestor.Id,
-                StatusSAP = StatusManutencaoSAP.OrdemCriada,
+                Status = StatusManutencao.EmAndamento,
                 Custo = null,
                 ConcluidoEm = null,
-                NumeroOrdemSAP = "SAP-2024-0003",
-                FornecedorSAP = "Auto Peças Central Ltda"
             },
 
             // ----------------------------------------
@@ -506,11 +496,9 @@ public static class DataSeeder
                 Prioridade = PrioridadeManutencao.Alta,
                 QuilometragemNoAto = 145150,
                 SolicitanteId = gestor.Id,
-                StatusSAP = StatusManutencaoSAP.EmExecucao,
+                Status = StatusManutencao.EmAndamento,
                 Custo = null,
                 ConcluidoEm = null,
-                NumeroOrdemSAP = "SAP-2024-0004",
-                FornecedorSAP = "Oficina Mecânica São Paulo"
             },
 
             // ----------------------------------------
@@ -524,11 +512,9 @@ public static class DataSeeder
                 Prioridade = PrioridadeManutencao.Baixa,
                 QuilometragemNoAto = 27850,
                 SolicitanteId = gestor.Id,
-                StatusSAP = StatusManutencaoSAP.Finalizada,
+                Status = StatusManutencao.Concluida,
                 Custo = 850.00m,
                 ConcluidoEm = hoje.AddDays(-15),
-                NumeroOrdemSAP = "SAP-2024-0005",
-                FornecedorSAP = "Auto Peças Central Ltda"
             },
 
             // ----------------------------------------
@@ -542,11 +528,9 @@ public static class DataSeeder
                 Prioridade = PrioridadeManutencao.Urgente,
                 QuilometragemNoAto = 74500,
                 SolicitanteId = gestor.Id,
-                StatusSAP = StatusManutencaoSAP.Finalizada,
+                Status = StatusManutencao.Concluida,
                 Custo = 2450.00m,
                 ConcluidoEm = hoje.AddDays(-45),
-                NumeroOrdemSAP = "SAP-2024-0006",
-                FornecedorSAP = "Concessionária Mercedes-Benz"
             }
         };
 

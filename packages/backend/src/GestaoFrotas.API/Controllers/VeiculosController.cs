@@ -215,14 +215,12 @@ public class VeiculosController : ControllerBase
                 m.Id,
                 m.Tipo,
                 m.Prioridade,
-                StatusSAP = m.StatusSAP,
+                Status = m.Status,
                 m.Descricao,
                 m.QuilometragemNoAto,
                 m.Custo,
                 m.CriadoEm,
-                m.AtualizadoEm,
-                m.NumeroOrdemSAP,
-                m.FornecedorSAP
+                m.AtualizadoEm
             })
             .ToListAsync();
 
@@ -236,12 +234,11 @@ public class VeiculosController : ControllerBase
         // Estatísticas de checklists
         var checklistsEnviados = checklists.Count(c => c.Enviado);
         
-        // Estatísticas de manutenções (usando StatusSAP)
-        var manutencoesSolicitadas = manutencoes.Count(m => m.StatusSAP == StatusManutencaoSAP.Solicitada);
-        var manutencoesAprovadas = manutencoes.Count(m => m.StatusSAP == StatusManutencaoSAP.Aprovada);
-        var manutencoesEnviadasSAP = manutencoes.Count(m => m.StatusSAP == StatusManutencaoSAP.EnviadaSAP);
-        var manutencoesEmExecucao = manutencoes.Count(m => m.StatusSAP == StatusManutencaoSAP.EmExecucao);
-        var manutencoesFinalizadas = manutencoes.Count(m => m.StatusSAP == StatusManutencaoSAP.Finalizada);
+        // Estatísticas de manutenções
+        var manutencoesAgendadas = manutencoes.Count(m => m.Status == StatusManutencao.Agendada);
+        var manutencoesEmAndamento = manutencoes.Count(m => m.Status == StatusManutencao.EmAndamento);
+        var manutencoesConcluidas = manutencoes.Count(m => m.Status == StatusManutencao.Concluida);
+        var manutencoesCanceladas = manutencoes.Count(m => m.Status == StatusManutencao.Cancelada);
 
         // Evolução de quilometragem (últimos 10 checklists)
         var evolucaoKm = checklists
@@ -303,11 +300,10 @@ public class VeiculosController : ControllerBase
                 TotalChecklists = totalChecklists,
                 ChecklistsEnviados = checklistsEnviados,
                 TotalManutencoes = totalManutencoes,
-                ManutencoesSolicitadas = manutencoesSolicitadas,
-                ManutencoesAprovadas = manutencoesAprovadas,
-                ManutencoesEnviadasSAP = manutencoesEnviadasSAP,
-                ManutencoesEmExecucao = manutencoesEmExecucao,
-                ManutencoesFinalizadas = manutencoesFinalizadas,
+                ManutencoesAgendadas = manutencoesAgendadas,
+                ManutencoesEmAndamento = manutencoesEmAndamento,
+                ManutencoesConcluidas = manutencoesConcluidas,
+                ManutencoesCanceladas = manutencoesCanceladas,
                 CustoTotalManutencoes = custoTotalManutencoes,
                 UltimoChecklist = ultimoChecklist,
                 UltimaManutencao = ultimaManutencao

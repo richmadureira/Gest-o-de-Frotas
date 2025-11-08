@@ -24,7 +24,7 @@ public class ManutencoesController : ControllerBase
         [FromQuery] TipoManutencao? tipo,
         [FromQuery] Guid? veiculoId,
         [FromQuery] PrioridadeManutencao? prioridade,
-        [FromQuery] StatusManutencaoSAP? statusSAP,
+        [FromQuery] StatusManutencao? status,
         [FromQuery] DateTime? dataInicio,
         [FromQuery] DateTime? dataFim)
     {
@@ -47,9 +47,9 @@ public class ManutencoesController : ControllerBase
             query = query.Where(m => m.Prioridade == prioridade.Value);
         }
 
-        if (statusSAP.HasValue)
+        if (status.HasValue)
         {
-            query = query.Where(m => m.StatusSAP == statusSAP.Value);
+            query = query.Where(m => m.Status == status.Value);
         }
 
         if (dataInicio.HasValue)
@@ -119,9 +119,8 @@ public class ManutencoesController : ControllerBase
             Prioridade = request.Prioridade,
             QuilometragemNoAto = request.QuilometragemNoAto,
             SolicitanteId = solicitanteId,
-            StatusSAP = StatusManutencaoSAP.Solicitada
+            Status = StatusManutencao.Agendada
         };
-        // Observações e centro de custo removidos do modelo; enriquecimento omitido
 
         _context.Manutencoes.Add(manutencao);
         await _context.SaveChangesAsync();
@@ -160,7 +159,8 @@ public class ManutencoesController : ControllerBase
             return NotFound(new { message = "Manutenção não encontrada" });
         }
 
-        // Status removido; endpoint mantém atualização de custo apenas
+        // Atualizar status
+        manutencao.Status = request.Status;
 
         if (request.Custo.HasValue)
         {
@@ -189,64 +189,6 @@ public class ManutencoesController : ControllerBase
         return NoContent();
     }
 
-    [HttpPost("{id}/simular-proximo-status")]
-    public async Task<ActionResult<Manutencao>> SimularProximoStatus(Guid id)
-    {
-        var manutencao = await _context.Manutencoes
-            .Include(m => m.Veiculo)
-            .FirstOrDefaultAsync(m => m.Id == id);
-            
-        if (manutencao == null) return NotFound();
-        
-        // Não permitir avançar se já está finalizada
-        if (manutencao.StatusSAP == StatusManutencaoSAP.Finalizada)
-            return BadRequest(new { message = "Manutenção já está finalizada" });
-
-        var proximoStatus = ObterProximoStatus(manutencao.StatusSAP);
-        manutencao.StatusSAP = proximoStatus;
-        // Progresso removido; progresso calculado no frontend
-        
-        if (proximoStatus == StatusManutencaoSAP.OrdemCriada && string.IsNullOrEmpty(manutencao.NumeroOrdemSAP))
-        {
-            manutencao.NumeroOrdemSAP = $"OS-{DateTime.UtcNow.Year}-{Random.Shared.Next(100, 999)}";
-            manutencao.FornecedorSAP = "Oficina Central";
-        }
-
-        await _context.SaveChangesAsync();
-        
-        // Retornar dados atualizados
-        return Ok(manutencao);
-    }
-
-    private StatusManutencaoSAP? ObterProximoStatus(StatusManutencaoSAP? atual)
-    {
-        // Sequência: Solicitada -> Aprovada -> EnviadaSAP -> ProcessandoSAP -> OrdemCriada -> EmExecucao -> Finalizada
-        return atual switch
-        {
-            StatusManutencaoSAP.Solicitada => StatusManutencaoSAP.Aprovada,
-            StatusManutencaoSAP.Aprovada => StatusManutencaoSAP.EnviadaSAP,
-            StatusManutencaoSAP.EnviadaSAP => StatusManutencaoSAP.ProcessandoSAP,
-            StatusManutencaoSAP.ProcessandoSAP => StatusManutencaoSAP.OrdemCriada,
-            StatusManutencaoSAP.OrdemCriada => StatusManutencaoSAP.EmExecucao,
-            StatusManutencaoSAP.EmExecucao => StatusManutencaoSAP.Finalizada,
-            _ => atual
-        };
-    }
-
-    private int CalcularProgresso(StatusManutencaoSAP? status)
-    {
-        return status switch
-        {
-            StatusManutencaoSAP.Solicitada => 10,
-            StatusManutencaoSAP.Aprovada => 25,
-            StatusManutencaoSAP.EnviadaSAP => 40,
-            StatusManutencaoSAP.ProcessandoSAP => 55,
-            StatusManutencaoSAP.OrdemCriada => 70,
-            StatusManutencaoSAP.EmExecucao => 85,
-            StatusManutencaoSAP.Finalizada => 100,
-            _ => 0
-        };
-    }
 }
 
 public record ManutencaoRequest(

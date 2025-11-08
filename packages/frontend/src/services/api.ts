@@ -233,11 +233,6 @@ export const createManutencao = async (data: {
   return response.data;
 };
 
-export const simularProximoStatusManutencao = async (id: string) => {
-  const response = await api.post(`/manutencoes/${id}/simular-proximo-status`);
-  return response.data;
-};
-
 export const updateManutencao = async (id: string, data: {
   veiculoId: string;
   tipo: string;

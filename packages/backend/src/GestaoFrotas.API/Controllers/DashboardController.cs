@@ -48,9 +48,13 @@ public class DashboardController : ControllerBase
             
             var taxaConclusao = totalCondutoresAtivos > 0 ? (condutoresQueEnviaramChecklist * 100) / totalCondutoresAtivos : 0;
 
-            // KPI 3: Manutenções (baseado em StatusSAP)
-            var manutencoesAtivas = await _context.Manutencoes
-                .Where(m => m.StatusSAP != null && m.StatusSAP != StatusManutencaoSAP.Finalizada)
+            // KPI 3: Manutenções
+            var manutencoesAgendadas = await _context.Manutencoes
+                .Where(m => m.Status == StatusManutencao.Agendada)
+                .CountAsync();
+
+            var manutencoesEmAndamento = await _context.Manutencoes
+                .Where(m => m.Status == StatusManutencao.EmAndamento)
                 .CountAsync();
             
             var manutencoesAtrasadas = await _context.Veiculos
@@ -166,7 +170,8 @@ public class DashboardController : ControllerBase
                     },
                     manutencoes = new
                     {
-                        ativas = manutencoesAtivas,
+                        agendadas = manutencoesAgendadas,
+                        emAndamento = manutencoesEmAndamento,
                         atrasadas = manutencoesAtrasadas
                     },
                     custos = new

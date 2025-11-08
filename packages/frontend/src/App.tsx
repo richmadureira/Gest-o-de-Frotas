@@ -14,7 +14,6 @@ import Drivers from './pages/Drivers'; // Certifique-se de que a grafia correspo
 import ReportDetails from './pages/ReportDetails'; // Importa a nova página de detalhes do relatório
  // Importa a nova página de configurações
 import Maintenance from './pages/Maintenance';
-import MaintenanceSAP from './pages/MaintenanceSAP'; 
 import Sidebar from './components/Sidebar';
 import { useAuth } from './components/AuthContext';
 import LogoutIcon from '@mui/icons-material/ExitToApp';

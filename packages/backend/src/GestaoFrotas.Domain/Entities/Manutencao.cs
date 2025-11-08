@@ -27,29 +27,15 @@ public class Manutencao : EntidadeBase
     /// </summary>
     public decimal? Custo { get; set; }
 
-    // Campos removidos: Status e AgendadoPara (fluxo controlado via StatusSAP)
+    /// <summary>
+    /// Status atual da manutenção
+    /// </summary>
+    public StatusManutencao Status { get; set; } = StatusManutencao.Agendada;
 
     /// <summary>
     /// Data e hora em que a manutenção foi concluída
     /// </summary>
     public DateTime? ConcluidoEm { get; set; }
-
-    /// <summary>
-    /// Número da ordem de serviço no SAP
-    /// </summary>
-    public string? NumeroOrdemSAP { get; set; }
-
-    /// <summary>
-    /// Fornecedor responsável pela manutenção no SAP
-    /// </summary>
-    public string? FornecedorSAP { get; set; }
-
-    /// <summary>
-    /// Status atual da manutenção no SAP
-    /// </summary>
-    public StatusManutencaoSAP? StatusSAP { get; set; }
-
-    // Campo removido: Progresso (calculado no front a partir de StatusSAP)
 
     /// <summary>
     /// Prioridade atribuída à manutenção (Baixa, Média, Alta, Urgente)

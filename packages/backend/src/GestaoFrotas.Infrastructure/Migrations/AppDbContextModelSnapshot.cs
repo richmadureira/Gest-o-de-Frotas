@@ -190,12 +190,6 @@ namespace GestaoFrotas.Infrastructure.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("nvarchar(1000)");
 
-                    b.Property<string>("FornecedorSAP")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("NumeroOrdemSAP")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Prioridade")
                         .IsRequired()
                         .HasMaxLength(10)
@@ -207,7 +201,7 @@ namespace GestaoFrotas.Infrastructure.Migrations
                     b.Property<Guid?>("SolicitanteId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("StatusSAP")
+                    b.Property<int>("Status")
                         .HasColumnType("int");
 
                     b.Property<string>("Tipo")

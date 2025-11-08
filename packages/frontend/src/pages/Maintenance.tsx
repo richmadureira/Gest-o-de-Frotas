@@ -34,6 +34,7 @@ import { Add, Edit, Delete, Visibility, Build, Assignment, CheckCircle, Schedule
 import HomeIcon from '@mui/icons-material/Home';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { SelectChangeEvent } from '@mui/material';
+import { useAuth } from '../components/AuthContext';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { 
   getVeiculo, 
@@ -60,9 +61,11 @@ interface Manutencao {
   descricao: string;
   custo?: number;
   status: string; // "Agendada" | "EmAndamento" | "Concluida" | "Cancelada"
-  agendadoPara: string;
+  prioridade: string;
+  quilometragemNoAto?: number;
   concluidoEm?: string;
   criadoEm: string;
+  atualizadoEm?: string;
 }
 
 type ManutencaoFormData = {
@@ -79,6 +82,7 @@ type ManutencaoErrors = Partial<Record<keyof ManutencaoFormData, string>>;
 function Manutencoes() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { userRole } = useAuth();
   
   // Estados para dados da API
   const [manutencoes, setManutencoes] = useState<Manutencao[]>([]);
@@ -519,16 +523,26 @@ function Manutencoes() {
                 </TableCell>
                 <TableCell>{manutencao.custo ? `R$ ${manutencao.custo.toFixed(2)}` : '-'}</TableCell>
                 <TableCell align="right">
-                  <Tooltip title="Editar">
-                    <IconButton color="primary" onClick={() => handleOpenDialog(manutencao)}>
-                      <Edit />
-                    </IconButton>
-                  </Tooltip>
-                  <Tooltip title="Excluir">
-                    <IconButton color="error" onClick={() => handleDeleteClick(manutencao)}>
-                      <Delete />
-                    </IconButton>
-                  </Tooltip>
+                  <Box sx={{ display: 'flex', gap: 0.5, justifyContent: 'flex-end' }}>
+                    <Tooltip title="Editar">
+                      <IconButton color="primary" onClick={() => handleOpenDialog(manutencao)}>
+                        <Edit />
+                      </IconButton>
+                    </Tooltip>
+                    <Tooltip title={
+                      userRole !== 'admin' ? 'Apenas Administradores podem excluir manutenções' : 'Excluir'
+                    }>
+                      <span>
+                        <IconButton 
+                          color="error" 
+                          onClick={() => handleDeleteClick(manutencao)}
+                          disabled={userRole !== 'admin'}
+                        >
+                          <Delete />
+                        </IconButton>
+                      </span>
+                    </Tooltip>
+                  </Box>
                 </TableCell>
               </TableRow>
             ))}
