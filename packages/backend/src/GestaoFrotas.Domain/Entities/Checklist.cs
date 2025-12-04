@@ -83,11 +83,6 @@ public class Checklist : EntidadeBase
     /// </summary>
     public string? Observacoes { get; set; }
 
-    /// <summary>
-    /// Indica se o checklist foi enviado pelo condutor
-    /// </summary>
-    public bool Enviado { get; set; } = false;
-
     // Navigation Properties
 
     /// <summary>

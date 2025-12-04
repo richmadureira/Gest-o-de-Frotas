@@ -71,7 +71,6 @@ public class ChecklistsController : ControllerBase
                     c.ImagemFreios,
                     c.ImagemOutrasAvarias,
                     c.Observacoes,
-                    c.Enviado,
                     Veiculo = new
                     {
                         c.Veiculo.Id,
@@ -112,7 +111,7 @@ public class ChecklistsController : ControllerBase
                 .ToListAsync();
                 
             var totalHoje = checklistsHoje.Count;
-            var enviados = checklistsHoje.Count(c => c.Enviado);
+            var enviados = checklistsHoje.Count;
             
             // Avarias não resolvidas (checklists com avarias detectadas nos últimos 7 dias)
             var avariasNaoResolvidas = await _context.Checklists
@@ -181,8 +180,7 @@ public class ChecklistsController : ControllerBase
         var checklistVeiculoHoje = await _context.Checklists
             .AnyAsync(c => c.VeiculoId == request.VeiculoId 
                         && c.Data >= hoje 
-                        && c.Data < amanha
-                        && c.Enviado);
+                        && c.Data < amanha);
 
         if (checklistVeiculoHoje)
         {
@@ -203,8 +201,7 @@ public class ChecklistsController : ControllerBase
             ImagemLuzes = request.ImagemLuzes,
             ImagemFreios = request.ImagemFreios,
             ImagemOutrasAvarias = request.ImagemOutrasAvarias,
-            Observacoes = request.Observacoes,
-            Enviado = true // Marca como enviado ao criar
+            Observacoes = request.Observacoes
         };
 
         _context.Checklists.Add(checklist);
@@ -226,8 +223,7 @@ public class ChecklistsController : ControllerBase
             .Include(c => c.Veiculo)
             .Where(c => c.MotoristaId == motoristaId 
                      && c.Data >= hoje 
-                     && c.Data < amanha
-                     && c.Enviado)
+                     && c.Data < amanha)
             .OrderByDescending(c => c.Data)
             .Select(c => new
             {
@@ -270,8 +266,7 @@ public class ChecklistsController : ControllerBase
             .Include(c => c.Veiculo)
             .Where(c => c.VeiculoId == veiculoId 
                      && c.Data >= hoje 
-                     && c.Data < amanha
-                     && c.Enviado)
+                     && c.Data < amanha)
             .OrderByDescending(c => c.Data)
             .FirstOrDefaultAsync();
         
@@ -349,8 +344,7 @@ public class ChecklistsController : ControllerBase
                 .Include(c => c.Motorista)
                 .Where(c => c.VeiculoId == veiculoId 
                          && c.Data >= hoje 
-                         && c.Data < amanha
-                         && c.Enviado)
+                         && c.Data < amanha)
                 .FirstOrDefaultAsync();
             
             if (checklistExistente != null)

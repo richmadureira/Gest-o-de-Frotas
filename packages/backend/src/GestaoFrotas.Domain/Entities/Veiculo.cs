@@ -47,11 +47,6 @@ public class Veiculo : EntidadeBase
     /// </summary>
     public DateTime? UltimaManutencao { get; set; }
 
-    /// <summary>
-    /// Data prevista para próxima manutenção
-    /// </summary>
-    public DateTime? ProximaManutencao { get; set; }
-
     // Navigation Properties
 
     /// <summary>

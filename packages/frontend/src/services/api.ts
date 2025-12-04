@@ -215,8 +215,6 @@ export const getManutencao = async (id: string) => {
 export const createManutencao = async (data: {
   veiculoId: string;
   tipo: string;
-  prioridade: string;
-  quilometragemNoAto?: number;
   descricao: string;
   custo?: number;
 }) => {
@@ -224,8 +222,6 @@ export const createManutencao = async (data: {
   const backendData = {
     VeiculoId: data.veiculoId,
     Tipo: data.tipo,
-    Prioridade: data.prioridade,
-    QuilometragemNoAto: data.quilometragemNoAto,
     Descricao: data.descricao,
     Custo: data.custo
   };
@@ -236,16 +232,12 @@ export const createManutencao = async (data: {
 export const updateManutencao = async (id: string, data: {
   veiculoId: string;
   tipo: string;
-  prioridade: string;
-  quilometragemNoAto?: number;
   descricao: string;
   custo?: number;
 }) => {
   const backendData = {
     VeiculoId: data.veiculoId,
     Tipo: data.tipo,
-    Prioridade: data.prioridade,
-    QuilometragemNoAto: data.quilometragemNoAto,
     Descricao: data.descricao,
     Custo: data.custo
   };

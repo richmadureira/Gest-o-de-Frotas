@@ -46,10 +46,6 @@ public class ChecklistConfiguration : IEntityTypeConfiguration<Checklist>
         builder.Property(c => c.Observacoes)
             .HasMaxLength(1000);
 
-        builder.Property(c => c.Enviado)
-            .IsRequired()
-            .HasDefaultValue(false);
-
         // Valores padrão
         builder.Property(c => c.Data)
             .HasDefaultValueSql("GETUTCDATE()");

@@ -42,7 +42,6 @@ namespace GestaoFrotas.API.Middleware
                         usuarioNome,
                         "LOGIN",
                         "Usuario",
-                        usuarioId,
                         string.Empty,
                         ipAddress ?? string.Empty,
                         userAgent ?? string.Empty
@@ -79,7 +78,6 @@ namespace GestaoFrotas.API.Middleware
                             usuarioNome,
                             acao,
                             entidade,
-                            string.Empty, // EntidadeId poderia ser extraído da URL
                             string.Empty, // Changes - requer implementação mais complexa
                             ipAddress ?? string.Empty,
                             userAgent ?? string.Empty

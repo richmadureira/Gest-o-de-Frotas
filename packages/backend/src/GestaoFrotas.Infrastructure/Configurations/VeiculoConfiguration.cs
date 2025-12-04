@@ -39,9 +39,6 @@ public class VeiculoConfiguration : IEntityTypeConfiguration<Veiculo>
         builder.Property(v => v.UltimaManutencao)
             .IsRequired(false);
 
-        builder.Property(v => v.ProximaManutencao)
-            .IsRequired(false);
-
         // Índices únicos
         builder.HasIndex(v => v.Placa)
             .IsUnique();

@@ -41,7 +41,7 @@ public class DashboardController : ControllerBase
             
             // Condutores únicos que enviaram checklist hoje (não importa quantos checklists)
             var condutoresQueEnviaramChecklist = await _context.Checklists
-                .Where(c => c.Data >= hoje && c.Data < hoje.AddDays(1) && c.Enviado)
+                .Where(c => c.Data >= hoje && c.Data < hoje.AddDays(1))
                 .Select(c => c.MotoristaId)
                 .Distinct()
                 .CountAsync();
@@ -55,10 +55,6 @@ public class DashboardController : ControllerBase
 
             var manutencoesEmAndamento = await _context.Manutencoes
                 .Where(m => m.Status == StatusManutencao.EmAndamento)
-                .CountAsync();
-            
-            var manutencoesAtrasadas = await _context.Veiculos
-                .Where(v => v.ProximaManutencao.HasValue && v.ProximaManutencao.Value < hoje)
                 .CountAsync();
 
             // KPI 4: Custos do Mês (baseado em data de criação)
@@ -83,22 +79,6 @@ public class DashboardController : ControllerBase
                 .Take(5)
                 .ToListAsync();
 
-            // Alertas: Manutenções Atrasadas
-            var veiculosManutencaoAtrasada = await _context.Veiculos
-                .Where(v => v.ProximaManutencao.HasValue && 
-                           v.ProximaManutencao.Value < hoje)
-                .Select(v => new
-                {
-                    id = v.Id,
-                    placa = v.Placa,
-                    modelo = v.Modelo,
-                    proximaManutencao = v.ProximaManutencao,
-                    diasAtraso = EF.Functions.DateDiffDay(v.ProximaManutencao!.Value, hoje)
-                })
-                .OrderByDescending(v => v.diasAtraso)
-                .Take(5)
-                .ToListAsync();
-
             // Alertas: Checklists Pendentes (condutores que não enviaram checklist hoje)
             var condutoresAtivos = await _context.Usuarios
                 .Where(u => u.Papel == PapelUsuario.Condutor && u.Ativo)
@@ -106,7 +86,7 @@ public class DashboardController : ControllerBase
                 .ToListAsync();
 
             var condutoresComChecklist = await _context.Checklists
-                .Where(c => c.Data >= hoje && c.Data < hoje.AddDays(1) && c.Enviado)
+                .Where(c => c.Data >= hoje && c.Data < hoje.AddDays(1))
                 .Select(c => c.MotoristaId)
                 .Distinct()
                 .ToListAsync();
@@ -124,7 +104,7 @@ public class DashboardController : ControllerBase
 
             // Tendências: Condutores únicos que enviaram checklists nos últimos 7 dias
             var checklistsSemana = await _context.Checklists
-                .Where(c => c.Data >= inicioSemana && c.Enviado)
+                .Where(c => c.Data >= inicioSemana)
                 .GroupBy(c => c.Data.Date)
                 .Select(g => new
                 {
@@ -171,8 +151,7 @@ public class DashboardController : ControllerBase
                     manutencoes = new
                     {
                         agendadas = manutencoesAgendadas,
-                        emAndamento = manutencoesEmAndamento,
-                        atrasadas = manutencoesAtrasadas
+                        emAndamento = manutencoesEmAndamento
                     },
                     custos = new
                     {
@@ -182,7 +161,6 @@ public class DashboardController : ControllerBase
                 alertas = new
                 {
                     cnhVencidas = condutoresCnhVencida,
-                    manutencoesAtrasadas = veiculosManutencaoAtrasada,
                     checklistsPendentes = checklistsPendentes
                 },
                 tendencias = new

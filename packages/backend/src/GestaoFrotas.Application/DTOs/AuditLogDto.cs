@@ -9,7 +9,6 @@ namespace GestaoFrotas.Application.DTOs
         public string UsuarioNome { get; set; } = string.Empty;
         public string Acao { get; set; } = string.Empty;
         public string Entidade { get; set; } = string.Empty;
-        public string? EntidadeId { get; set; }
         public string? ValoresAntigos { get; set; }
         public string? ValoresNovos { get; set; }
         public DateTime DataHora { get; set; }

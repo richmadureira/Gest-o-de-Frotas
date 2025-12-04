@@ -50,7 +50,6 @@ interface ChecklistItem {
   imagemFreios?: string;
   imagemOutrasAvarias?: string;
   observacoes?: string;
-  enviado: boolean;
   veiculo?: Veiculo;
   motorista?: Usuario;
 }

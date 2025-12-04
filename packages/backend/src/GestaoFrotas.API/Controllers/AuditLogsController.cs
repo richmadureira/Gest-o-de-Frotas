@@ -71,7 +71,6 @@ namespace GestaoFrotas.API.Controllers
                     UsuarioNome = a.UsuarioNome,
                     Acao = a.Acao,
                     Entidade = a.Entidade,
-                    EntidadeId = a.EntidadeId,
                     ValoresAntigos = a.ValoresAntigos,
                     ValoresNovos = a.ValoresNovos,
                     DataHora = a.DataHora,

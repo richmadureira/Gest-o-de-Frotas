@@ -99,8 +99,7 @@ public class VeiculosController : ControllerBase
             Tipo = request.Tipo,
             Status = request.Status ?? StatusVeiculo.Disponivel,
             Quilometragem = request.Quilometragem,
-            UltimaManutencao = request.UltimaManutencao,
-            ProximaManutencao = request.ProximaManutencao
+            UltimaManutencao = request.UltimaManutencao
         };
 
         _context.Veiculos.Add(veiculo);
@@ -134,7 +133,6 @@ public class VeiculosController : ControllerBase
         veiculo.Status = request.Status ?? veiculo.Status;
         veiculo.Quilometragem = request.Quilometragem;
         veiculo.UltimaManutencao = request.UltimaManutencao;
-        veiculo.ProximaManutencao = request.ProximaManutencao;
 
         await _context.SaveChangesAsync();
 
@@ -201,7 +199,6 @@ public class VeiculosController : ControllerBase
                 c.Freios,
                 c.Limpeza,
                 c.Observacoes,
-                c.Enviado,
                 TemAvarias = !c.Pneus || !c.Luzes || !c.Freios || !c.Limpeza
             })
             .ToListAsync();
@@ -214,10 +211,8 @@ public class VeiculosController : ControllerBase
             {
                 m.Id,
                 m.Tipo,
-                m.Prioridade,
                 Status = m.Status,
                 m.Descricao,
-                m.QuilometragemNoAto,
                 m.Custo,
                 m.CriadoEm,
                 m.AtualizadoEm
@@ -232,7 +227,7 @@ public class VeiculosController : ControllerBase
         var ultimaManutencao = manutencoes.FirstOrDefault();
         
         // Estatísticas de checklists
-        var checklistsEnviados = checklists.Count(c => c.Enviado);
+        var checklistsEnviados = checklists.Count;
         
         // Estatísticas de manutenções
         var manutencoesAgendadas = manutencoes.Count(m => m.Status == StatusManutencao.Agendada);
@@ -290,8 +285,7 @@ public class VeiculosController : ControllerBase
                 veiculo.Tipo,
                 veiculo.Status,
                 veiculo.Quilometragem,
-                veiculo.UltimaManutencao,
-                veiculo.ProximaManutencao
+                veiculo.UltimaManutencao
             },
             Checklists = checklists,
             Manutencoes = manutencoes,
@@ -328,6 +322,5 @@ public record VeiculoRequest(
     TipoVeiculo Tipo,
     StatusVeiculo? Status,
     int? Quilometragem,
-    DateTime? UltimaManutencao,
-    DateTime? ProximaManutencao
+    DateTime? UltimaManutencao
 );

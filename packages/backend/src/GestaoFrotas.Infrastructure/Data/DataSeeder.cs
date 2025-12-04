@@ -134,8 +134,7 @@ public static class DataSeeder
                 Tipo = TipoVeiculo.Carro,
                 Status = StatusVeiculo.Disponivel,
                 Quilometragem = 42000,
-                UltimaManutencao = hoje.AddDays(-45),
-                ProximaManutencao = hoje.AddDays(30) // Manutenção daqui 30 dias
+                UltimaManutencao = hoje.AddDays(-45)
             },
 
             // Carro Em Manutenção - Quilometragem alta, manutenção em andamento
@@ -148,8 +147,7 @@ public static class DataSeeder
                 Tipo = TipoVeiculo.Carro,
                 Status = StatusVeiculo.EmManutencao,
                 Quilometragem = 145000,
-                UltimaManutencao = hoje.AddDays(-90),
-                ProximaManutencao = hoje.AddDays(-15) // Manutenção atrasada
+                UltimaManutencao = hoje.AddDays(-90)
             },
 
             // Carro Disponível - Quilometragem baixa, recém mantido
@@ -162,8 +160,7 @@ public static class DataSeeder
                 Tipo = TipoVeiculo.Carro,
                 Status = StatusVeiculo.Disponivel,
                 Quilometragem = 28000,
-                UltimaManutencao = hoje.AddDays(-15),
-                ProximaManutencao = hoje.AddDays(75) // Bem mantido
+                UltimaManutencao = hoje.AddDays(-15)
             },
 
             // Carro Inativo - Quilometragem muito alta, aguardando decisão
@@ -176,8 +173,7 @@ public static class DataSeeder
                 Tipo = TipoVeiculo.Carro,
                 Status = StatusVeiculo.Inativo,
                 Quilometragem = 320000,
-                UltimaManutencao = hoje.AddDays(-180),
-                ProximaManutencao = null // Sem manutenção programada (inativo)
+                UltimaManutencao = hoje.AddDays(-180)
             },
 
             // ----------------------------------------
@@ -194,8 +190,7 @@ public static class DataSeeder
                 Tipo = TipoVeiculo.Motocicleta,
                 Status = StatusVeiculo.Disponivel,
                 Quilometragem = 22000,
-                UltimaManutencao = hoje.AddDays(-60),
-                ProximaManutencao = hoje.AddDays(30)
+                UltimaManutencao = hoje.AddDays(-60)
             },
 
             // Motocicleta Disponível - Quilometragem baixa, manutenção ATRASADA (para alerta)
@@ -208,8 +203,7 @@ public static class DataSeeder
                 Tipo = TipoVeiculo.Motocicleta,
                 Status = StatusVeiculo.Disponivel,
                 Quilometragem = 15000,
-                UltimaManutencao = hoje.AddDays(-120),
-                ProximaManutencao = hoje.AddDays(-20) // Atrasada há 20 dias - ALERTA!
+                UltimaManutencao = hoje.AddDays(-120)
             }
         };
 
@@ -253,8 +247,7 @@ public static class DataSeeder
             ImagemPneus = "/uploads/checklist-pneus-002.jpg",
             ImagemLuzes = "/uploads/checklist-luzes-001.jpg",
             ImagemFreios = "/uploads/checklist-freios-001.jpg",
-            Observacoes = "ATENÇÃO: Múltiplos problemas detectados. Pneus carecas, faróis queimados e pastilhas de freio gastas. Veículo necessita manutenção imediata!",
-            Enviado = true
+            Observacoes = "ATENÇÃO: Múltiplos problemas detectados. Pneus carecas, faróis queimados e pastilhas de freio gastas. Veículo necessita manutenção imediata!"
         });
 
         // ----------------------------------------
@@ -274,8 +267,7 @@ public static class DataSeeder
             Luzes = true,
             Freios = true,
             Limpeza = false, // Problema de limpeza
-            Observacoes = "Veículo necessita lavagem interna e externa.",
-            Enviado = true
+            Observacoes = "Veículo necessita lavagem interna e externa."
         });
 
         checklists.Add(new Checklist
@@ -288,8 +280,7 @@ public static class DataSeeder
             Pneus = true,
             Luzes = true,
             Freios = true,
-            Limpeza = true,
-            Enviado = true
+            Limpeza = true
         });
 
         // Dia -2
@@ -303,8 +294,7 @@ public static class DataSeeder
             Pneus = true,
             Luzes = true,
             Freios = true,
-            Limpeza = true,
-            Enviado = true
+            Limpeza = true
         });
 
         // Dia -3
@@ -320,8 +310,7 @@ public static class DataSeeder
             Freios = true,
             Limpeza = true,
             ImagemLuzes = "/uploads/checklist-luzes-002.jpg",
-            Observacoes = "Lanterna traseira direita queimada.",
-            Enviado = true
+            Observacoes = "Lanterna traseira direita queimada."
         });
 
         // Dia -4
@@ -335,8 +324,7 @@ public static class DataSeeder
             Pneus = true,
             Luzes = true,
             Freios = true,
-            Limpeza = true,
-            Enviado = true
+            Limpeza = true
         });
 
         // Dia -5
@@ -350,8 +338,7 @@ public static class DataSeeder
             Pneus = true,
             Luzes = true,
             Freios = true,
-            Limpeza = true,
-            Enviado = true
+            Limpeza = true
         });
 
         // Dia -6
@@ -365,8 +352,7 @@ public static class DataSeeder
             Pneus = true,
             Luzes = true,
             Freios = true,
-            Limpeza = true,
-            Enviado = true
+            Limpeza = true
         });
 
         // Dia -7
@@ -380,8 +366,7 @@ public static class DataSeeder
             Pneus = true,
             Luzes = true,
             Freios = true,
-            Limpeza = true,
-            Enviado = true
+            Limpeza = true
         });
 
         context.Checklists.AddRange(checklists);
@@ -417,8 +402,7 @@ public static class DataSeeder
                 QuilometragemNoAto = 35000,
                 SolicitanteId = condutor.Id,
                 Status = StatusManutencao.Agendada,
-                Custo = null,
-                ConcluidoEm = null,
+                Custo = null
             },
 
             // ----------------------------------------
@@ -433,8 +417,7 @@ public static class DataSeeder
                 QuilometragemNoAto = 42085,
                 SolicitanteId = gestor.Id,
                 Status = StatusManutencao.EmAndamento,
-                Custo = null,
-                ConcluidoEm = null,
+                Custo = null
             },
 
             // ----------------------------------------
@@ -449,8 +432,7 @@ public static class DataSeeder
                 QuilometragemNoAto = 75000,
                 SolicitanteId = gestor.Id,
                 Status = StatusManutencao.EmAndamento,
-                Custo = null,
-                ConcluidoEm = null,
+                Custo = null
             },
 
             // ----------------------------------------
@@ -465,8 +447,7 @@ public static class DataSeeder
                 QuilometragemNoAto = 145230,
                 SolicitanteId = gestor.Id,
                 Status = StatusManutencao.EmAndamento,
-                Custo = null,
-                ConcluidoEm = null,
+                Custo = null
             },
 
             // ----------------------------------------
@@ -481,8 +462,7 @@ public static class DataSeeder
                 QuilometragemNoAto = 28000,
                 SolicitanteId = gestor.Id,
                 Status = StatusManutencao.EmAndamento,
-                Custo = null,
-                ConcluidoEm = null,
+                Custo = null
             },
 
             // ----------------------------------------
@@ -497,8 +477,7 @@ public static class DataSeeder
                 QuilometragemNoAto = 145150,
                 SolicitanteId = gestor.Id,
                 Status = StatusManutencao.EmAndamento,
-                Custo = null,
-                ConcluidoEm = null,
+                Custo = null
             },
 
             // ----------------------------------------
@@ -513,8 +492,7 @@ public static class DataSeeder
                 QuilometragemNoAto = 27850,
                 SolicitanteId = gestor.Id,
                 Status = StatusManutencao.Concluida,
-                Custo = 850.00m,
-                ConcluidoEm = hoje.AddDays(-15),
+                Custo = 850.00m
             },
 
             // ----------------------------------------
@@ -529,8 +507,7 @@ public static class DataSeeder
                 QuilometragemNoAto = 74500,
                 SolicitanteId = gestor.Id,
                 Status = StatusManutencao.Concluida,
-                Custo = 2450.00m,
-                ConcluidoEm = hoje.AddDays(-45),
+                Custo = 2450.00m
             }
         };
 

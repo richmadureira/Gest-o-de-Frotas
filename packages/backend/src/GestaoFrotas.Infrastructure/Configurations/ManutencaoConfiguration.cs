@@ -31,21 +31,18 @@ public class ManutencaoConfiguration : IEntityTypeConfiguration<Manutencao>
             .HasColumnType("decimal(18,2)")
             .IsRequired(false);
 
-        builder.Property(m => m.ConcluidoEm)
-            .IsRequired(false);
-
         // Conversões de enum para string
         builder.Property(m => m.Tipo)
             .HasConversion<string>()
             .HasMaxLength(20);
 
-        // Campo Status removido; usar somente StatusSAP
+        builder.Property(m => m.Status)
+            .HasConversion<string>()
+            .HasMaxLength(20);
 
         builder.Property(m => m.Prioridade)
             .HasConversion<string>()
             .HasMaxLength(10);
-
-        // Campos CentroCusto e Observacoes removidos
 
         builder.Property(m => m.QuilometragemNoAto)
             .IsRequired(false);
@@ -61,7 +58,6 @@ public class ManutencaoConfiguration : IEntityTypeConfiguration<Manutencao>
 
         // Índices para performance
         builder.HasIndex(m => m.VeiculoId);
-        // Índices removidos: AgendadoPara e Status
         builder.HasIndex(m => m.Tipo);
         builder.HasIndex(m => m.Prioridade);
     }

@@ -33,11 +33,6 @@ public class Manutencao : EntidadeBase
     public StatusManutencao Status { get; set; } = StatusManutencao.Agendada;
 
     /// <summary>
-    /// Data e hora em que a manutenção foi concluída
-    /// </summary>
-    public DateTime? ConcluidoEm { get; set; }
-
-    /// <summary>
     /// Prioridade atribuída à manutenção (Baixa, Média, Alta, Urgente)
     /// </summary>
     public PrioridadeManutencao Prioridade { get; set; } = PrioridadeManutencao.Media;
@@ -46,8 +41,6 @@ public class Manutencao : EntidadeBase
     /// Quilometragem registrada no momento da abertura da manutenção
     /// </summary>
     public int? QuilometragemNoAto { get; set; }
-
-    // Campos removidos: CentroCusto e Observacoes
 
     /// <summary>
     /// Usuário que abriu a solicitação (solicitante)

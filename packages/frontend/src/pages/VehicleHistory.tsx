@@ -31,7 +31,6 @@ import {
   BarChart as BarChartIcon,
   CheckCircle,
   Cancel,
-  HourglassEmpty,
 } from '@mui/icons-material';
 import { getVeiculoHistorico } from '../services/api';
 import { format } from 'date-fns';
@@ -339,12 +338,9 @@ const VehicleHistory: React.FC = () => {
                 <TableRow>
                   <TableCell>Data</TableCell>
                   <TableCell>Tipo</TableCell>
-                  <TableCell>Prioridade</TableCell>
-                  <TableCell>Status SAP</TableCell>
+                  <TableCell>Status</TableCell>
                   <TableCell>Descrição</TableCell>
-                  <TableCell>KM</TableCell>
                   <TableCell>Custo</TableCell>
-                  <TableCell>Ordem SAP</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -353,13 +349,14 @@ const VehicleHistory: React.FC = () => {
                     <TableCell>{format(new Date(manutencao.criadoEm), 'dd/MM/yyyy')}</TableCell>
                     <TableCell>{manutencao.tipo}</TableCell>
                     <TableCell>
-                      <Chip label={manutencao.prioridade} size="small" />
-                    </TableCell>
-                    <TableCell>
                       <Chip 
-                        label={manutencao.statusSAP || 'N/A'} 
+                        label={manutencao.status || 'N/A'} 
                         size="small" 
-                        icon={<HourglassEmpty />}
+                        color={
+                          manutencao.status === 'Concluida' ? 'success' : 
+                          manutencao.status === 'EmAndamento' ? 'warning' : 
+                          'default'
+                        }
                       />
                     </TableCell>
                     <TableCell>
@@ -369,9 +366,7 @@ const VehicleHistory: React.FC = () => {
                         </Typography>
                       </Tooltip>
                     </TableCell>
-                    <TableCell>{manutencao.quilometragemNoAto?.toLocaleString() || '-'} km</TableCell>
                     <TableCell>R$ {manutencao.custo?.toFixed(2) || '0,00'}</TableCell>
-                    <TableCell>{manutencao.numeroOrdemSAP || '-'}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>

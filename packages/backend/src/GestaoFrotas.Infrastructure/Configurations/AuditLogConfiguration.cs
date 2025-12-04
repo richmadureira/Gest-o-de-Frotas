@@ -28,9 +28,6 @@ namespace GestaoFrotas.Infrastructure.Configurations
                 .IsRequired()
                 .HasMaxLength(100);
 
-            builder.Property(a => a.EntidadeId)
-                .HasMaxLength(450);
-
             builder.Property(a => a.DataHora)
                 .IsRequired();
 
@@ -44,7 +41,6 @@ namespace GestaoFrotas.Infrastructure.Configurations
             builder.HasIndex(a => a.UsuarioId);
             builder.HasIndex(a => a.Entidade);
             builder.HasIndex(a => a.DataHora);
-            builder.HasIndex(a => new { a.Entidade, a.EntidadeId });
         }
     }
 }

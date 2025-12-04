@@ -22,7 +22,6 @@ namespace GestaoFrotas.Infrastructure.Services
             string userName,
             string action,
             string entityName,
-            string entityId,
             string changes,
             string ipAddress,
             string userAgent)
@@ -34,7 +33,6 @@ namespace GestaoFrotas.Infrastructure.Services
                 UsuarioNome = userName,
                 Acao = action,
                 Entidade = entityName,
-                EntidadeId = entityId,
                 ValoresNovos = changes, // Using ValoresNovos for the changes
                 DataHora = DateTime.UtcNow,
                 IpAddress = ipAddress,
@@ -56,7 +54,6 @@ namespace GestaoFrotas.Infrastructure.Services
                     UsuarioNome = a.UsuarioNome,
                     Acao = a.Acao,
                     Entidade = a.Entidade,
-                    EntidadeId = a.EntidadeId,
                     ValoresAntigos = a.ValoresAntigos,
                     ValoresNovos = a.ValoresNovos,
                     DataHora = a.DataHora,

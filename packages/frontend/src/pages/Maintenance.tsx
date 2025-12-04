@@ -61,9 +61,6 @@ interface Manutencao {
   descricao: string;
   custo?: number;
   status: string; // "Agendada" | "EmAndamento" | "Concluida" | "Cancelada"
-  prioridade: string;
-  quilometragemNoAto?: number;
-  concluidoEm?: string;
   criadoEm: string;
   atualizadoEm?: string;
 }
@@ -71,8 +68,6 @@ interface Manutencao {
 type ManutencaoFormData = {
   veiculoId: string;
   tipo: string;
-  prioridade: string;
-  quilometragemNoAto?: number;
   descricao: string;
   custo?: number;
 };
@@ -105,7 +100,6 @@ function Manutencoes() {
   const [formData, setFormData] = useState<ManutencaoFormData>({ 
     veiculoId: '', 
     tipo: '', 
-    prioridade: 'Media',
     descricao: ''
   });
   const [editingRequest, setEditingRequest] = useState<Manutencao | null>(null);
@@ -207,7 +201,6 @@ function Manutencoes() {
               veiculoId: veiculoId,
               descricao: descricao || '',
               tipo: tipoManutencao || 'Corretiva',
-              prioridade: 'Media',
               custo: undefined
             });
           } catch (error) {
@@ -216,7 +209,6 @@ function Manutencoes() {
               veiculoId: '',
               descricao: descricao || '',
               tipo: tipoManutencao || 'Corretiva',
-              prioridade: 'Media',
               custo: undefined
             });
           }
@@ -304,13 +296,11 @@ function Manutencoes() {
     setFormData(request ? {
       veiculoId: request.veiculoId,
       tipo: request.tipo,
-      prioridade: 'Media',
       descricao: request.descricao,
       custo: request.custo
     } : { 
       veiculoId: '', 
       tipo: '', 
-      prioridade: 'Media',
       descricao: ''
     });
     setErrors({});
@@ -320,7 +310,7 @@ function Manutencoes() {
   const handleCloseDialog = () => {
     setOpenDialog(false);
     setEditingRequest(null);
-    setFormData({ veiculoId: '', tipo: '', prioridade: 'Media', descricao: '' });
+    setFormData({ veiculoId: '', tipo: '', descricao: '' });
     setErrors({});
   };
 
@@ -329,7 +319,6 @@ function Manutencoes() {
     
     if (!formData.veiculoId) newErrors.veiculoId = 'Veículo é obrigatório';
     if (!formData.tipo) newErrors.tipo = 'Tipo de manutenção é obrigatório';
-    if (!formData.prioridade) newErrors.prioridade = 'Prioridade é obrigatória';
     if (!formData.descricao) newErrors.descricao = 'Descrição é obrigatória';
     
     setErrors(newErrors);
