@@ -2,12 +2,12 @@
 
 Sistema completo de gestão de frotas com checklist veicular, desenvolvido como TCC Fatec 2024.
 
-## 🏗️ Arquitetura
+## Arquitetura
 
 Este projeto é organizado em **monorepo** com:
 
 - **Frontend**: React + TypeScript + Material-UI (porta 3000)
-- **Backend**: ASP.NET Core 8 Web API + Clean Architecture (porta 5000/5001)
+- **Backend**: ASP.NET Core 9.0 Web API + Clean Architecture (porta 5119)
 - **Banco de Dados**: SQL Server LocalDB ou SQL Server Express
 
 ## 📁 Estrutura do Projeto
@@ -26,15 +26,14 @@ gestao-frotas/
 │       │   ├── GestaoFrotas.Domain/        # Entities, Enums
 │       │   └── GestaoFrotas.Infrastructure/# DbContext, Repositories
 │       └── GestaoFrotas.sln
-├── checklist-veicular-ui/     # (Frontend original - será movido)
 └── README.md
 ```
 
-## 🚀 Pré-requisitos
+## Pré-requisitos
 
-### 1. .NET 8 SDK
-- Download: https://dotnet.microsoft.com/download/dotnet/8.0
-- Verificar: `dotnet --version` (deve mostrar 8.x.x)
+### 1. .NET 9.0 SDK
+- Download: https://dotnet.microsoft.com/download/dotnet/9.0
+- Verificar: `dotnet --version` (deve mostrar 9.x.x)
 
 ### 2. Node.js 18+
 - Download: https://nodejs.org/
@@ -53,25 +52,21 @@ Escolha uma opção:
 
 ## 📦 Instalação Rápida
 
-### Passo 1: Instalar .NET 8 SDK
+### Passo 1: Instalar .NET 9.0 SDK
 
 Se ainda não tiver o .NET instalado:
 
-1. Baixe o instalador do .NET 8 SDK
+1. Baixe o instalador do .NET 9.0 SDK
 2. Execute o instalador
 3. Reinicie o terminal
 4. Verifique: `dotnet --version`
 
-### Passo 2: Criar Projeto Backend
-
-Execute o script de setup (requer .NET instalado):
+### Passo 2: Restaurar Dependências Backend
 
 ```powershell
 cd packages\backend
-.\setup-backend.ps1
+dotnet restore
 ```
-
-**OU** execute manualmente os comandos em `packages/backend/SETUP.md`
 
 ### Passo 3: Configurar Banco de Dados
 
@@ -91,15 +86,12 @@ Edite `packages/backend/src/GestaoFrotas.API/appsettings.json`:
 - **SQL Server Express**: `Server=localhost\\SQLEXPRESS;Database=GestaoFrotas;Trusted_Connection=true;TrustServerCertificate=True`
 - **SQL Server com autenticação**: `Server=localhost;Database=GestaoFrotas;User Id=sa;Password=SuaSenha;TrustServerCertificate=True`
 
-### Passo 4: Criar e Aplicar Migrations
+### Passo 4: Aplicar Migrations
+
+As migrations são aplicadas automaticamente ao iniciar a aplicação. Se precisar aplicar manualmente:
 
 ```powershell
 cd packages\backend\src\GestaoFrotas.API
-
-# Criar migration
-dotnet ef migrations add InitialCreate --project ..\GestaoFrotas.Infrastructure
-
-# Aplicar ao banco
 dotnet ef database update --project ..\GestaoFrotas.Infrastructure
 ```
 
@@ -126,9 +118,8 @@ dotnet watch run
 ```
 
 ✅ Backend rodando em:
-- HTTP: http://localhost:5000
-- HTTPS: https://localhost:5001
-- Swagger: https://localhost:5001/swagger
+- HTTP: http://localhost:5119
+- Swagger: http://localhost:5119/swagger
 
 ### Iniciar Frontend (Terminal 2)
 
@@ -141,27 +132,32 @@ npm start
 
 ## 📚 Funcionalidades
 
-### ✅ Frontend (Implementado)
-- Dashboard com estatísticas
-- Gestão de veículos
-- Gestão de motoristas
-- Checklist veicular com upload de fotos
-- Relatórios e exportação (CSV/Excel)
-- Manutenções programadas
-- Autenticação com 3 perfis (Admin, Gestor, Condutor)
-- Interface responsiva (mobile/desktop)
+### ✅ Funcionalidades Implementadas
 
-### 🔄 Backend (Em Implementação)
-- [ ] API RESTful completa
-- [ ] Autenticação JWT
-- [ ] CRUD de Usuários/Motoristas
-- [ ] CRUD de Veículos
-- [ ] CRUD de Checklists
-- [ ] CRUD de Manutenções
-- [ ] Upload e armazenamento de imagens
-- [ ] Relatórios e estatísticas
-- [ ] Validações com FluentValidation
-- [ ] Logs com Serilog
+**Frontend:**
+- Dashboard com estatísticas e KPIs em tempo real
+- Gestão de veículos (CRUD completo)
+- Gestão de condutores/usuários (CRUD completo)
+- Checklist veicular diário com upload de fotos de avarias
+- Gestão de manutenções
+- Histórico de veículos (checklists e manutenções)
+- Relatórios e exportação (CSV/Excel)
+- Autenticação com 3 perfis (Administrador, Gestor, Condutor)
+- Logs de auditoria (apenas Administrador)
+- Interface responsiva (mobile/desktop)
+- PWA (Progressive Web App) com suporte offline
+
+**Backend:**
+- API RESTful completa
+- Autenticação JWT
+- CRUD de Usuários/Condutores
+- CRUD de Veículos
+- CRUD de Checklists
+- CRUD de Manutenções
+- Upload e armazenamento de imagens
+- Dashboard com estatísticas e relatórios
+- Sistema de auditoria (logs de ações)
+- Clean Architecture com separação de camadas
 
 ## 🛠️ Tecnologias
 
@@ -174,26 +170,22 @@ npm start
 - Date-fns
 
 **Backend:**
-- ASP.NET Core 8
-- Entity Framework Core 8
+- ASP.NET Core 9.0
+- Entity Framework Core 9.0
 - SQL Server
 - JWT Bearer Authentication
-- AutoMapper
-- FluentValidation
-- Serilog
+- BCrypt.Net (hash de senhas)
 - Swagger/OpenAPI
 
 ## 📖 Documentação Adicional
 
-- [Setup Completo do Backend](packages/backend/SETUP.md)
-- [Guia de Desenvolvimento](docs/DESENVOLVIMENTO.md) *(em breve)*
-- [Arquitetura do Sistema](docs/ARQUITETURA.md) *(em breve)*
-- [Documentação da API](docs/API.md) *(em breve)*
+- [Setup Completo do Backend](packages/backend/README.md)
+- Documentação da API disponível via Swagger: `http://localhost:5119/swagger`
 
 ## 🐛 Troubleshooting
 
 ### "dotnet não é reconhecido"
-- Instale o .NET 8 SDK
+- Instale o .NET 9.0 SDK
 - Reinicie o terminal
 - Adicione ao PATH se necessário
 
@@ -210,16 +202,24 @@ npm start
 - Use `npm install --legacy-peer-deps`
 - Delete `node_modules` e `package-lock.json` e tente novamente
 
-## 📝 Próximos Passos
+## 👤 Usuários de Teste
 
-1. ✅ Estrutura do monorepo
-2. 🔄 Criar entidades do domínio
-3. 🔄 Configurar DbContext e migrations
-4. 🔄 Implementar autenticação JWT
-5. 🔄 Criar controllers da API
-6. 🔄 Integrar frontend com backend
-7. 🔄 Testes
-8. 🔄 Deploy
+Após executar a aplicação, os seguintes usuários estarão disponíveis:
+
+### Administrador
+- **Email**: `admin@gestaodefrotas.com`
+- **Senha**: `123456` (deve ser alterada no primeiro login)
+- **Permissões**: Acesso total ao sistema, incluindo exclusão de registros e logs de auditoria
+
+### Gestor
+- **Email**: `gestor@gestaodefrotas.com`
+- **Senha**: `123456` (deve ser alterada no primeiro login)
+- **Permissões**: Gerenciar veículos, checklists e manutenções (sem exclusão)
+
+### Condutor
+- **Email**: `condutor@gestaodefrotas.com`
+- **Senha**: `123456` (deve ser alterada no primeiro login)
+- **Permissões**: Criar e visualizar checklists
 
 ## 👥 Equipe
 
